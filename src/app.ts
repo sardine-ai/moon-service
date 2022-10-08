@@ -1,14 +1,23 @@
+import 'reflect-metadata';
+import config from "./config";
 import express, { Application } from "express";
+import Logger from "./loaders/logger";
+import loader from "./loaders";
 
-require('dotenv').config();
+async function startServer() {
+  const app: Application = express();
+  await loader(app);
 
-const evmCommandsRouter = require('./src/routes/evmCommands.router');
-const PORT = process.env.PORT || 8000;
-const app: Application = express();
+  app.listen(config.port, () => {
+    Logger.info(`
+      ################################################
+      🛡️  Server listening on port: ${config.port} 🛡️
+      ################################################
+    `);
+  }).on('error', err => {
+    Logger.error(err);
+    process.exit(1);
+  });
+}
 
-app.get("/", async (_req, res) => {});
-app.use('/evm-commands', evmCommandsRouter);
-
-app.listen(PORT, () => {
-  console.log("Server is running on port", PORT);
-});
+startServer();
