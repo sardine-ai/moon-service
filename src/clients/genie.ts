@@ -1,5 +1,6 @@
 // Client built for the following api: https://v2.api.genie.xyz/docs/#/Assets/get_walletAssets
-var axios = require('axios');
+import axios from 'axios';
+import { BuyGenieNFTParams, GenieCallDataResponse } from '../types/genie';
 
 const BASE_URL = "https://v2.api.genie.xyz/";
 
@@ -9,13 +10,13 @@ export interface IGenieClient {
 
 export class GenieClient implements IGenieClient {
   async getCallData({ assetId, nftId, collectionName, marketplace, contractAddress, recepientAddress }: BuyGenieNFTParams): Promise<GenieCallDataResponse> {
-    var data = JSON.stringify({
+    const data = JSON.stringify({
       "buy": [
         {
             "address": contractAddress,
             "amount": 1,
             "collectionName": collectionName,
-            "id": `${contractAddress}-${assetId}`,
+            "id": `${contractAddress}-${nftId}`,
             "marketplace": marketplace,
             "name": `#${nftId}`,
             "symbol": assetId,
@@ -26,7 +27,7 @@ export class GenieClient implements IGenieClient {
       "sender": recepientAddress
     });
     
-    var config = {
+    const config = {
       method: 'post',
       url: BASE_URL + 'route',
       headers: { 
@@ -36,54 +37,7 @@ export class GenieClient implements IGenieClient {
       data : data
     };
     
-    let response = await axios(config);
-    return response;
+    const response = await axios(config);
+    return response.data;
   }
-}
-
-export interface BuyGenieNFTParams {
-  assetId: string,
-  nftId: string,
-  collectionName: string,
-  marketplace: string,
-  contractAddress: string,
-  recepientAddress: string
-}
-
-export interface GenieCallDataResponse {
-  valueToSend: string,
-  route: [
-    {
-      action: string,
-      marketplace: string,
-      amountIn: string,
-      assetIn: {
-        basePrice: string,
-        baseAsset: string,
-        ETHPrice: string
-      },
-      amountOut: string,
-      assetOut: {
-        address: string,
-        amount: string,
-        collectionName: string,
-        id: string,
-        marketplace: string,
-        name: string,
-        symbol: string,
-        tokenId: string,
-        tokenType: string,
-        priceInfo: {
-          basePrice: string,
-          baseAsset: string,
-          ETHPrice: string
-        },
-        orderSource: string,
-        wyvernOrSeaport: string
-      }
-    }
-  ],
-  data: string,
-  to: string,
-  containsSeaport: true
 }

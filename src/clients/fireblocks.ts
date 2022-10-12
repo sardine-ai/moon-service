@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { FireblocksSDK, PeerType, TransactionOperation, CreateTransactionResponse, TransactionArguments } from "fireblocks-sdk";
 import { EvmTransaction } from "../types/evmTransaction";
 import { formatEther, formatUnits } from "ethers/lib/utils";
-import * as fs from "fs";
-
-require('dotenv').config();
+import config from '../config';
 
 export interface IFireblocksClient {
   fireblocks: FireblocksSDK;
@@ -12,7 +12,6 @@ export interface IFireblocksClient {
   sendTransaction(assetId: string, vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse>
   sendEthTransaction(vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse>
   sendPolygonTransaction(vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse>
-  // sendSolanaTransaction(transaction: PopulatedTransaction): Promise<TransactionResponse>
   getVaultAddress(vaultId: string, assetId: string): Promise<string>
 }
 
@@ -22,8 +21,7 @@ export class FireblocksClient implements IFireblocksClient {
   polygonChain: string;
 
   constructor(ethereumChain: string, polygonChain: string) {
-    let apiSecret = fs.readFileSync(process.env.FIREBLOCKS_API_SECRET_PATH!, "utf8");
-    this.fireblocks = new FireblocksSDK(apiSecret, process.env.FIREBLOCKS_API_KEY!, process.env.FIREBLOCKS_API_BASE_URL);
+    this.fireblocks = new FireblocksSDK(config.fireblocksApiSecret, config.fireblocksApiKey, config.fireblocksBaseUrl);
     this.ethereumChain = ethereumChain;
     this.polygonChain = polygonChain;
   }

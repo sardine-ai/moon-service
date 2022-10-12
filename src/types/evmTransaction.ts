@@ -8,5 +8,5 @@ export interface EvmTransaction {
   gasPrice?: BigNumber; 
   amountEth?: BigNumberish;
   txNote?: string;
-  data: string;
+  data?: string;
 }
