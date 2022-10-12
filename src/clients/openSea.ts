@@ -1,4 +1,5 @@
 import { OpenSeaSDK } from 'opensea-js'
+import { Seaport } from "@opensea/seaport-js";
 
 export interface IOpenSeaClient {
   openSea: OpenSeaSDK;
@@ -25,12 +26,14 @@ export class OpenSeaClient implements IOpenSeaClient {
     return order;
   }
 
-  async buyNFT(nftId: number, assetContractAddress: string, paymentTokenAddress: string) {
+  async getNFTCallData(nftId: number, assetContractAddress: string, paymentTokenAddress: string, accountAddress: string, recipientAddress: string) {
     const order = await this.getOrder(nftId, assetContractAddress, paymentTokenAddress);
-    const tx = await this.openSea.fulfillOrder({
-      order,
-      accountAddress, // The address of your wallet, which will sign the transaction
-      recipientAddress // The address of the recipient, i.e. the wallet you're purchasing on behalf of
+    const { actions } = await this.openSea.seaport.fulfillOrder({
+      order: order.protocolData,
+      accountAddress,
+      recipientAddress,
     })
+    let callData = await actions[0].transactionMethods.buildTransaction();
+    return callData;
   }
 }
