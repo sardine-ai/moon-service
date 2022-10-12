@@ -3,15 +3,17 @@
 import { FireblocksSDK, PeerType, TransactionOperation, CreateTransactionResponse, TransactionArguments } from "fireblocks-sdk";
 import { EvmTransaction } from "../types/evmTransaction";
 import { formatEther, formatUnits } from "ethers/lib/utils";
-import config from '../config';
+import { FireblocksConfig } from "../config/fireblocksConfig";
 
 export interface IFireblocksClient {
   fireblocks: FireblocksSDK;
   ethereumChain: string;
   polygonChain: string;
+  config: FireblocksConfig,
   sendTransaction(assetId: string, vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse>
   sendEthTransaction(vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse>
   sendPolygonTransaction(vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse>
+  getVaultAccountId(): string
   getVaultAddress(vaultId: string, assetId: string): Promise<string>
 }
 
@@ -19,11 +21,13 @@ export class FireblocksClient implements IFireblocksClient {
   fireblocks: FireblocksSDK;
   ethereumChain: string;
   polygonChain: string;
+  config: FireblocksConfig;
 
-  constructor(ethereumChain: string, polygonChain: string) {
+  constructor(ethereumChain: string, polygonChain: string, config: FireblocksConfig) {
     this.fireblocks = new FireblocksSDK(config.fireblocksApiSecret, config.fireblocksApiKey, config.fireblocksBaseUrl);
     this.ethereumChain = ethereumChain;
     this.polygonChain = polygonChain;
+    this.config = config;
   }
 
   async sendTransaction(assetId: string, vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse> {
@@ -58,6 +62,10 @@ export class FireblocksClient implements IFireblocksClient {
 
   async sendPolygonTransaction(vaultAccountId: string, transaction: EvmTransaction): Promise<CreateTransactionResponse> {
     return this.sendTransaction(this.polygonChain, vaultAccountId, transaction);
+  }
+
+  getVaultAccountId(): string {
+    return this.config.vaultAccountId;
   }
 
   async getVaultAddress(vaultId: string, assetId: string): Promise<string> {
