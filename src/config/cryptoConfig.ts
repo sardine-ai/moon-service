@@ -61,32 +61,36 @@ const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
 
 const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
 
-const vaultAccountId = process.env.VAULT_ACCOUNT_ID || "";
+export interface CryptoConfig {
+  sardinePrivateKey: string,
+  sardinePublicKey: string,
+  ethRPC: string,
+  maticRPC: string,
+  ethChain: string,
+  ethChainId: number,
+  ethAssetId: string,
+  ethUsdcAddress: string,
+  polygonChain: string,
+  polygonChainId: number,
+  polygonAssetId: string,
+  solanaChain: string,
+}
 
-export default {
-  sardinePrivateKey: process.env.SARDINE_PRIVATE || "",
-  sardinePublicKey: process.env.SARDINE_PUBLIC || "",
-  ethRPC: process.env.ROOT_RPC || "",
-  maticRPC: process.env.MATIC_RPC || "",
-  fireblocksApiSecret: process.env.FIREBLOCKS_API_SECRET_PATH || "",
-  fireblocksApiKey: process.env.FIREBLOCKS_API_KEY || "",
-  fireblocksSourceVaultAccount: process.env.FIREBLOCKS_SOURCE_VAULT_ACCOUNT || "",
-  fireblocksBaseUrl: process.env.FIREBLOCKS_API_BASE_URL || "",
-  ethChain: ethChain,
-  ethChainId: ethChainId,
-  ethAssetId: ethAssetId,
-  ethUsdcAddress: ethUsdcAddress,
-  polygonChain: polygonChain,
-  polygonChainId: polygonChainId,
-  polygonAssetId: polygonAssetId,
-  solanaChain: solanaChain,
-  vaultAccountId: vaultAccountId,
-
-  port: parseInt(process.env.PORT || "8000", 10),
-  logs: {
-    level: process.env.LOG_LEVEL || 'silly',
-  },
-  api: {
-    prefix: '/api',
+const getCryptoConfig = (): CryptoConfig => {
+  return {
+    sardinePrivateKey: process.env.SARDINE_PRIVATE || "",
+    sardinePublicKey: process.env.SARDINE_PUBLIC || "",
+    ethRPC: process.env.ROOT_RPC || "",
+    maticRPC: process.env.MATIC_RPC || "",
+    ethChain: ethChain,
+    ethChainId: ethChainId,
+    ethAssetId: ethAssetId,
+    ethUsdcAddress: ethUsdcAddress,
+    polygonChain: polygonChain,
+    polygonChainId: polygonChainId,
+    polygonAssetId: polygonAssetId,
+    solanaChain: solanaChain,
   }
 }
+
+export default getCryptoConfig;

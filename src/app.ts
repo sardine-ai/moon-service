@@ -1,17 +1,18 @@
 import 'reflect-metadata';
-import config from "./config";
 import express, { Application } from "express";
 import Logger from "./loaders/logger";
 import loader from "./loaders";
+import getAppConfig from './config/appConfig';
 
 async function startServer() {
   const app: Application = express();
   await loader(app);
+  const appConfig = getAppConfig()
 
-  app.listen(config.port, () => {
+  app.listen(appConfig.port, () => {
     Logger.info(`
       ################################################
-      🛡️  Server listening on port: ${config.port} 🛡️
+      🛡️  Server listening on port: ${appConfig.port} 🛡️
       ################################################
     `);
   }).on('error', err => {

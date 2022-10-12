@@ -3,9 +3,11 @@
 import express, { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import router from '../api/routes';
-import config from '../config';
+import getAppConfig from '../config/appConfig';
 
 export default async ({ app }: { app: express.Application }) => {
+  const appConfig = getAppConfig;
+  
   /**
    * Health Check endpoints
    */
@@ -28,7 +30,7 @@ export default async ({ app }: { app: express.Application }) => {
   // Transforms the raw string of req.body into json
   app.use(express.json());
   // Load API routes
-  app.use(config.api.prefix, router);
+  app.use(appConfig.api.prefix, router);
 
   /// catch 404 and forward to error handler
   app.use((_req: Request, res: Response, _next: NextFunction) => {
