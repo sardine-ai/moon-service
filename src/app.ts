@@ -8,7 +8,7 @@ async function startServer() {
   const app: Application = express();
   await loader(app);
   const appConfig = getAppConfig()
-
+  console.log("hello")
   app.listen(appConfig.port, () => {
     Logger.info(`
       ################################################

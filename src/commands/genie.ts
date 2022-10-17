@@ -1,4 +1,4 @@
-import { FireblocksClient } from "../clients/fireblocks";
+import { FireblocksClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
 import { BuyGenieNFTParams, GenieCallDataResponse } from "../types/genie";
 import { swapUsdcToEth } from "./index";
@@ -10,12 +10,9 @@ export const buyGenieNFTUninjected = (
 ) => async (BuyGenieNFTParams: BuyGenieNFTParams) => {
   const callData: GenieCallDataResponse = await genieClient.getCallData(BuyGenieNFTParams);
   await swapUsdcToEth(callData.valueToSend)
-  await fireblocksClient.sendEthTransaction(
-    fireblocksClient.getVaultAccountId(),
-    {
-      to: callData.to,
-      amountEth: callData.valueToSend,
-      data: callData.data
-    }
-  )
+  await fireblocksClient.sendEthTransaction({
+    to: callData.to,
+    value: callData.valueToSend,
+    data: callData.data
+  });
 }

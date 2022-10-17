@@ -8,8 +8,12 @@ if (envFound.error) {
 
 export interface AppConfig {
   port: number,
-  logs: object,
-  api: object,
+  logs: {
+    level: string
+  },
+  api: {
+    prefix: string
+  }
 }
 
 const getAppConfig = (): AppConfig => {

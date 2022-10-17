@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon",
+    "dev": "nodemon -L",
     "start": "tsc && node dist/src/app.js",
     "lint": "gts lint",
     "test": "ts-node src/polygon.ts",
@@ -44,7 +44,6 @@
     "@maticnetwork/maticjs": "^3.3.0",
     "@maticnetwork/maticjs-ethers": "^1.0.2",
     "@maticnetwork/maticjs-web3": "^1.0.1",
-    "@opensea/seaport-js": "^1.0.8",
     "@types/cors": "^2.8.12",
     "@uniswap/sdk": "^3.0.3",
     "@uniswap/smart-order-router": "^2.9.2",

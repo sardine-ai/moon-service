@@ -1,5 +1,5 @@
 import { BuyClubHouseNFTParams } from "../types/clubHouse";
-import { FireblocksClient } from "../clients/fireblocks";
+import { FireblocksClient } from "../clients/transactions";
 import Logger from "../loaders/logger";
 
 export const buyClubHouseNFTUninjected = (

@@ -1,39 +1,39 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { OpenSeaSDK } from 'opensea-js'
-import { Seaport } from "@opensea/seaport-js";
 
 export interface IOpenSeaClient {
   openSea: OpenSeaSDK;
-  ethereumChain: string;
+  ethChain: string;
   polygonChain: string;
 }
 
 export class OpenSeaClient implements IOpenSeaClient {
   openSea: OpenSeaSDK;
-  ethereumChain: string;
+  ethChain: string;
   polygonChain: string;
-  constructor(ethereumChain: string, polygonChain: string, openSea: OpenSeaSDK) {
+  constructor(ethChain: string, polygonChain: string, openSea: OpenSeaSDK) {
     this.openSea = openSea;
-    this.ethereumChain = ethereumChain;
+    this.ethChain = ethChain;
     this.polygonChain = polygonChain;
   }
 
-  async getOrder(nftId: number, assetContractAddress: string, paymentTokenAddress: string) {
+  async getOrder(nftId: number, assetContractAddress: string) {
     const order = await this.openSea.api.getOrder({
       side: "ask",
-      assetContractAddress: assetContractAddress,
-      paymentTokenAddress: paymentTokenAddress
+      tokenId: nftId.toString(), 
+      assetContractAddress: assetContractAddress
     })
     return order;
   }
 
-  async getNFTCallData(nftId: number, assetContractAddress: string, paymentTokenAddress: string, accountAddress: string, recipientAddress: string) {
-    const order = await this.getOrder(nftId, assetContractAddress, paymentTokenAddress);
+  async getFulfillOrderCallData(protocalData: any, accountAddress: string, recipientAddress: string) {
     const { actions } = await this.openSea.seaport.fulfillOrder({
-      order: order.protocolData,
+      order: protocalData,
       accountAddress,
       recipientAddress,
     })
-    let callData = await actions[0].transactionMethods.buildTransaction();
+    const callData = await actions[0].transactionMethods.buildTransaction();
     return callData;
   }
 }

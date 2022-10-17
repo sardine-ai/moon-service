@@ -2,7 +2,7 @@ import { abi as uniswapRouterV2ABI } from '@uniswap/v2-periphery/build/IUniswapV
 import { Router, TradeOptions, WETH, CurrencyAmount, ETHER, Fetcher, Trade, Route, Percent, TradeType, SwapParameters, Pair } from "@uniswap/sdk";
 import { parseEther } from "ethers/lib/utils";
 import { ethers } from "ethers";
-import { FireblocksClient } from "../clients/fireblocks";
+import { FireblocksClient } from "../clients/transactions";
 import { CryptoConfig } from '../config/cryptoConfig';
 
 const UNISWAP_ROUTER_V2_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
@@ -25,13 +25,12 @@ const swap = async (amount: string, pair: Pair, fireblocksClient: FireblocksClie
   const swapTx = await router.populateTransaction[swapParams.methodName](...swapParams.args, { value: swapParams.value });
 
   return await fireblocksClient.sendEthTransaction(
-    fireblocksClient.getVaultAccountId(),
     {
       to: swapTx.to,
       nonce: swapTx.nonce,
-      gasLimit: swapTx.gasLimit,
+      gas: swapTx.gasLimit,
       gasPrice: swapTx.gasPrice, 
-      amountEth: swapTx.value,
+      value: swapTx.value,
       data: swapTx.data,
     }
   )

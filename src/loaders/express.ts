@@ -6,7 +6,7 @@ import router from '../api/routes';
 import getAppConfig from '../config/appConfig';
 
 export default async ({ app }: { app: express.Application }) => {
-  const appConfig = getAppConfig;
+  const appConfig = getAppConfig();
   
   /**
    * Health Check endpoints
