@@ -1,12 +1,18 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "rootDir": ".",
     "outDir": "build",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "preserveSymlinks": true,
+    "lib": ["esnext"],
+    "target": "esnext",
+    "strict": true,
+    "noUnusedLocals": true,
   },
   "include": [
     "src/**/*.ts",
