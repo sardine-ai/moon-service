@@ -30,6 +30,6 @@ class TransferEvmOrder {
 
   @IsDefined()
   @Expose()
-  @IsValidEvmAddress({message: "Recepient Address must be a valid EVM Address"})
-  recepientAddress: string;
+  @IsValidEvmAddress({message: "To address must be a valid EVM Address"})
+  toAddress: string;
 }

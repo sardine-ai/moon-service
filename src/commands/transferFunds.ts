@@ -13,9 +13,10 @@ export const transferPolygonFunds = (
     const fromAddress = await transactionSubmissionClient.getFromAddress(cryptoConfig.polygonAssetId)
     let transaction: EvmTransaction = await erc20.getPolygonTransferTransaction({
       fromAddress: fromAddress,
-      toAddress: order.recepientAddress,
+      toAddress: order.toAddress,
       amountInAsset: order.amountInNativeToken,
-      assetContractAddress: order.assetContractAddress
+      assetContractAddress: order.assetContractAddress || cryptoConfig.polygonUsdAddress
     });
+    return await transactionSubmissionClient.sendPolygonTransaction(transaction);
   });
 }
