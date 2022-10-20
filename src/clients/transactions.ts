@@ -15,6 +15,7 @@ export interface ITransactionSubmissionClient {
   sendTransaction(assetId: string, transaction: EvmTransaction): Promise<any>
   sendEthTransaction(transaction: EvmTransaction): Promise<any>
   sendPolygonTransaction(transaction: EvmTransaction): Promise<any>
+  getFromAddress(assetId: string): Promise<string> | string
   getNonce(accountAddress: string): Promise<number>
 }
 
@@ -72,8 +73,8 @@ export class FireblocksClient implements ITransactionSubmissionClient {
     return this.config.vaultAccountId;
   }
 
-  async getVaultAddress(vaultId: string, assetId: string): Promise<string> {
-    const depositAddresses = await this.fireblocks.getDepositAddresses(vaultId, assetId);
+  async getFromAddress(assetId: string): Promise<string> {
+    const depositAddresses = await this.fireblocks.getDepositAddresses(this.getVaultAccountId(), assetId);
     return depositAddresses[0].address;
   }
 }
@@ -130,5 +131,9 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
   async getNonce(address: string): Promise<number> {
     const nonce = await this.web3.eth.getTransactionCount(address, 'latest');
     return nonce
+  }
+
+  getFromAddress(_assetId: string): string {
+    return this.cryptoConfig.sardinePublicKey;
   }
 }

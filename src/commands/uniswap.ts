@@ -12,7 +12,7 @@ const swap = async (amount: string, pair: Pair, fireblocksClient: FireblocksClie
   const amountIn = parseEther(amount).toString();
   const trade = new Trade(route, CurrencyAmount.ether(amountIn), TradeType.EXACT_INPUT);
 
-  const recipient = await fireblocksClient.getVaultAddress(fireblocksClient.getVaultAccountId(), cryptoConfig.ethAssetId);
+  const recipient = await fireblocksClient.getFromAddress(cryptoConfig.ethAssetId);
   const tradeOptions: TradeOptions = {
       allowedSlippage: new Percent('50', '10000'),
       ttl: 3000,
