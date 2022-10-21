@@ -62,7 +62,7 @@
     "fireblocks-defi-sdk": "^1.2.5",
     "fireblocks-sdk": "^2.3.2",
     "jsbi": "^3.0.0",
-    "node-fetch": "^3.2.10",
+    "node-fetch": "^2.6.7",
     "opensea-js": "^4.0.12",
     "reflect-metadata": "^0.1.13",
     "typedi": "^0.10.0",

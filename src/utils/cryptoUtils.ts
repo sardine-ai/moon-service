@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import axios from 'axios';
 import { PolgyonGasDetails } from "src/types/transfer/polygon";
 
 const POLYGON_NETWORK_TO_GAS_URL: { [name: string]: string } = {
@@ -8,11 +8,7 @@ const POLYGON_NETWORK_TO_GAS_URL: { [name: string]: string } = {
 
 export const getPolygonGasDetails = async (chain: string): Promise<PolgyonGasDetails> => {
   const url = POLYGON_NETWORK_TO_GAS_URL[chain];
-  return fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(response.statusText)
-      }
-      return response.json() as Promise<PolgyonGasDetails>
-    })
+  const result = await axios(url);
+  return result.data;
+
 }

@@ -19,17 +19,17 @@ class TransferEvmOrder {
   @IsIn(VALID_ASSET_IDS, {message: `Asset Id must be one of ${VALID_ASSET_IDS.toString()}`})
   assetId: string;
 
-  @Expose()
-  @IsValidEvmAddress({message: "Asset contract Address must be a valid EVM Address"})
-  assetContractAddress?: string;
-
-  @IsDefined()
-  @Expose()
-  @IsPositive({message: "Please submit an amoount greater than 0"})
-  amountInNativeToken: number
-
   @IsDefined()
   @Expose()
   @IsValidEvmAddress({message: "To address must be a valid EVM Address"})
   toAddress: string;
+
+  @IsDefined()
+  @Expose()
+  @IsPositive({message: "Please submit an amoount greater than 0"})
+  amountInAsset: number
+
+  @Expose()
+  @IsValidEvmAddress({message: "Asset contract Address must be a valid EVM Address"})
+  assetContractAddress?: string;
 }
