@@ -20,3 +20,13 @@ export const buyClubHouseNFT = async (req: Request, res: Response) => {
     res.status(500);
   }
 }
+
+export const transferEvmFunds = async (req: Request, res: Response) => {
+  try {
+    Logger.info("Handling Transfer Funds");
+    res.json(await commands.transferFunds(req.body)).status(200);
+  } catch (err: unknown) {
+    Logger.error("An Error Occured while processing Handling Transfer Funds", err);
+    res.status(500);
+  }
+}

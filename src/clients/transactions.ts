@@ -7,6 +7,7 @@ import { formatEther, formatUnits } from "ethers/lib/utils";
 import { FireblocksConfig } from "../config/fireblocksConfig";
 import { CryptoConfig } from "../config/cryptoConfig";
 import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
+import Logger from "../loaders/logger";
 
 export interface ITransactionSubmissionClient {
   ethereumChain: string;
@@ -15,6 +16,7 @@ export interface ITransactionSubmissionClient {
   sendTransaction(assetId: string, transaction: EvmTransaction): Promise<any>
   sendEthTransaction(transaction: EvmTransaction): Promise<any>
   sendPolygonTransaction(transaction: EvmTransaction): Promise<any>
+  getFromAddress(assetId: string): Promise<string> | string
   getNonce(accountAddress: string): Promise<number>
 }
 
@@ -72,8 +74,8 @@ export class FireblocksClient implements ITransactionSubmissionClient {
     return this.config.vaultAccountId;
   }
 
-  async getVaultAddress(vaultId: string, assetId: string): Promise<string> {
-    const depositAddresses = await this.fireblocks.getDepositAddresses(vaultId, assetId);
+  async getFromAddress(assetId: string): Promise<string> {
+    const depositAddresses = await this.fireblocks.getDepositAddresses(this.getVaultAccountId(), assetId);
     return depositAddresses[0].address;
   }
 }
@@ -82,36 +84,33 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
   ethereumChain: string;
   polygonChain: string;
   cryptoConfig: CryptoConfig;
-  web3: AlchemyWeb3;
+  ethWeb3: AlchemyWeb3;
+  polygonWeb3: AlchemyWeb3;
 
   constructor(ethereumChain: string, polygonChain: string, cryptoConfig: CryptoConfig) {
     this.ethereumChain = ethereumChain;
     this.polygonChain = polygonChain;
     this.cryptoConfig = cryptoConfig;
-    this.web3 = createAlchemyWeb3(cryptoConfig.ethRPC);
+    this.ethWeb3 = createAlchemyWeb3(cryptoConfig.ethRPC);
+    this.polygonWeb3 = createAlchemyWeb3(cryptoConfig.maticRPC);
   }
 
   async sendTransaction(_assetId: string, transaction: EvmTransaction): Promise<any> {
-    console.log(transaction);
-    const signedTransaction = await this.web3.eth.accounts.signTransaction({
+    Logger.info("Signing Transaction")
+    const signedTransaction = await this.polygonWeb3.eth.accounts.signTransaction({
       from: transaction.from,
       to: transaction.to,
-      value: transaction.value?.toString(),
+      value: transaction.value?.toString() || 0,
       gas: transaction.gas?.toString(),
-      gasPrice: transaction.gasPrice?.toString(),
-      maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
-      maxFeePerGas: transaction.maxFeePerGas?.toString(),
+      // maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
       data: transaction.data,
       nonce: transaction.nonce,
-      chainId: transaction.chainId,
+      chainId: await this.polygonWeb3.eth.getChainId(),
     }, this.cryptoConfig.sardinePrivateKey);
-    const result = await this.web3.eth.sendSignedTransaction(signedTransaction.rawTransaction!, (err, hash) => {
-      if (!err) {
-        console.log(
-          "The hash of the mint is: ",
-          hash,
-          "\nCheck Alchemy's Mempool to view the status of your transaction!"
-        )
+
+    const result = await this.polygonWeb3.eth.sendSignedTransaction(signedTransaction.rawTransaction!, (err, hash) => {
+      if (err === null) {
+        console.log("Hash: ", hash)
       } else {
         console.log("Something went wrong when submitting your transaction:", err)
       }
@@ -128,7 +127,11 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
   }
 
   async getNonce(address: string): Promise<number> {
-    const nonce = await this.web3.eth.getTransactionCount(address, 'latest');
+    const nonce = await this.polygonWeb3.eth.getTransactionCount(address, 'latest');
     return nonce
+  }
+
+  getFromAddress(_assetId: string): string {
+    return this.cryptoConfig.sardinePublicKey;
   }
 }

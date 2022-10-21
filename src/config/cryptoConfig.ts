@@ -46,6 +46,11 @@ enum PolygonChain {
   MAINNET = "polygon",
 }
 
+const POLYGON_CHAIN_USDC_ADDRESS: {[key: string]: string } = {
+  [PolygonChain.MUMBAI]: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747",
+  [PolygonChain.MAINNET]: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+}
+
 enum SolanaChain {
   MAINNET = "mainnet-beta",
   DEVNET = "devnet",
@@ -59,6 +64,7 @@ const ethUsdcAddress = ETH_CHAIN_TO_USDC_CONTRACT[ethChain];
 const polygonChain = process.env.POLYGON_CHAIN || PolygonChain.MUMBAI;
 const polygonChainId = CHAIN_IDS[polygonChain];
 const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
+const polygonUsdAddress = POLYGON_CHAIN_USDC_ADDRESS[polygonChain];
 
 const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
 
@@ -77,6 +83,7 @@ export interface CryptoConfig {
   polygonChain: string,
   polygonChainId: number,
   polygonAssetId: string,
+  polygonUsdAddress: string,
   solanaChain: string,
   openSeaNetwork: string,
   openSeaAPIKey: string,
@@ -95,6 +102,7 @@ const getCryptoConfig = (): CryptoConfig => {
     polygonChain: polygonChain,
     polygonChainId: polygonChainId,
     polygonAssetId: polygonAssetId,
+    polygonUsdAddress: polygonUsdAddress,
     solanaChain: solanaChain,
     openSeaNetwork: openSeaNetwork,
     openSeaAPIKey: openSeaAPIKey,

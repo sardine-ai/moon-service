@@ -1,11 +1,6 @@
-import { buyGenieNFT, buyClubHouseNFT } from '../controllers';
-import { BuyClubHouseNFTParams } from '../../types/clubHouse';
-import { validationMw } from '../middleware/validation';
+import evmRouter from "./evm";
 import express from 'express';
 
 const router = express.Router();
-
-router.post('/buy-genie-nft', buyGenieNFT);
-router.post('/buy-club-house-nft', validationMw(BuyClubHouseNFTParams), buyClubHouseNFT);
-
+router.use('/evm', evmRouter);
 export default router;
