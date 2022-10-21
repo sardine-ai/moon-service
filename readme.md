@@ -44,7 +44,7 @@ _This feature allows you to buy a given NFT on a seaport marketplace through an 
 Steps:
 1. Go to `https://testnets.opensea.io/` and click on an NFT you would "like" to purcahse. The url should look something like thid: `https://testnets.opensea.io/assets/goerli/0xb00492a72557b778cb31270e78d27716d6340bbf/1` Note the contractAddress and nftId. In this case that would be `0xb00492a72557b778cb31270e78d27716d6340bbf` and `1` respectively.
 
-## Adding new Features
+## Adding New Features
 1. In `api/routes` add the endpoint to your new feature
 2. Add a controller to handle incoming requests
 3. Create a new command file and write the command "uninjected", all dependencies should be passed as arguments and the function should return the injected version.
