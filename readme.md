@@ -20,6 +20,24 @@ to use a feature make sure your server is running
 
 ### Transfer Funds (in progress)
 _This feature allows crypto backend to send api requests to wallet service to transfer funds to different addresses in different currencies_
+Steps for Transfering WETH on Polygon Mumbai using your Public Private Key Pair:
+1. Join the polygon discord server: https://discord.gg/ctfKkChkZC
+2. In the `matic-faucet` channel use the commands to request matic
+3. Go to`https://uniswap.org/`, launch the app and switch to `polygon-mumbai`
+4. Swap your matic for WETH
+5. Call `localhost:8000/api/evm/transfer-funds` with the following body:
+```
+{
+    "orders": [
+        {
+            "assetId": "MATIC",
+            "toAddress": "SOME_OTHER_ADDRESS",
+            "amountInAsset": "0.1",
+            "assetContractAddress": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889" // WETH ADDRESS ON MUMBAI
+        }
+    ]
+}
+```
 
 ### Buy Seaport NFT (in progress)
 _This feature allows you to buy a given NFT on a seaport marketplace through an API request._
