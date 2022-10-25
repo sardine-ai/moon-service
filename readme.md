@@ -10,8 +10,9 @@
 ## Setup
 1. clone the repo
 2. Create a `.env` file using the `.env.example` file. To send transactions to the blockchain using your public/private keypair, install the metamask chrome extension here: `https://metamask.io/download/`. Create a new wallet and give yourself some goerli testnet ETH here: `https://goerlifaucet.com/`. Export the public private key pair and add them to the readme under `SARDINE_PUBLIC` and `SARDINE_PRIVATE` 
-3. run `npm install` to install dependencies
-4. run `npm run dev` to start the server
+3. run `npm install` to install dependencies (compiling will not work)
+4. run `npm run dev` to start the server. Uses your public/private key pair by default
+  - `npm run dev -- fireblocks` to use fireblocks instead
 
 Docker setup coming soon
 

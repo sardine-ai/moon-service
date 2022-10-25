@@ -2,14 +2,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { FireblocksSDK, PeerType, TransactionOperation, TransactionArguments } from "fireblocks-sdk";
-import { EvmTransaction } from "../types/evmTransaction";
+import { EvmTransaction } from "../types/evm";
 import { formatEther, formatUnits } from "ethers/lib/utils";
 import { FireblocksConfig } from "../config/fireblocksConfig";
 import { CryptoConfig } from "../config/cryptoConfig";
 import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
-import Logger from "../loaders/logger";
+import winston from 'winston';
 
 export interface ITransactionSubmissionClient {
+  logger: winston.Logger
   ethereumChain: string;
   polygonChain: string;
 
@@ -21,12 +22,14 @@ export interface ITransactionSubmissionClient {
 }
 
 export class FireblocksClient implements ITransactionSubmissionClient {
+  logger: winston.Logger
   fireblocks: FireblocksSDK;
   ethereumChain: string;
   polygonChain: string;
   config: FireblocksConfig;
 
-  constructor(ethereumChain: string, polygonChain: string, config: FireblocksConfig) {
+  constructor(logger: winston.Logger, ethereumChain: string, polygonChain: string, config: FireblocksConfig) {
+    this.logger = logger;
     this.fireblocks = new FireblocksSDK(config.fireblocksApiSecret, config.fireblocksApiKey, config.fireblocksBaseUrl);
     this.ethereumChain = ethereumChain;
     this.polygonChain = polygonChain;
@@ -45,7 +48,7 @@ export class FireblocksClient implements ITransactionSubmissionClient {
             id: this.getVaultAccountId()
         },
         gasPrice: transaction.gasPrice != undefined ? formatUnits(transaction.gasPrice.toString(), "gwei") : undefined,
-        gasLimit: transaction.maxFeePerGas?.toString(),
+        gasLimit: transaction?.maxFeePerGas,
         destination: {
             type: PeerType.ONE_TIME_ADDRESS,
             id: "",
@@ -54,7 +57,7 @@ export class FireblocksClient implements ITransactionSubmissionClient {
             }
         },
         note: transaction.txNote || '',
-        amount: formatEther(transaction.value?.toString() || "0"),
+        amount: formatEther(transaction?.value || 0),
         extraParameters: {
             contractCallData: transaction.data
         }
@@ -81,13 +84,15 @@ export class FireblocksClient implements ITransactionSubmissionClient {
 }
 
 export class SelfCustodyClient implements ITransactionSubmissionClient {
+  logger: winston.Logger
   ethereumChain: string;
   polygonChain: string;
   cryptoConfig: CryptoConfig;
   ethWeb3: AlchemyWeb3;
   polygonWeb3: AlchemyWeb3;
 
-  constructor(ethereumChain: string, polygonChain: string, cryptoConfig: CryptoConfig) {
+  constructor(logger: winston.Logger, ethereumChain: string, polygonChain: string, cryptoConfig: CryptoConfig) {
+    this.logger = logger;
     this.ethereumChain = ethereumChain;
     this.polygonChain = polygonChain;
     this.cryptoConfig = cryptoConfig;
@@ -96,13 +101,13 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
   }
 
   async sendTransaction(_assetId: string, transaction: EvmTransaction): Promise<any> {
-    Logger.info("Signing Transaction")
+    this.logger.info("Signing Transaction")
     const signedTransaction = await this.polygonWeb3.eth.accounts.signTransaction({
       from: transaction.from,
       to: transaction.to,
-      value: transaction.value?.toString() || 0,
-      gas: transaction.gas?.toString(),
-      // maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
+      value: transaction?.value || 0,
+      gas: transaction?.gas,
+      maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
       data: transaction.data,
       nonce: transaction.nonce,
       chainId: await this.polygonWeb3.eth.getChainId(),

@@ -29,11 +29,6 @@ const CHAIN_IDS: {[key: string]: number }  = {
   [Chain.MUMBAI]: 80001,
 }
 
-const ETH_CHAIN_TO_USDC_CONTRACT: {[key: string]: string } = {
-  [Chain.MAINNET]: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-  [Chain.ROPSTEN]: '0xFE724a829fdF12F7012365dB98730EEe33742ea2',
-}
-
 enum EthChain {
   MAINNET = "mainnet",
   ROPSTEN = "ropsten",
@@ -46,11 +41,6 @@ enum PolygonChain {
   MAINNET = "polygon",
 }
 
-const POLYGON_CHAIN_USDC_ADDRESS: {[key: string]: string } = {
-  [PolygonChain.MUMBAI]: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747",
-  [PolygonChain.MAINNET]: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
-}
-
 enum SolanaChain {
   MAINNET = "mainnet-beta",
   DEVNET = "devnet",
@@ -59,12 +49,10 @@ enum SolanaChain {
 const ethChain = process.env.ETH_CHAIN || EthChain.GOERLI;
 const ethChainId = CHAIN_IDS[ethChain];
 const ethAssetId = CHAIN_TO_ASSET_ID[ethChain];
-const ethUsdcAddress = ETH_CHAIN_TO_USDC_CONTRACT[ethChain];
 
 const polygonChain = process.env.POLYGON_CHAIN || PolygonChain.MUMBAI;
 const polygonChainId = CHAIN_IDS[polygonChain];
 const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
-const polygonUsdAddress = POLYGON_CHAIN_USDC_ADDRESS[polygonChain];
 
 const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
 
@@ -79,11 +67,9 @@ export interface CryptoConfig {
   ethChain: string,
   ethChainId: number,
   ethAssetId: string,
-  ethUsdcAddress: string,
   polygonChain: string,
   polygonChainId: number,
   polygonAssetId: string,
-  polygonUsdAddress: string,
   solanaChain: string,
   openSeaNetwork: string,
   openSeaAPIKey: string,
@@ -98,11 +84,9 @@ const getCryptoConfig = (): CryptoConfig => {
     ethChain: ethChain,
     ethChainId: ethChainId,
     ethAssetId: ethAssetId,
-    ethUsdcAddress: ethUsdcAddress,
     polygonChain: polygonChain,
     polygonChainId: polygonChainId,
     polygonAssetId: polygonAssetId,
-    polygonUsdAddress: polygonUsdAddress,
     solanaChain: solanaChain,
     openSeaNetwork: openSeaNetwork,
     openSeaAPIKey: openSeaAPIKey,

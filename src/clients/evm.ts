@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { EvmTransaction } from "src/types/evmTransaction";
+import { EvmTransaction, Erc20Token } from "src/types/evm";
 import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { CryptoConfig } from "src/config/cryptoConfig";
 import  { getPolygonGasDetails } from "../utils/cryptoUtils";
+import { getAssetContractDetails } from "../constants";
 import { AbiItem } from "web3-utils"
 import abi from "../abi/ERC20ABI.json";
+import winston from "winston";
 
 export class Erc20 {
-  private cryptoConfig: CryptoConfig;
+  logger: winston.Logger;
+  cryptoConfig: CryptoConfig;
 
-  constructor(cryptoConfig: CryptoConfig) {
+  constructor(logger: winston.Logger, cryptoConfig: CryptoConfig) {
+    this.logger = logger;
     this.cryptoConfig = cryptoConfig;
   }
 
@@ -19,31 +23,54 @@ export class Erc20 {
     return contract;
   }
 
-  getCallData(web3: AlchemyWeb3, toAddress: string, amount: number, assetContractAddress: string) {
-    const contract = this.loadErc20Contract(web3, assetContractAddress);
-    // TODO model contracts better, 18 shouldn't be hard coded needs to be a property of the asset contract address
-    return contract.methods.transfer(toAddress, (amount * 10 ** 18).toString()).encodeABI();
+  getCallData(web3: AlchemyWeb3, toAddress: string, amount: number, assetContractDetails: Erc20Token) {
+    const contract = this.loadErc20Contract(web3, assetContractDetails.assetContractAddress);
+    return contract.methods.transfer(toAddress, (amount * 10 ** assetContractDetails.decimals).toString()).encodeABI();
   }
 
-  async getPolygonTransferTransaction({ fromAddress, toAddress, amountInAsset, assetContractAddress }: PolygonTransferParams): Promise<EvmTransaction> {
+  async getPolygonErc20TransferTransaction({ fromAddress, toAddress, amountInAsset, assetSymbol }: Erc20TransferParams): Promise<EvmTransaction> {
+    // REFACTOR getPolygonGasDetails makes this an action
+    const polygonGasDetails = await getPolygonGasDetails(this.cryptoConfig.polygonChain);
+    const assetContractDetails = getAssetContractDetails(this.cryptoConfig.polygonChain, assetSymbol);
+    const web3 = createAlchemyWeb3(this.cryptoConfig.maticRPC);
+    const transaction: EvmTransaction = {
+      from: fromAddress,
+      to: assetContractDetails.assetContractAddress,
+      nonce: await web3.eth.getTransactionCount(fromAddress),
+      gas: "50000",
+      maxPriorityFeePerGas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 9).toString(),
+      data: this.getCallData(web3, toAddress, amountInAsset, assetContractDetails),
+      chainId: this.cryptoConfig.polygonChainId
+    }
+    return transaction;
+  }
+
+  async getPolygonTransferTransaction({fromAddress, toAddress, amount}: EvmTransferParams) {
+    // REFACTOR getPolygonGasDetails makes this an action
     const polygonGasDetails = await getPolygonGasDetails(this.cryptoConfig.polygonChain);
     const web3 = createAlchemyWeb3(this.cryptoConfig.maticRPC);
     const transaction: EvmTransaction = {
       from: fromAddress,
-      to: assetContractAddress,
+      to: toAddress,
+      value: amount.toString(),
       nonce: await web3.eth.getTransactionCount(fromAddress),
-      gas: 50000,
-      maxPriorityFeePerGas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 9),
-      data: this.getCallData(web3, toAddress, amountInAsset, assetContractAddress),
+      gas: "50000",
+      maxPriorityFeePerGas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 9).toString(),
       chainId: this.cryptoConfig.polygonChainId
     }
     return transaction;
   }
 }
 
-interface PolygonTransferParams {
+interface Erc20TransferParams {
   fromAddress: string,
   toAddress: string,
   amountInAsset: number,
-  assetContractAddress: string
+  assetSymbol: string
+}
+
+interface EvmTransferParams {
+  fromAddress: string,
+  toAddress: string,
+  amount: number,
 }
