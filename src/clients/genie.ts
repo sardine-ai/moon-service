@@ -1,5 +1,6 @@
 // Client built for the following api: https://v2.api.genie.xyz/docs/#/Assets/get_walletAssets
 import axios from 'axios';
+import winston from 'winston';
 import { BuyGenieNFTParams, GenieCallDataResponse } from '../types/genie';
 
 const BASE_URL = "https://v2.api.genie.xyz/";
@@ -9,6 +10,12 @@ export interface IGenieClient {
 }
 
 export class GenieClient implements IGenieClient {
+  logger: winston.Logger
+
+  constructor(logger: winston.Logger) {
+    this.logger = logger;
+  }
+
   async getCallData({ assetId, nftId, collectionName, marketplace, contractAddress, recepientAddress }: BuyGenieNFTParams): Promise<GenieCallDataResponse> {
     const data = JSON.stringify({
       "buy": [

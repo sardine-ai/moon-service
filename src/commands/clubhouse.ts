@@ -1,9 +1,10 @@
 import { BuyClubHouseNFTParams } from "../types/clubHouse";
 import { ITransactionSubmissionClient } from "../clients/transactions";
-import Logger from "../loaders/logger";
+import winston from "winston";
 
 export const buyClubHouseNFTUninjected = (
+  logger: winston.Logger,
   _transactionSubmissionClient: ITransactionSubmissionClient,
 ) => async (_buyClubHouseNFTParams: BuyClubHouseNFTParams) => {
-  Logger.info("hello world");
+  logger.info("hello world");
 }

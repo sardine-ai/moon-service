@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { OpenSeaSDK } from 'opensea-js'
+import winston from 'winston';
 
 export interface IOpenSeaClient {
   openSea: OpenSeaSDK;
@@ -9,10 +10,12 @@ export interface IOpenSeaClient {
 }
 
 export class OpenSeaClient implements IOpenSeaClient {
+  logger: winston.Logger;
   openSea: OpenSeaSDK;
   ethChain: string;
   polygonChain: string;
-  constructor(ethChain: string, polygonChain: string, openSea: OpenSeaSDK) {
+  constructor(logger: winston.Logger, ethChain: string, polygonChain: string, openSea: OpenSeaSDK) {
+    this.logger = logger;
     this.openSea = openSea;
     this.ethChain = ethChain;
     this.polygonChain = polygonChain;

@@ -4,6 +4,8 @@ import { parseEther } from "ethers/lib/utils";
 import { ethers } from "ethers";
 import { ITransactionSubmissionClient } from "../clients/transactions";
 import { CryptoConfig } from '../config/cryptoConfig';
+import { getAssetContractDetails } from "../constants";
+import winston from 'winston';
 
 const UNISWAP_ROUTER_V2_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
 
@@ -28,19 +30,20 @@ const swap = async (amount: string, pair: Pair, transactionSubmissionClient: ITr
     {
       to: swapTx.to,
       nonce: swapTx.nonce,
-      gas: swapTx.gasLimit,
-      gasPrice: swapTx.gasPrice, 
-      value: swapTx.value,
+      gas: swapTx.gasLimit?.toString(),
+      value: swapTx.value?.toString(),
       data: swapTx.data,
     }
   )
 }
 
 export const swapUsdcToEthUninjected = (
+  _logger: winston.Logger,
   cryptoConfig: CryptoConfig,
   fireblocksClient: ITransactionSubmissionClient
 ) => async (amount: string) => {
-  const usdc = await Fetcher.fetchTokenData(cryptoConfig.ethChainId, cryptoConfig.ethUsdcAddress);
+  const assetContractDetails = getAssetContractDetails(cryptoConfig.ethChain, "USDC");
+  const usdc = await Fetcher.fetchTokenData(cryptoConfig.ethChainId, assetContractDetails.assetContractAddress);
   const weth = WETH[cryptoConfig.ethChainId as keyof typeof WETH];  
   const pair = await Fetcher.fetchPairData(usdc, weth);
   return swap(amount, pair, fireblocksClient, cryptoConfig);
