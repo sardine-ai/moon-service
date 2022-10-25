@@ -1,4 +1,4 @@
-# Wallet Service
+# 🌒 Moon Service 
 ## _A serivce for building blockchain transactions and fulfilling them on chain_
 
 ## Table of Contents
