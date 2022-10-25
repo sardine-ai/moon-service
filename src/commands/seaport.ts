@@ -1,5 +1,5 @@
 import { ITransactionSubmissionClient } from "../clients/transactions";
-import { OpenSeaClient } from "../clients/openSea";
+import { OpenSeaClient } from "../clients/opensea";
 import { CryptoConfig } from "../config/cryptoConfig";
 import winston from "winston";
 

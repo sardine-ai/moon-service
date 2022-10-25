@@ -1,5 +1,5 @@
 import { buyGenieNFT, buyClubHouseNFT, transferEvmFunds } from '../controllers';
-import { BuyClubHouseNFTParams } from '../../types/clubHouse';
+import { BuyClubHouseNFTParams } from '../../types/clubhouse';
 import { TransferEvmFundsParams } from '../../types/transfer';
 import { validationMw } from '../middleware/validation';
 import express from 'express';
