@@ -1,6 +1,6 @@
 import { ITransactionSubmissionClient } from "../clients/transactions";
 import { OpenSeaClient } from "../clients/opensea";
-import { CryptoConfig } from "../config/cryptoConfig";
+import { CryptoConfig } from "../config/crypto-config";
 import winston from "winston";
 
 export const buySeaportNFTUninjected = (

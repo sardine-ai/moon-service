@@ -3,7 +3,7 @@
 import express, { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import router from '../api/routes';
-import getAppConfig from '../config/appConfig';
+import getAppConfig from '../config/app-config';
 
 export default async ({ app }: { app: express.Application }) => {
   const appConfig = getAppConfig();

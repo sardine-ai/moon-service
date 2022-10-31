@@ -3,7 +3,7 @@ import { Router, TradeOptions, WETH, CurrencyAmount, ETHER, Fetcher, Trade, Rout
 import { parseEther } from "ethers/lib/utils";
 import { ethers } from "ethers";
 import { ITransactionSubmissionClient } from "../clients/transactions";
-import { CryptoConfig } from '../config/cryptoConfig';
+import { CryptoConfig } from '../config/crypto-config';
 import { getAssetContractDetails } from "../constants";
 import winston from 'winston';
 

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -16,17 +16,17 @@ model Bundle {
   transactions Transaction[]
 }
 
-// enum TransactionState {
-//   SUBMITTED
-//   BROADCASTING
-//   CONFIRMING
-//   COMPLETED
-//   CANCELLED
-//   REJECTED
-//   BLOCKED
-//   FAILED
-//   RETRYING
-// }
+enum TransactionState {
+  SUBMITTED
+  BROADCASTING
+  CONFIRMING
+  COMPLETED
+  CANCELLED
+  REJECTED
+  BLOCKED
+  FAILED
+  RETRYING
+}
 
 model Transaction {
   id         String  @id @default(uuid())
@@ -35,9 +35,9 @@ model Transaction {
   isStarting Boolean @default(false)
   transactionHash String?
   executionId String?
-  // state TransactionState
+  state TransactionState
   operation String
-  // params Json
+  params Json
 
   // add inherited types here
   evmTransaction EvmTransaction?

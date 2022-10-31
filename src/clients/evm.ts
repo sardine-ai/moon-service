@@ -2,8 +2,8 @@
 
 import { EvmTransaction, Erc20Token } from "src/types/evm";
 import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { CryptoConfig } from "src/config/cryptoConfig";
-import  { getPolygonGasDetails } from "../utils/cryptoUtils";
+import { CryptoConfig } from "src/config/crypto-config";
+import  { getPolygonGasDetails } from "../utils/crypto-utils";
 import { getAssetContractDetails } from "../constants";
 import { AbiItem } from "web3-utils"
 import abi from "../abi/ERC20ABI.json";
