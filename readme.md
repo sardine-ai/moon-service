@@ -28,6 +28,14 @@
 
 Docker setup coming soon...
 
+## Name convention
+
+- Folder: kebab-case
+- File: kebab-case
+- Interface: PascalCase
+- Variable: camelCase
+- Function: camelCase
+
 ## Features
 to use a feature make sure your server is running
 
