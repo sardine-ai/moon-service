@@ -3,13 +3,13 @@
 import { swapUsdcToEthUninjected } from "./uniswap";
 import { buyClubHouseNFTUninjected } from "./clubhouse";
 import { buyGenieNFTUninjected } from "./genie";
-import { transferFundsUninjected } from "./transferFunds";
+import { transferFundsUninjected } from "./transfer-funds";
 import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
-import getCryptoConfig from "../config/cryptoConfig";
-import getFireblocksConfig from "../config/fireblocksConfig";
+import getCryptoConfig from "../config/crypto-config";
+import getFireblocksConfig from "../config/fireblocks-config";
 import { buySeaportNFTUninjected } from "./seaport";
-import { OpenSeaClient } from "../clients/openSea";
+import { OpenSeaClient } from "../clients/opensea";
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
 import { Erc20 } from "../clients/evm";

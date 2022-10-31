@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": ".",
+    "sourceMap": true,
     "outDir": "build",
     "esModuleInterop": true,
     "experimentalDecorators": true,

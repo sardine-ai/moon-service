@@ -2,7 +2,7 @@ import { TransferEvmFundsParams } from "src/types/transfer";
 import { ITransactionSubmissionClient } from "../clients/transactions";
 import { Erc20 } from "src/clients/evm";
 import { EvmTransaction } from "src/types/evm";
-import { CryptoConfig } from "src/config/cryptoConfig";
+import { CryptoConfig } from "src/config/crypto-config";
 import winston from "winston";
 
 export const transferFundsUninjected = (

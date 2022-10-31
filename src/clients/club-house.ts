@@ -1,4 +1,4 @@
-import { BuyClubHouseNFTParams } from "../types/clubHouse";
+import { BuyClubHouseNFTParams } from "../types/clubhouse";
 
 export interface IClubhouseClient {
   getCallData(buyClubhouseNFTParams: BuyClubHouseNFTParams): void

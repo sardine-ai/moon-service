@@ -4,8 +4,8 @@
 import { FireblocksSDK, PeerType, TransactionOperation, TransactionArguments } from "fireblocks-sdk";
 import { EvmTransaction } from "../types/evm";
 import { formatEther, formatUnits } from "ethers/lib/utils";
-import { FireblocksConfig } from "../config/fireblocksConfig";
-import { CryptoConfig } from "../config/cryptoConfig";
+import { FireblocksConfig } from "../config/fireblocks-config";
+import { CryptoConfig } from "../config/crypto-config";
 import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
 import winston from 'winston';
 
