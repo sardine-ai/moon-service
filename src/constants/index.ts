@@ -7,7 +7,7 @@ interface AssetContractDetails {
 }
 
 const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
-  "GOERLI": {
+  "goerli": {
     "USDC": {
       "assetContractAddress": "0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557",
       "decimals": 6
@@ -17,7 +17,7 @@ const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
       "decimals": 18
     }
   },
-  "ETH": {
+  "mainnet": {
     "USDC": {
       "assetContractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "decimals": 6
@@ -27,7 +27,7 @@ const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
       "decimals": 18
     }
   },
-  "MUMBAI": {
+  "polygon_test": {
     "USDC": {
       "assetContractAddress": "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747",
       "decimals": 6
@@ -37,7 +37,7 @@ const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
       "decimals": 18
     }
   },
-  "MATIC": {
+  "polygon": {
     "USDC": {
       "assetContractAddress": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
       "decimals": 6

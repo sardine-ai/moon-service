@@ -1,7 +1,6 @@
 export interface EvmTransaction {
   from?: string;
   to?: string;
-  nonce?: number;
   gas?: string;
   gasPrice?: string; 
   maxPriorityFeePerGas?: string;

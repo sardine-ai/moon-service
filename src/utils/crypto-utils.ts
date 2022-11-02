@@ -2,8 +2,8 @@ import axios from 'axios';
 import { PolgyonGasDetails } from "src/types/transfer/polygon";
 
 const POLYGON_NETWORK_TO_GAS_URL: { [name: string]: string } = {
-  "MUMBAI": "https://gasstation-mumbai.matic.today/v2",
-  "MATIC": "https://gasstation-mainnet.matic.network/v2"
+  "polygon_test": "https://gasstation-mumbai.matic.today/v2",
+  "polygon": "https://gasstation-mainnet.matic.network/v2"
 }
 
 export const getPolygonGasDetails = async (chain: string): Promise<PolgyonGasDetails> => {

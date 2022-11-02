@@ -14,7 +14,6 @@ export const buySeaportNFTUninjected = (
   await transactionClient.sendEthTransaction({
     from: callData.from,
     to: callData.to,
-    nonce: callData.nonce,
     gas: callData.gasLimit?.toString(),
     gasPrice: callData.gasPrice?.toString(),
     maxPriorityFeePerGas: callData.maxPriorityFeePerGas?.toString(),

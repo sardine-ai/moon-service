@@ -21,7 +21,7 @@ const fireblocksConfig = getFireblocksConfig()
 let transactionSubmissionClient: ITransactionSubmissionClient;
 if (process.argv.length > 2 && process.argv[2] == "fireblocks") {
   logger.warn("Configured to use Fireblocks to submit transactions")
-  transactionSubmissionClient = new FireblocksClient(logger, cryptoConfig.ethChain, cryptoConfig.polygonChain, fireblocksConfig);
+  transactionSubmissionClient = new FireblocksClient(logger, cryptoConfig.ethChain, cryptoConfig.polygonChain, fireblocksConfig, cryptoConfig);
 } else {
   logger.info("Configured to use your personal keys to submit transactions")
   transactionSubmissionClient = new SelfCustodyClient(logger, cryptoConfig.ethChain, cryptoConfig.polygonChain, cryptoConfig);

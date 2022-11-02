@@ -12,20 +12,16 @@ export const transferFundsUninjected = (
   transactionSubmissionClient: ITransactionSubmissionClient,
 ) => async (transferEvmFundsParams: TransferEvmFundsParams) => {
   logger.info(`Processing Order: ${JSON.stringify(transferEvmFundsParams)}`)
-  const fromAddress = await transactionSubmissionClient.getFromAddress(cryptoConfig.polygonAssetId)
-  logger.info(`Sending From: ${fromAddress}`)
 
   let transaction: EvmTransaction;
   if (transferEvmFundsParams.assetSymbol) {
     transaction = await erc20.getPolygonErc20TransferTransaction({
-      fromAddress: fromAddress,
       toAddress: transferEvmFundsParams.toAddress,
       amountInAsset: transferEvmFundsParams.amountInAsset,
       assetSymbol: transferEvmFundsParams.assetSymbol
     });
   } else {
     transaction = await erc20.getPolygonTransferTransaction({
-      fromAddress: fromAddress,
       toAddress: transferEvmFundsParams.toAddress,
       amount: transferEvmFundsParams.amountInAsset,
     });

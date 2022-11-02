@@ -29,10 +29,9 @@ const swap = async (amount: string, pair: Pair, transactionSubmissionClient: ITr
   return await transactionSubmissionClient.sendEthTransaction(
     {
       to: swapTx.to,
-      nonce: swapTx.nonce,
       gas: swapTx.gasLimit?.toString(),
       value: swapTx.value?.toString(),
-      data: swapTx.data,
+      data: swapTx.data
     }
   )
 }

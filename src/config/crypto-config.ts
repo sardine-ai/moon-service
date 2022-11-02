@@ -73,7 +73,7 @@ const getCryptoConfig = (): CryptoConfig => {
 
   const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
 
-  const openSeaNetwork = process.env.OPEN_SEA_NETWORK || EthChain.GOERLI
+  const openSeaNetwork = process.env.ETH_CHAIN || EthChain.GOERLI
   const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || ""
 
   return {

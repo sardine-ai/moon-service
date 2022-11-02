@@ -28,16 +28,15 @@ export class Erc20 {
     return contract.methods.transfer(toAddress, (amount * 10 ** assetContractDetails.decimals).toString()).encodeABI();
   }
 
-  async getPolygonErc20TransferTransaction({ fromAddress, toAddress, amountInAsset, assetSymbol }: Erc20TransferParams): Promise<EvmTransaction> {
+  async getPolygonErc20TransferTransaction({ toAddress, amountInAsset, assetSymbol }: Erc20TransferParams): Promise<EvmTransaction> {
     // REFACTOR getPolygonGasDetails makes this an action
     const polygonGasDetails = await getPolygonGasDetails(this.cryptoConfig.polygonChain);
+    console.log(polygonGasDetails);
     const assetContractDetails = getAssetContractDetails(this.cryptoConfig.polygonChain, assetSymbol);
     const web3 = createAlchemyWeb3(this.cryptoConfig.maticRPC);
     const transaction: EvmTransaction = {
-      from: fromAddress,
       to: assetContractDetails.assetContractAddress,
-      nonce: await web3.eth.getTransactionCount(fromAddress),
-      gas: "50000",
+      gas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 18).toString(), // helper function
       maxPriorityFeePerGas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 9).toString(),
       data: this.getCallData(web3, toAddress, amountInAsset, assetContractDetails),
       chainId: this.cryptoConfig.polygonChainId
@@ -45,15 +44,12 @@ export class Erc20 {
     return transaction;
   }
 
-  async getPolygonTransferTransaction({fromAddress, toAddress, amount}: EvmTransferParams) {
+  async getPolygonTransferTransaction({toAddress, amount}: EvmTransferParams) {
     // REFACTOR getPolygonGasDetails makes this an action
     const polygonGasDetails = await getPolygonGasDetails(this.cryptoConfig.polygonChain);
-    const web3 = createAlchemyWeb3(this.cryptoConfig.maticRPC);
     const transaction: EvmTransaction = {
-      from: fromAddress,
       to: toAddress,
       value: amount.toString(),
-      nonce: await web3.eth.getTransactionCount(fromAddress),
       gas: "50000",
       maxPriorityFeePerGas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 9).toString(),
       chainId: this.cryptoConfig.polygonChainId
@@ -63,14 +59,12 @@ export class Erc20 {
 }
 
 interface Erc20TransferParams {
-  fromAddress: string,
   toAddress: string,
   amountInAsset: number,
   assetSymbol: string
 }
 
 interface EvmTransferParams {
-  fromAddress: string,
   toAddress: string,
   amount: number,
 }
