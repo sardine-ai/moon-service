@@ -20,6 +20,8 @@ export const buySeaportNFTUninjected = (
     maxFeePerGas: callData.maxFeePerGas?.toString(),
     data: callData.data,
     value: callData.value?.toString(),
-    chainId: callData.chainId
+    chainId: callData.chainId,
+    chain: cryptoConfig.ethChain,
+    assetSymbol: "NATIVE"
   });
 }

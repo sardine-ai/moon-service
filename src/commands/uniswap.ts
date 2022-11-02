@@ -14,7 +14,7 @@ const swap = async (amount: string, pair: Pair, transactionSubmissionClient: ITr
   const amountIn = parseEther(amount).toString();
   const trade = new Trade(route, CurrencyAmount.ether(amountIn), TradeType.EXACT_INPUT);
 
-  const recipient = await transactionSubmissionClient.getFromAddress(cryptoConfig.ethAssetId);
+  const recipient = await transactionSubmissionClient.getFromAddress(cryptoConfig.ethChain, "NATIVE");
   const tradeOptions: TradeOptions = {
       allowedSlippage: new Percent('50', '10000'),
       ttl: 3000,
@@ -31,7 +31,9 @@ const swap = async (amount: string, pair: Pair, transactionSubmissionClient: ITr
       to: swapTx.to,
       gas: swapTx.gasLimit?.toString(),
       value: swapTx.value?.toString(),
-      data: swapTx.data
+      data: swapTx.data,
+      chain: cryptoConfig.ethChain,
+      assetSymbol: pair.token0.symbol || ""
     }
   )
 }

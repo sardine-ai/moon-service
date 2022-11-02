@@ -39,7 +39,9 @@ export class Erc20 {
       gas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 18).toString(), // helper function
       maxPriorityFeePerGas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 9).toString(),
       data: this.getCallData(web3, toAddress, amountInAsset, assetContractDetails),
-      chainId: this.cryptoConfig.polygonChainId
+      chainId: this.cryptoConfig.polygonChainId,
+      chain: this.cryptoConfig.polygonChain,
+      assetSymbol: assetSymbol
     }
     return transaction;
   }
@@ -52,7 +54,9 @@ export class Erc20 {
       value: amount.toString(),
       gas: "50000",
       maxPriorityFeePerGas: Math.round(polygonGasDetails.standard.maxPriorityFee * 10 ** 9).toString(),
-      chainId: this.cryptoConfig.polygonChainId
+      chainId: this.cryptoConfig.polygonChainId,
+      chain: this.cryptoConfig.polygonChain,
+      assetSymbol: "NATIVE"
     }
     return transaction;
   }

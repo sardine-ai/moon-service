@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { FireblocksSDK, PeerType, TransactionOperation, TransactionArguments } from "fireblocks-sdk";
+import { FireblocksSDK, PeerType, TransactionOperation, TransactionArguments, VaultAccountResponse } from "fireblocks-sdk";
 import { EvmTransaction } from "../types/evm";
 import { formatEther, formatUnits } from "ethers/lib/utils";
 import { FireblocksConfig } from "../config/fireblocks-config";
 import { CryptoConfig } from "../config/crypto-config";
 import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { SignedTransaction } from "web3-core"
-// import { getFireblocksAssetId } from "../utils/fireblocks-utils";
+import { getFireblocksAssetId } from "../utils/fireblocks-utils";
 import winston from 'winston';
 
 export interface ITransactionSubmissionClient {
@@ -17,15 +17,13 @@ export interface ITransactionSubmissionClient {
 
   sendEthTransaction(transaction: EvmTransaction): Promise<any>
   sendPolygonTransaction(transaction: EvmTransaction): Promise<any>
-  getFromAddress(assetId: string): Promise<string> | string
+  getFromAddress(chain: string, assetSymbol: string): Promise<string> | string
 }
 
-// interface FireblocksVault {
-//   Id: string,
-//   assetId: string,
-//   assetSymbol?: string,
-//   vaultAddress: string,
-// }
+interface FireblocksVaultAccount {
+  id: string,
+  assetId: string
+}
 
 export class FireblocksClient implements ITransactionSubmissionClient {
   logger: winston.Logger
@@ -52,13 +50,13 @@ export class FireblocksClient implements ITransactionSubmissionClient {
     return this.fireblocks_dontCallDirectly;
   }
 
-  getTransactionArguments(transaction: EvmTransaction, assetId: string, vaultAccountId: string): TransactionArguments {
+  getTransactionArguments(transaction: EvmTransaction, vaultAccount: FireblocksVaultAccount): TransactionArguments {
     const txArguments: TransactionArguments = {
       operation: TransactionOperation.CONTRACT_CALL,
-      assetId: assetId,
+      assetId: vaultAccount.assetId,
       source: {
           type: PeerType.VAULT_ACCOUNT,
-          id: vaultAccountId
+          id: vaultAccount.id
       },
       gasPrice: transaction.gasPrice != undefined ? formatUnits(transaction.gasPrice.toString(), "gwei") : undefined,
       gasLimit: transaction?.maxFeePerGas,
@@ -78,35 +76,55 @@ export class FireblocksClient implements ITransactionSubmissionClient {
     return txArguments
   }
 
-  async sendTransaction(transaction: EvmTransaction, assetId: string, vaultAccountId: string): Promise<any> {
-    const txArguments = this.getTransactionArguments(transaction, assetId, vaultAccountId)
+  // TODO: Implement logic to determine which vault to use, probably want to look at balances
+  choseVaultAccount(potentialVaults: Array<VaultAccountResponse>): VaultAccountResponse {
+    return potentialVaults[0];
+  }
+
+  async getVaultAccount(chain: string, assetSymbol: string): Promise<FireblocksVaultAccount | undefined> {
     const fireblocks = await this.getOrSetFireblocksSdk();
-    console.log(fireblocks);
-    console.log(txArguments);
-    return fireblocks.createTransaction(txArguments);
+    const fireblocksAssetId = getFireblocksAssetId({chain, assetSymbol});
+    const potentialVaults = await fireblocks.getVaultAccountsWithPageInfo({assetId: fireblocksAssetId});
+    if (potentialVaults.accounts && potentialVaults.accounts.length > 0) {
+      return {
+        id: this.choseVaultAccount(potentialVaults.accounts).id,
+        assetId: fireblocksAssetId
+      };
+    } 
+    return undefined;
+  }
+
+  async getFromAddress(chain: string, assetSymbol: string): Promise<string> {
+    const fireblocks = await this.getOrSetFireblocksSdk();
+    const vaultAccount = await this.getVaultAccount(chain, assetSymbol);
+    if (vaultAccount) {
+      const fireblocksAssetId = getFireblocksAssetId({chain, assetSymbol});
+      const depositAddresses = await fireblocks.getDepositAddresses(vaultAccount.id, fireblocksAssetId);
+      return depositAddresses[0].address;
+    }
+    this.logger.error("No address found");
+    return "";
+  }
+
+  async sendTransaction(transaction: EvmTransaction): Promise<any> {
+    // TODO: if the address is passed in the transaction we will want to get the vault id associated with that address
+    // need a getVaultFromAddress method
+    const vaultAccount = await this.getVaultAccount(transaction.chain, transaction.assetSymbol);
+    if (vaultAccount) {
+      const txArguments = this.getTransactionArguments(transaction, vaultAccount);
+      const fireblocks = await this.getOrSetFireblocksSdk();
+      return fireblocks.createTransaction(txArguments);
+    }
+    this.logger.error("No vault acccount found");
+    return;
   }
 
   async sendEthTransaction(transaction: EvmTransaction): Promise<any> {
-    return this.sendTransaction(transaction, this.cryptoConfig.ethAssetId, "");
+    return this.sendTransaction(transaction);
   }
 
   async sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
-    return this.sendTransaction(transaction, this.cryptoConfig.polygonAssetId, "");
-  }
-
-  async getVaultAccountId(assetId: string, assetSymbol: string): Promise<string> {
-    const fireblocks = await this.getOrSetFireblocksSdk();
-    const potentialVaults = await fireblocks.getVaultAccountsWithPageInfo({assetId: "WETH_POLYGON_TEST"});
-    console.log(potentialVaults);
-    console.log(JSON.stringify(potentialVaults));
-    return this.config.vaultAccountId;
-  }
-
-  async getFromAddress(assetId: string): Promise<string> {
-    const fireblocks = await this.getOrSetFireblocksSdk();
-    const vaultAccountId = await this.getVaultAccountId(assetId, "");
-    const depositAddresses = await fireblocks.getDepositAddresses(vaultAccountId, assetId);
-    return depositAddresses[0].address;
+    return this.sendTransaction(transaction);
   }
 }
 
@@ -161,16 +179,16 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
   }
 
   async sendEthTransaction(transaction: EvmTransaction): Promise<any> {
-    const fromAddress = this.getFromAddress(this.cryptoConfig.ethAssetId)
+    const fromAddress = this.getFromAddress(transaction.chain, transaction.assetSymbol)
     return await this.sendTransaction(this.ethWeb3, transaction, fromAddress);
   }
 
   async sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
-    const fromAddress = this.getFromAddress(this.cryptoConfig.polygonAssetId)
+    const fromAddress = this.getFromAddress(transaction.chain, transaction.assetSymbol)
     return await this.sendTransaction(this.polygonWeb3, transaction, fromAddress);
   }
 
-  getFromAddress(_assetId: string): string {
+  getFromAddress(_chain: string, _assetSymbol: string): string {
     return this.cryptoConfig.sardinePublicKey;
   }
 }
@@ -190,7 +208,7 @@ export class TestTransactionSubmissionClient implements ITransactionSubmissionCl
   sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
     throw new Error("Method not implemented.");
   }
-  getFromAddress(assetId: string): string | Promise<string> {
+  getFromAddress(chain: string, assetSymbol: string): string | Promise<string> {
     throw new Error("Method not implemented.");
   }
 }

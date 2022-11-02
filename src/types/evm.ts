@@ -9,6 +9,8 @@ export interface EvmTransaction {
   value?: string;
   txNote?: string;
   chainId?: number;
+  chain: string;
+  assetSymbol: string;
 }
 
 export interface Erc20Token {

@@ -1,5 +1,3 @@
-import { Erc20Token } from "src/types/evm"
-
 interface AssetToFireblocksAssetId {
   [key: string]: {
     [key: string]: string
@@ -7,7 +5,7 @@ interface AssetToFireblocksAssetId {
 }
 
 interface GetFireblocksAssetIdParams {
-  assetId: string,
+  chain: string,
   assetSymbol?: string
 }
 
@@ -23,7 +21,7 @@ const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
     "WETH": "",
   },
   "polygon_test": {
-    "NATIVE": "MATIC_TEST",
+    "NATIVE": "MATIC_POLYGON_MUMBAI",
     "USDC": "USDC_POLYGON_TEST_2",
     "WETH": "WETH_POLYGON_TEST",
   },
@@ -34,6 +32,6 @@ const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
   }
 }
 
-export const getFireblocksAssetId = ({assetId, assetSymbol}: GetFireblocksAssetIdParams): string => {
-  return ASSET_TO_FIREBLOCKS_ASSET_ID[assetId][assetSymbol || "NATIVE"]
+export const getFireblocksAssetId = ({chain, assetSymbol}: GetFireblocksAssetIdParams): string => {
+  return ASSET_TO_FIREBLOCKS_ASSET_ID[chain][assetSymbol || "NATIVE"]
 }

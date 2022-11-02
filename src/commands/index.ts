@@ -38,6 +38,6 @@ const erc20: Erc20 = new Erc20(logger, cryptoConfig);
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(logger, cryptoConfig, transactionSubmissionClient);
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(logger, transactionSubmissionClient);
-export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactionSubmissionClient);
+export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactionSubmissionClient, cryptoConfig);
 export const buySeaportNFT = buySeaportNFTUninjected(logger, openSeaClient, transactionSubmissionClient, cryptoConfig);
 export const transferFunds = transferFundsUninjected(logger, erc20, cryptoConfig, transactionSubmissionClient);
