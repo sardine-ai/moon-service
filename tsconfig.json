@@ -1,8 +1,8 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "rootDir": ".",
+    "baseUrl": "./",
+    "rootDir": "./",
     "sourceMap": true,
     "outDir": "build",
     "esModuleInterop": true,
@@ -10,10 +10,12 @@
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,
     "preserveSymlinks": true,
-    "lib": ["esnext"],
-    "target": "esnext",
     "strict": true,
     "noUnusedLocals": true,
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
   },
   "include": [
     "src/**/*.ts",

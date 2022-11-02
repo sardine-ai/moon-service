@@ -30,19 +30,28 @@ export class FireblocksClient implements ITransactionSubmissionClient {
 
   constructor(logger: winston.Logger, ethereumChain: string, polygonChain: string, config: FireblocksConfig) {
     this.logger = logger;
-    this.fireblocks = new FireblocksSDK(config.fireblocksApiSecret, config.fireblocksApiKey, config.fireblocksBaseUrl);
     this.ethereumChain = ethereumChain;
     this.polygonChain = polygonChain;
     this.config = config;
   }
+
   getNonce(_accountAddress: string): Promise<number> {
     throw new Error("Method not implemented.");
+  }
+
+  async getOrSetFireblocksSdk(): Promise<FireblocksSDK> {
+    if (this.fireblocks) {
+      return this.fireblocks
+    }
+    const fireblocksApiSecret = await this.config.getFireblocksApiSecret();
+    this.fireblocks = new FireblocksSDK(fireblocksApiSecret, this.config.fireblocksApiKey);
+    return this.fireblocks;
   }
 
   async sendTransaction(assetId: string, transaction: EvmTransaction): Promise<any> {
     const txArguments: TransactionArguments = {
         operation: TransactionOperation.CONTRACT_CALL,
-        assetId: assetId,
+        assetId: "MATIC_POLYGON_MUMBAI",
         source: {
             type: PeerType.VAULT_ACCOUNT,
             id: this.getVaultAccountId()
@@ -62,7 +71,9 @@ export class FireblocksClient implements ITransactionSubmissionClient {
             contractCallData: transaction.data
         }
     };
-    return this.fireblocks.createTransaction(txArguments);
+    console.log(txArguments);
+    const fireblocks = await this.getOrSetFireblocksSdk();
+    return fireblocks.createTransaction(txArguments);
   }
 
   async sendEthTransaction(transaction: EvmTransaction): Promise<any> {
@@ -78,7 +89,8 @@ export class FireblocksClient implements ITransactionSubmissionClient {
   }
 
   async getFromAddress(assetId: string): Promise<string> {
-    const depositAddresses = await this.fireblocks.getDepositAddresses(this.getVaultAccountId(), assetId);
+    const fireblocks = await this.getOrSetFireblocksSdk();
+    const depositAddresses = await fireblocks.getDepositAddresses(this.getVaultAccountId(), "MATIC_POLYGON_MUMBAI");
     return depositAddresses[0].address;
   }
 }

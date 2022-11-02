@@ -1,9 +1,8 @@
 import { ITransactionSubmissionClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
-import { BuyGenieNFTParams, GenieCallDataResponse } from "../types/genie";
+import { BuyGenieNFTParams, GenieCallDataResponse } from "../types/genie/index";
 import { swapUsdcToEth } from "./index";
 import winston from "winston";
-
 
 export const buyGenieNFTUninjected = (
   _logger: winston.Logger,

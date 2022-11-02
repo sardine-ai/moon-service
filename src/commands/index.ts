@@ -16,7 +16,7 @@ import { Erc20 } from "../clients/evm";
 import logger from "../loaders/logger";
 
 const cryptoConfig = getCryptoConfig();
-const fireblocksConfig = getFireblocksConfig();
+const fireblocksConfig = getFireblocksConfig()
 
 let transactionSubmissionClient: ITransactionSubmissionClient;
 if (process.argv.length > 2 && process.argv[2] == "fireblocks") {

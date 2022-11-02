@@ -1,5 +1,5 @@
 import { Response, Request } from 'express';
-import * as commands from '../../commands'
+import * as commands from '../../commands/index';
 import Logger from '../../loaders/logger';
 
 export const buyGenieNFT = async (req: Request, res: Response) => {

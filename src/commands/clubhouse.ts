@@ -1,4 +1,4 @@
-import { BuyClubHouseNFTParams } from "../types/clubhouse";
+import { BuyClubHouseNFTParams } from "../types/clubhouse/index";
 import { ITransactionSubmissionClient } from "../clients/transactions";
 import winston from "winston";
 

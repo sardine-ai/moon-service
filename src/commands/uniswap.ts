@@ -4,7 +4,7 @@ import { parseEther } from "ethers/lib/utils";
 import { ethers } from "ethers";
 import { ITransactionSubmissionClient } from "../clients/transactions";
 import { CryptoConfig } from '../config/crypto-config';
-import { getAssetContractDetails } from "../constants";
+import { getAssetContractDetails } from "../constants/index";
 import winston from 'winston';
 
 const UNISWAP_ROUTER_V2_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';

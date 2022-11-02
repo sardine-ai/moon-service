@@ -46,19 +46,6 @@ enum SolanaChain {
   DEVNET = "devnet",
 }
 
-const ethChain = process.env.ETH_CHAIN || EthChain.GOERLI;
-const ethChainId = CHAIN_IDS[ethChain];
-const ethAssetId = CHAIN_TO_ASSET_ID[ethChain];
-
-const polygonChain = process.env.POLYGON_CHAIN || PolygonChain.MUMBAI;
-const polygonChainId = CHAIN_IDS[polygonChain];
-const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
-
-const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
-
-const openSeaNetwork = process.env.OPEN_SEA_NETWORK || EthChain.GOERLI
-const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || ""
-
 export interface CryptoConfig {
   sardinePrivateKey: string,
   sardinePublicKey: string,
@@ -76,6 +63,19 @@ export interface CryptoConfig {
 }
 
 const getCryptoConfig = (): CryptoConfig => {
+  const ethChain = process.env.ETH_CHAIN || EthChain.GOERLI;
+  const ethChainId = CHAIN_IDS[ethChain];
+  const ethAssetId = CHAIN_TO_ASSET_ID[ethChain];
+
+  const polygonChain = process.env.POLYGON_CHAIN || PolygonChain.MUMBAI;
+  const polygonChainId = CHAIN_IDS[polygonChain];
+  const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
+
+  const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
+
+  const openSeaNetwork = process.env.OPEN_SEA_NETWORK || EthChain.GOERLI
+  const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || ""
+
   return {
     sardinePrivateKey: process.env.SARDINE_PRIVATE || "",
     sardinePublicKey: process.env.SARDINE_PUBLIC || "",

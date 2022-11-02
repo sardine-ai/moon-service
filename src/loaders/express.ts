@@ -2,7 +2,7 @@
 
 import express, { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
 import cors from 'cors';
-import router from '../api/routes';
+import router from '../api/routes/index';
 import getAppConfig from '../config/app-config';
 
 export default async ({ app }: { app: express.Application }) => {
@@ -29,6 +29,7 @@ export default async ({ app }: { app: express.Application }) => {
 
   // Transforms the raw string of req.body into json
   app.use(express.json());
+  
   // Load API routes
   app.use(appConfig.api.prefix, router);
 
