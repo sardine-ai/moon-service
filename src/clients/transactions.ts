@@ -129,7 +129,7 @@ export class FireblocksClient implements ITransactionSubmissionClient {
 }
 
 export class SelfCustodyClient implements ITransactionSubmissionClient {
-  logger: winston.Logger
+  logger: winston.Logger;
   ethereumChain: string;
   polygonChain: string;
   cryptoConfig: CryptoConfig;
@@ -196,19 +196,33 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
 export class TestTransactionSubmissionClient implements ITransactionSubmissionClient {
   ethereumChain: string;
   polygonChain: string;
+  logger: winston.Logger;
 
-  constructor(ethereumChain: string, polygonChain: string) {
+  constructor(logger: winston.Logger, ethereumChain: string, polygonChain: string) {
+    this.logger = logger;
     this.ethereumChain = ethereumChain;
     this.polygonChain = polygonChain;
   }
 
-  sendEthTransaction(transaction: EvmTransaction): Promise<any> {
-    throw new Error("Method not implemented.");
+  async getFakePromise(): Promise<any> {
+    return new Promise<number>((resolve) => {
+      resolve(-1);
+  });
   }
-  sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
-    throw new Error("Method not implemented.");
+
+  async sendEthTransaction(transaction: EvmTransaction): Promise<any> {
+    this.logger.info("Sending out a fake ETH transaction:", transaction);
+    return await this.getFakePromise();
   }
-  getFromAddress(chain: string, assetSymbol: string): string | Promise<string> {
-    throw new Error("Method not implemented.");
+
+  async sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
+    this.logger.info("Sending out a fake Polygon transaction:", transaction);
+    return await this.getFakePromise();
+  }
+
+  getFromAddress(_chain: string, _assetSymbol: string): string | Promise<string> {
+    const fakeAddress = "0x123456";
+    this.logger.info("Fake from address", fakeAddress);
+    return fakeAddress;
   }
 }
