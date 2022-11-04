@@ -8,6 +8,8 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { ethers } from "ethers";
+import { Transform } from "class-transformer"
+import { cloneDeep } from "lodash"
 
 @ValidatorConstraint()
 export class IsValidEvmAddressContraint implements ValidatorConstraintInterface {
@@ -26,4 +28,8 @@ export function IsValidEvmAddress(validationOptions?: ValidationOptions) {
       validator: IsValidEvmAddressContraint,
     });
   };
+}
+
+export function Default(defaultValue: unknown): PropertyDecorator {
+  return Transform((value: unknown) => value ?? cloneDeep(defaultValue))
 }

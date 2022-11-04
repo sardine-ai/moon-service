@@ -10,14 +10,61 @@ import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { SignedTransaction } from "web3-core"
 import { getFireblocksAssetId } from "../utils/fireblocks-utils";
 import winston from 'winston';
+import { Bundle, Transaction, TransactionState } from "../types/models";
+import { UpdateTransaction } from "../repositories/base-repository";
 
 export interface ITransactionSubmissionClient {
-  ethereumChain: string;
-  polygonChain: string;
-
-  sendEthTransaction(transaction: EvmTransaction): Promise<any>
-  sendPolygonTransaction(transaction: EvmTransaction): Promise<any>
+  sendTransaction(transaction: Transaction): Promise<any>
   getFromAddress(chain: string, assetSymbol: string): Promise<string> | string
+}
+
+interface EstimateGasParams {
+  to: string,
+  data: string,
+  valueInEther: number
+}
+
+abstract class TransactionSubmissionClient implements ITransactionSubmissionClient {
+  cryptoConfig: CryptoConfig;
+  ethWeb3: AlchemyWeb3;
+  polygonWeb3: AlchemyWeb3;
+
+  constructor(cryptoConfig: CryptoConfig) {
+    this.cryptoConfig = cryptoConfig;
+    this.ethWeb3 = createAlchemyWeb3(cryptoConfig.ethRPC);
+    this.polygonWeb3 = createAlchemyWeb3(cryptoConfig.maticRPC);
+  }
+  
+  sendTransaction(_transaction: Transaction): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
+
+  getFromAddress(_chain: string, _assetSymbol: string): string | Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+
+  getChainAlchemy(chain: string): AlchemyWeb3  {
+    switch (chain) {
+      case this.cryptoConfig.ethChain:
+        return this.ethWeb3;
+      case this.cryptoConfig.polygonChain:
+        return this.polygonWeb3;
+      default:
+        throw new Error("Unsupported Chain");
+    }
+  }
+
+  async estimateGasFees(chain: string, {to, data, valueInEther}: EstimateGasParams): Promise<number> {
+    const alchemy = this.getChainAlchemy(chain);
+    const estimate = alchemy.eth.estimateGas({
+      to: to,
+      // `function deposit() payable`
+      data: data,
+      // 1 ether
+      value: valueInEther,
+    })
+    return estimate;
+  }
 }
 
 interface FireblocksVaultAccount {
@@ -25,20 +72,15 @@ interface FireblocksVaultAccount {
   assetId: string
 }
 
-export class FireblocksClient implements ITransactionSubmissionClient {
+export class FireblocksClient extends TransactionSubmissionClient {
   logger: winston.Logger
   fireblocks_dontCallDirectly: FireblocksSDK;
-  ethereumChain: string;
-  polygonChain: string;
   config: FireblocksConfig;
-  cryptoConfig: CryptoConfig
 
-  constructor(logger: winston.Logger, ethereumChain: string, polygonChain: string, config: FireblocksConfig, cryptoConfig: CryptoConfig) {
+  constructor(logger: winston.Logger, config: FireblocksConfig, cryptoConfig: CryptoConfig) {
+    super(cryptoConfig);
     this.logger = logger;
-    this.ethereumChain = ethereumChain;
-    this.polygonChain = polygonChain;
     this.config = config;
-    this.cryptoConfig = cryptoConfig;
   }
 
   async getOrSetFireblocksSdk(): Promise<FireblocksSDK> {
@@ -67,12 +109,16 @@ export class FireblocksClient implements ITransactionSubmissionClient {
               address: <string>transaction.to
           }
       },
-      note: transaction.txNote || '',
-      amount: formatEther(transaction?.value || 0),
-      extraParameters: {
-          contractCallData: transaction.data
+      note: transaction.txNote || ''
+    }
+    if (transaction.data) {
+      txArguments.extraParameters = {
+        contractCallData: transaction.data
       }
-    };
+    }
+    if (transaction.value) {
+      txArguments.amount = formatEther(transaction.value)
+    }
     return txArguments
   }
 
@@ -106,7 +152,7 @@ export class FireblocksClient implements ITransactionSubmissionClient {
     return "";
   }
 
-  async sendTransaction(transaction: EvmTransaction): Promise<any> {
+  async sendTransaction(transaction: Transaction): Promise<any> {
     // TODO: if the address is passed in the transaction we will want to get the vault id associated with that address
     // need a getVaultFromAddress method
     const vaultAccount = await this.getVaultAccount(transaction.chain, transaction.assetSymbol);
@@ -118,31 +164,14 @@ export class FireblocksClient implements ITransactionSubmissionClient {
     this.logger.error("No vault acccount found");
     return;
   }
-
-  async sendEthTransaction(transaction: EvmTransaction): Promise<any> {
-    return this.sendTransaction(transaction);
-  }
-
-  async sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
-    return this.sendTransaction(transaction);
-  }
 }
 
-export class SelfCustodyClient implements ITransactionSubmissionClient {
+export class SelfCustodyClient extends TransactionSubmissionClient {
   logger: winston.Logger;
-  ethereumChain: string;
-  polygonChain: string;
-  cryptoConfig: CryptoConfig;
-  ethWeb3: AlchemyWeb3;
-  polygonWeb3: AlchemyWeb3;
 
-  constructor(logger: winston.Logger, ethereumChain: string, polygonChain: string, cryptoConfig: CryptoConfig) {
+  constructor(logger: winston.Logger, cryptoConfig: CryptoConfig) {
+    super(cryptoConfig);
     this.logger = logger;
-    this.ethereumChain = ethereumChain;
-    this.polygonChain = polygonChain;
-    this.cryptoConfig = cryptoConfig;
-    this.ethWeb3 = createAlchemyWeb3(cryptoConfig.ethRPC);
-    this.polygonWeb3 = createAlchemyWeb3(cryptoConfig.maticRPC);
   }
 
   async signTransaction(alchemyWeb3: AlchemyWeb3, transaction: EvmTransaction, nonce: number): Promise<SignedTransaction> {
@@ -172,20 +201,12 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
     return result;
   }
 
-  async sendTransaction(alchemyWeb3: AlchemyWeb3, transaction: EvmTransaction, fromAddress: string): Promise<any> {
+  async sendTransaction(transaction: Transaction): Promise<any> {
+    const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
+    const fromAddress =  this.getFromAddress(transaction.chain, transaction.assetSymbol);
     const nonce = await alchemyWeb3.eth.getTransactionCount(fromAddress, 'latest');
     const signedTransaction = await this.signTransaction(alchemyWeb3, transaction, nonce);
     return this.sendSignedTransaction(alchemyWeb3, signedTransaction);
-  }
-
-  async sendEthTransaction(transaction: EvmTransaction): Promise<any> {
-    const fromAddress = this.getFromAddress(transaction.chain, transaction.assetSymbol)
-    return await this.sendTransaction(this.ethWeb3, transaction, fromAddress);
-  }
-
-  async sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
-    const fromAddress = this.getFromAddress(transaction.chain, transaction.assetSymbol)
-    return await this.sendTransaction(this.polygonWeb3, transaction, fromAddress);
   }
 
   getFromAddress(_chain: string, _assetSymbol: string): string {
@@ -194,14 +215,15 @@ export class SelfCustodyClient implements ITransactionSubmissionClient {
 }
 
 export class TestTransactionSubmissionClient implements ITransactionSubmissionClient {
-  ethereumChain: string;
-  polygonChain: string;
   logger: winston.Logger;
 
-  constructor(logger: winston.Logger, ethereumChain: string, polygonChain: string) {
+  constructor(logger: winston.Logger) {
     this.logger = logger;
-    this.ethereumChain = ethereumChain;
-    this.polygonChain = polygonChain;
+  }
+
+  async sendTransaction(_transaction: EvmTransaction): Promise<any> {
+    this.logger.info("Sending Transaction... JK");
+    return
   }
 
   async getFakePromise(): Promise<any> {
@@ -210,19 +232,39 @@ export class TestTransactionSubmissionClient implements ITransactionSubmissionCl
   });
   }
 
-  async sendEthTransaction(transaction: EvmTransaction): Promise<any> {
-    this.logger.info("Sending out a fake ETH transaction:", transaction);
-    return await this.getFakePromise();
-  }
-
-  async sendPolygonTransaction(transaction: EvmTransaction): Promise<any> {
-    this.logger.info("Sending out a fake Polygon transaction:", transaction);
-    return await this.getFakePromise();
-  }
-
   getFromAddress(_chain: string, _assetSymbol: string): string | Promise<string> {
     const fakeAddress = "0x123456";
     this.logger.info("Fake from address", fakeAddress);
     return fakeAddress;
   }
+}
+
+export type ExecuteBundle = (bundle: Bundle) => Promise<void>
+
+export const executeBundleUninjected = (
+  transactionSubmissionClient: ITransactionSubmissionClient,
+  updateTransaction: UpdateTransaction
+) => async (bundle: Bundle) => {
+  let transaction = getReadyTransaction(bundle.transactions);
+  if (transaction) {
+    const result = transactionSubmissionClient.sendTransaction(transaction);
+    transaction = updateTransactionWithResult(transaction, result);
+    updateTransaction(transaction);
+  }
+}
+
+const getReadyTransaction = (transactions: Array<Transaction>): Transaction | undefined => {
+  const transaction = transactions.find(isTransactionReady);
+  return transaction;
+}
+
+const isTransactionReady = (transaction: Transaction) => {
+  return transaction.state == TransactionState.CREATED;
+}
+
+const updateTransactionWithResult = (transaction: Transaction, result: any): Transaction => {
+  const newTransaction = Object.assign({}, transaction);
+  newTransaction.executionId = result.id;
+  newTransaction.state = TransactionState.SUBMITTED;
+  return newTransaction
 }

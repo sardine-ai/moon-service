@@ -1,29 +1,30 @@
-import { TransferEvmFundsParams } from "src/types/transfer";
-import { ITransactionSubmissionClient } from "../clients/transactions";
-import { Erc20 } from "src/clients/evm";
-import { EvmTransaction } from "src/types/evm";
+import { TransferEvmFundsParams } from "../types/transfer";
+import { ExecuteBundle } from "../clients/transactions";
+import { buildEvmTransferTransaction } from "../clients/evm";
 import winston from "winston";
+import { createBundle, Bundle, BundleOperations } from "../types/models";
+import { StoreBundle } from "../repositories/base-repository"
+import { setStartingTransaction, updateTransactionWithBundleId } from "./utils";
+
 
 export const transferFundsUninjected = (
   logger: winston.Logger,
-  erc20: Erc20,
-  transactionSubmissionClient: ITransactionSubmissionClient,
+  storeBundle: StoreBundle,
+  executeBundle: ExecuteBundle,
 ) => async (transferEvmFundsParams: TransferEvmFundsParams) => {
   logger.info(`Processing Order: ${JSON.stringify(transferEvmFundsParams)}`)
+  const bundle = buildTransferFundsBundle(transferEvmFundsParams);
+  await storeBundle(bundle);
+  return await executeBundle(bundle);
+}
 
-  let transaction: EvmTransaction;
-  if (transferEvmFundsParams.assetSymbol) {
-    transaction = await erc20.getPolygonErc20TransferTransaction({
-      toAddress: transferEvmFundsParams.toAddress,
-      amountInAsset: transferEvmFundsParams.amountInAsset,
-      assetSymbol: transferEvmFundsParams.assetSymbol
-    });
-  } else {
-    transaction = await erc20.getPolygonTransferTransaction({
-      toAddress: transferEvmFundsParams.toAddress,
-      amount: transferEvmFundsParams.amountInAsset,
-    });
-  }
-  logger.info(`Transaction: ${JSON.stringify(transaction)}`)
-  return await transactionSubmissionClient.sendPolygonTransaction(transaction);
+const buildTransferFundsBundle = (transferEvmFundsParams: TransferEvmFundsParams): Bundle => {
+  let bundle = createBundle(BundleOperations.TRANSFER_FUNDS);
+  // TODO: Logic to check if we have the funds?
+  // ??
+  let transaction = buildEvmTransferTransaction(transferEvmFundsParams);
+  transaction = updateTransactionWithBundleId(transaction, bundle.id);
+  bundle.transactions.push(transaction);
+  bundle = setStartingTransaction(bundle);
+  return bundle;
 }

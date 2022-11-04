@@ -4,7 +4,7 @@ import { swapUsdcToEthUninjected } from "./uniswap";
 import { buyClubHouseNFTUninjected } from "./clubhouse";
 import { buyGenieNFTUninjected } from "./genie";
 import { transferFundsUninjected } from "./transfer-funds";
-import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient } from "../clients/transactions";
+import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, executeBundleUninjected, ExecuteBundle, TestTransactionSubmissionClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
 import getCryptoConfig from "../config/crypto-config";
 import getFireblocksConfig from "../config/fireblocks-config";
@@ -12,8 +12,8 @@ import { buySeaportNFTUninjected } from "./seaport";
 import { OpenSeaClient } from "../clients/opensea";
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
-import { Erc20 } from "../clients/evm";
 import logger from "../loaders/logger";
+import { storeBundle, updateTransaction } from "../repositories/prisma-repository";
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig()
@@ -21,13 +21,13 @@ const fireblocksConfig = getFireblocksConfig()
 let transactionSubmissionClient: ITransactionSubmissionClient;
 if (process.argv.length > 2 && process.argv[2] == "fireblocks") {
   logger.warn("Configured to use Fireblocks to submit transactions")
-  transactionSubmissionClient = new FireblocksClient(logger, cryptoConfig.ethChain, cryptoConfig.polygonChain, fireblocksConfig, cryptoConfig);
+  transactionSubmissionClient = new FireblocksClient(logger, fireblocksConfig, cryptoConfig);
 } else if (process.argv.length > 2 && process.argv[2] == "self") {
   logger.info("Configured to use your personal keys to submit transactions")
-  transactionSubmissionClient = new SelfCustodyClient(logger, cryptoConfig.ethChain, cryptoConfig.polygonChain, cryptoConfig);
+  transactionSubmissionClient = new SelfCustodyClient(logger, cryptoConfig);
 } else {
-  logger.info("Configured to fake transactions")
-  transactionSubmissionClient = new SelfCustodyClient(logger, cryptoConfig.ethChain, cryptoConfig.polygonChain, cryptoConfig);
+  logger.info("Configured to send fake transactions")
+  transactionSubmissionClient = new TestTransactionSubmissionClient(logger);
 }
 const genieClient: GenieClient = new GenieClient(logger);
 
@@ -37,10 +37,10 @@ const openSeaClient: OpenSeaClient = new OpenSeaClient(logger, cryptoConfig.ethC
   apiKey: cryptoConfig.openSeaAPIKey,
 }, logger.info))
 
-const erc20: Erc20 = new Erc20(logger, cryptoConfig);
+const executeBundle: ExecuteBundle = executeBundleUninjected(transactionSubmissionClient, updateTransaction)
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(logger, cryptoConfig, transactionSubmissionClient);
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(logger, transactionSubmissionClient);
 export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactionSubmissionClient, cryptoConfig);
 export const buySeaportNFT = buySeaportNFTUninjected(logger, openSeaClient, transactionSubmissionClient, cryptoConfig);
-export const transferFunds = transferFundsUninjected(logger, erc20, transactionSubmissionClient);
+export const transferFunds = transferFundsUninjected(logger, storeBundle, executeBundle);

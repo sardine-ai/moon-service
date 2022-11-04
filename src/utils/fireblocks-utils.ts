@@ -6,32 +6,32 @@ interface AssetToFireblocksAssetId {
 
 interface GetFireblocksAssetIdParams {
   chain: string,
-  assetSymbol?: string
+  assetSymbol: string
 }
 
 const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
   "goerli": {
-    "NATIVE": "",
+    "ETH": "",
     "USDC": "",
     "WETH": "",
   },
   "mainnet": {
-    "NATIVE": "",
+    "ETH": "",
     "USDC": "",
     "WETH": "",
   },
   "polygon_test": {
-    "NATIVE": "MATIC_POLYGON_MUMBAI",
+    "MATIC": "MATIC_POLYGON_MUMBAI",
     "USDC": "USDC_POLYGON_TEST_2",
     "WETH": "WETH_POLYGON_TEST",
   },
   "polygon": {
-    "NATIVE": "MATIC",
+    "MATIC": "MATIC",
     "USDC": "",
     "WETH": "WETH_POLYGON",
   }
 }
 
 export const getFireblocksAssetId = ({chain, assetSymbol}: GetFireblocksAssetIdParams): string => {
-  return ASSET_TO_FIREBLOCKS_ASSET_ID[chain][assetSymbol || "NATIVE"]
+  return ASSET_TO_FIREBLOCKS_ASSET_ID[chain][assetSymbol]
 }

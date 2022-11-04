@@ -8,16 +8,16 @@ import winston from "winston";
 export const buyGenieNFTUninjected = (
   _logger: winston.Logger,
   genieClient: GenieClient,
-  transactionSubmissionClient: ITransactionSubmissionClient,
-  cryptoConfig: CryptoConfig
+  _transactionSubmissionClient: ITransactionSubmissionClient,
+  _cryptoConfig: CryptoConfig
 ) => async (BuyGenieNFTParams: BuyGenieNFTParams) => {
   const callData: GenieCallDataResponse = await genieClient.getCallData(BuyGenieNFTParams);
   await swapUsdcToEth(callData.valueToSend)
-  await transactionSubmissionClient.sendEthTransaction({
-    to: callData.to,
-    value: callData.valueToSend,
-    data: callData.data,
-    chain: cryptoConfig.ethChain,
-    assetSymbol: "NATIVE"
-  });
+  // await transactionSubmissionClient.sendTransaction({
+  //   to: callData.to,
+  //   value: callData.valueToSend,
+  //   callData: callData.data,
+  //   chain: cryptoConfig.ethChain,
+  //   assetSymbol: "ETH"
+  // });
 }

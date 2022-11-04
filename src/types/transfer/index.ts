@@ -2,9 +2,9 @@
 
 import { IsDefined, IsIn, IsPositive } from "class-validator";
 import { Expose } from "class-transformer";
-import { IsValidEvmAddress } from "../decorators";
+import { IsValidEvmAddress, Default } from "../decorators";
 
-const VALID_CHAINS = ["ETH", "MATIC"]
+const VALID_CHAINS = ["mainnet", "goerli", "polygon", "polygon_test"]
 
 export class TransferEvmFundsParams {
   @IsDefined()
@@ -13,7 +13,8 @@ export class TransferEvmFundsParams {
   amountInAsset: number
 
   @Expose()
-  assetSymbol?: string;
+  @Default("NATIVE")
+  assetSymbol: string;
 
   @IsDefined()
   @Expose()
