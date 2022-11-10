@@ -1,5 +1,5 @@
 # 🌒 Moon Service 
-## _A serivce for building blockchain transactions and fulfilling them on chain_
+## _A service for building blockchain transactions and fulfilling them on chain_
 
 ## Table of Contents
 1. [Setup](#setup)
