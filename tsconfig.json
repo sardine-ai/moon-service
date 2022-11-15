@@ -12,7 +12,7 @@
     "preserveSymlinks": true,
     "strict": true,
     "noUnusedLocals": true,
-    "lib": ["ESNext"],
+    "lib": ["dom", "ESNext"],
     "target": "ESNext",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -20,5 +20,5 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ]
+  ],
 }

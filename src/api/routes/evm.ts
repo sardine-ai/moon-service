@@ -6,7 +6,7 @@ import { buyGenieNFT, buyClubHouseNFT, transferEvmFunds } from '../controllers/i
 
 const evmRouter = express.Router();
 
-evmRouter.post('/buy-genie-nft', ((req, resp) => buyGenieNFT(req, resp)));
+evmRouter.post('/buy-genie-nft', buyGenieNFT);
 evmRouter.post('/buy-club-house-nft', validationMw(BuyClubHouseNFTParams), buyClubHouseNFT);
 evmRouter.post('/transfer-funds', validationMw(TransferEvmFundsParams), transferEvmFunds);
 
