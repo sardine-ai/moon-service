@@ -47,3 +47,4 @@ export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactio
 export const buySeaportNFT = buySeaportNFTUninjected(logger, openSeaClient, transactionSubmissionClient, cryptoConfig);
 
 export const transferFunds = commandUninjected(logger, buildTransferFundsBundle, storeBundle, executeBundle); // <----- Every command should look like this
+
