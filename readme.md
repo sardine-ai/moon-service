@@ -49,14 +49,10 @@ Steps for Transfering WETH on Polygon Mumbai using your Public Private Key Pair:
 5. Call `localhost:8000/api/evm/transfer-funds` with the following body:
 ```
 {
-    "orders": [
-        {
-            "assetId": "MATIC",
-            "toAddress": "SOME_OTHER_ADDRESS",
-            "amountInAsset": "0.1",
-            "assetContractAddress": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889" // WETH ADDRESS ON MUMBAI
-        }
-    ]
+    "amountInAsset": 0.00001,
+    "assetSymbol": "WETH",
+    "chain": "polygon_test",
+    "toAddress": "0x4cc1756281D7203A172C63E9df9307dABA5523A8" // WETH ADDRESS ON MUMBAI
 }
 ```
 
