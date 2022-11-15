@@ -9,7 +9,7 @@
     "start": "ts-node src/app.ts",
     "lint": "gts lint",
     "clean": "gts clean",
-    "compile": "tsc",
+    "compile": "echo lol",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",

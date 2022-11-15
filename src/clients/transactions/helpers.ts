@@ -48,8 +48,8 @@ const isTransactionReady = (transaction: Transaction) => {
 
 const updateTransactionWithResult = (transaction: Transaction, result: any): Transaction => {
   const newTransaction = Object.assign({}, transaction);
-  newTransaction.executionId = result.id;
+  newTransaction.executionId = result?.id || undefined;
   newTransaction.state = TransactionState.SUBMITTED;
-  newTransaction.transactionHash = result.transactionHash;
+  newTransaction.transactionHash = result?.transactionHash || undefined;
   return newTransaction
 }

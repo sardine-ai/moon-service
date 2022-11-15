@@ -3,6 +3,11 @@
   "compilerOptions": {
     "baseUrl": "./",
     "rootDir": "./",
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ],
+    },
     "sourceMap": true,
     "outDir": "build",
     "esModuleInterop": true,
