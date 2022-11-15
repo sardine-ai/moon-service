@@ -3,7 +3,7 @@
 import { swapUsdcToEthUninjected } from "./uniswap";
 import { buyClubHouseNFTUninjected } from "./clubhouse";
 import { buyGenieNFTUninjected } from "./genie";
-import { transferFundsUninjected } from "./transfer-funds";
+import { buildTransferFundsBundle } from "./transfer-funds";
 import { executeBundleUninjected, ExecuteBundle } from "../clients/transactions/helpers";
 import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, TestTransactionSubmissionClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
@@ -15,6 +15,7 @@ import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
 import logger from "../loaders/logger";
 import { storeBundle, updateTransaction } from "../repositories/prisma-repository";
+import { commandUninjected } from "./command";
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig()
@@ -40,8 +41,9 @@ const openSeaClient: OpenSeaClient = new OpenSeaClient(logger, cryptoConfig.ethC
 
 const executeBundle: ExecuteBundle = executeBundleUninjected(transactionSubmissionClient, updateTransaction, logger)
 
-export const swapUsdcToEth = swapUsdcToEthUninjected(logger, cryptoConfig, transactionSubmissionClient);
+export const swapUsdcToEth = swapUsdcToEthUninjected(logger, cryptoConfig, transactionSubmissionClient); 
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(logger, transactionSubmissionClient);
 export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactionSubmissionClient, cryptoConfig);
 export const buySeaportNFT = buySeaportNFTUninjected(logger, openSeaClient, transactionSubmissionClient, cryptoConfig);
-export const transferFunds = transferFundsUninjected(logger, storeBundle, executeBundle);
+
+export const transferFunds = commandUninjected(logger, buildTransferFundsBundle, storeBundle, executeBundle); // <----- Every command should look like this
