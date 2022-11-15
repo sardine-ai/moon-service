@@ -40,6 +40,7 @@ export const buildEvmTransferTransaction = ({
   } else {
     const assetContractDetails = getAssetContractDetails(chain, assetSymbol);
     transaction.callData = buildTransferErc20CallData(toAddress, amountInAsset, assetContractDetails);
+    transaction.to = assetContractDetails.assetContractAddress;
   }
   return transaction;
 }

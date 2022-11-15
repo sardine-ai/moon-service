@@ -2,26 +2,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { FireblocksSDK, PeerType, TransactionOperation, TransactionArguments, VaultAccountResponse } from "fireblocks-sdk";
-import { EvmTransaction } from "../types/evm";
+import { EvmTransaction, GasDetails } from "../../types/evm";
 import { formatEther, formatUnits } from "ethers/lib/utils";
-import { FireblocksConfig } from "../config/fireblocks-config";
-import { CryptoConfig } from "../config/crypto-config";
+import { FireblocksConfig } from "../../config/fireblocks-config";
+import { CHAIN_TO_CHAIN_ID, CryptoConfig } from "../../config/crypto-config";
 import { AlchemyWeb3, createAlchemyWeb3 } from "@alch/alchemy-web3";
 import { SignedTransaction } from "web3-core"
-import { getFireblocksAssetId } from "../utils/fireblocks-utils";
+import { getFireblocksAssetId } from "../../utils/fireblocks-utils";
 import winston from 'winston';
-import { Bundle, Transaction, TransactionState } from "../types/models";
-import { UpdateTransaction } from "../repositories/base-repository";
+import { Transaction } from "../../types/models";
+import { getGasDetails } from "./helpers";
 
 export interface ITransactionSubmissionClient {
   sendTransaction(transaction: Transaction): Promise<any>
   getFromAddress(chain: string, assetSymbol: string): Promise<string> | string
-}
-
-interface EstimateGasParams {
-  to: string,
-  data: string,
-  valueInEther: number
 }
 
 abstract class TransactionSubmissionClient implements ITransactionSubmissionClient {
@@ -53,17 +47,28 @@ abstract class TransactionSubmissionClient implements ITransactionSubmissionClie
         throw new Error("Unsupported Chain");
     }
   }
+  
+  buildEvmTransaction(transaction: Transaction, fromAddress: string, nonce: number, gasDetails: GasDetails): EvmTransaction {
+    return {
+      from: fromAddress,
+      to: transaction.to,
+      gas: gasDetails.gasLimit,
+      maxPriorityFeePerGas: gasDetails.maxPriorityFee,
+      data: transaction.callData,
+      value: transaction.value,
+      chainId: CHAIN_TO_CHAIN_ID[transaction.chain],
+      chain: transaction.chain,
+      assetSymbol: transaction.assetSymbol,
+      nonce: nonce
+    }
+  }
 
-  async estimateGasFees(chain: string, {to, data, valueInEther}: EstimateGasParams): Promise<number> {
-    const alchemy = this.getChainAlchemy(chain);
-    const estimate = alchemy.eth.estimateGas({
-      to: to,
-      // `function deposit() payable`
-      data: data,
-      // 1 ether
-      value: valueInEther,
-    })
-    return estimate;
+  async convertTransactionToEvmTransaction(transaction: Transaction): Promise<EvmTransaction> {
+    const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
+    const fromAddress =  await this.getFromAddress(transaction.chain, transaction.assetSymbol);
+    const nonce = await alchemyWeb3.eth.getTransactionCount(fromAddress, 'latest');
+    const gasDetails = await getGasDetails(fromAddress, transaction, alchemyWeb3);
+    return this.buildEvmTransaction(transaction, fromAddress, nonce, gasDetails);
   }
 }
 
@@ -101,7 +106,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
           id: vaultAccount.id
       },
       gasPrice: transaction.gasPrice != undefined ? formatUnits(transaction.gasPrice.toString(), "gwei") : undefined,
-      gasLimit: transaction?.maxFeePerGas,
+      gasLimit: transaction?.gas,
       destination: {
           type: PeerType.ONE_TIME_ADDRESS,
           id: "",
@@ -109,15 +114,13 @@ export class FireblocksClient extends TransactionSubmissionClient {
               address: <string>transaction.to
           }
       },
-      note: transaction.txNote || ''
+      note: transaction.txNote || '',
+      amount: transaction.value?.toString() || formatEther("0"),
     }
     if (transaction.data) {
       txArguments.extraParameters = {
         contractCallData: transaction.data
       }
-    }
-    if (transaction.value) {
-      txArguments.amount = formatEther(transaction.value)
     }
     return txArguments
   }
@@ -157,7 +160,8 @@ export class FireblocksClient extends TransactionSubmissionClient {
     // need a getVaultFromAddress method
     const vaultAccount = await this.getVaultAccount(transaction.chain, transaction.assetSymbol);
     if (vaultAccount) {
-      const txArguments = this.getTransactionArguments(transaction, vaultAccount);
+      const evmTransaction = await this.convertTransactionToEvmTransaction(transaction);
+      const txArguments = this.getTransactionArguments(evmTransaction, vaultAccount);
       const fireblocks = await this.getOrSetFireblocksSdk();
       return fireblocks.createTransaction(txArguments);
     }
@@ -174,7 +178,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
     this.logger = logger;
   }
 
-  async signTransaction(alchemyWeb3: AlchemyWeb3, transaction: EvmTransaction, nonce: number): Promise<SignedTransaction> {
+  async signTransaction(alchemyWeb3: AlchemyWeb3, transaction: EvmTransaction): Promise<SignedTransaction> {
     this.logger.info("Signing Transaction")
     const signedTransaction = await alchemyWeb3.eth.accounts.signTransaction({
       from: transaction.from,
@@ -183,7 +187,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
       gas: transaction?.gas,
       maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
       data: transaction.data,
-      nonce: nonce,
+      nonce: transaction.nonce,
       chainId: transaction.chainId,
     }, this.cryptoConfig.sardinePrivateKey);
     return signedTransaction;
@@ -193,9 +197,9 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
     this.logger.info("Sending Signed Transaction")
     const result = await alchemyWeb3.eth.sendSignedTransaction(signedTransaction.rawTransaction!, (err, hash) => {
       if (err === null) {
-        this.logger.info("Hash: ", hash)
+        this.logger.info(`Hash: ${hash}`)
       } else {
-        this.logger.error("Something went wrong when submitting your transaction:", err)
+        this.logger.error(`Something went wrong when submitting your transaction: ${err}`)
       }
     });
     return result;
@@ -203,9 +207,8 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
 
   async sendTransaction(transaction: Transaction): Promise<any> {
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
-    const fromAddress =  this.getFromAddress(transaction.chain, transaction.assetSymbol);
-    const nonce = await alchemyWeb3.eth.getTransactionCount(fromAddress, 'latest');
-    const signedTransaction = await this.signTransaction(alchemyWeb3, transaction, nonce);
+    const evmTransaction = await this.convertTransactionToEvmTransaction(transaction);
+    const signedTransaction = await this.signTransaction(alchemyWeb3, evmTransaction);
     return this.sendSignedTransaction(alchemyWeb3, signedTransaction);
   }
 
@@ -221,7 +224,7 @@ export class TestTransactionSubmissionClient implements ITransactionSubmissionCl
     this.logger = logger;
   }
 
-  async sendTransaction(_transaction: EvmTransaction): Promise<any> {
+  async sendTransaction(_transaction: Transaction): Promise<any> {
     this.logger.info("Sending Transaction... JK");
     return
   }
@@ -234,37 +237,7 @@ export class TestTransactionSubmissionClient implements ITransactionSubmissionCl
 
   getFromAddress(_chain: string, _assetSymbol: string): string | Promise<string> {
     const fakeAddress = "0x123456";
-    this.logger.info("Fake from address", fakeAddress);
+    this.logger.info(`Fake from address: ${fakeAddress}`);
     return fakeAddress;
   }
-}
-
-export type ExecuteBundle = (bundle: Bundle) => Promise<void>
-
-export const executeBundleUninjected = (
-  transactionSubmissionClient: ITransactionSubmissionClient,
-  updateTransaction: UpdateTransaction
-) => async (bundle: Bundle) => {
-  let transaction = getReadyTransaction(bundle.transactions);
-  if (transaction) {
-    const result = transactionSubmissionClient.sendTransaction(transaction);
-    transaction = updateTransactionWithResult(transaction, result);
-    updateTransaction(transaction);
-  }
-}
-
-const getReadyTransaction = (transactions: Array<Transaction>): Transaction | undefined => {
-  const transaction = transactions.find(isTransactionReady);
-  return transaction;
-}
-
-const isTransactionReady = (transaction: Transaction) => {
-  return transaction.state == TransactionState.CREATED;
-}
-
-const updateTransactionWithResult = (transaction: Transaction, result: any): Transaction => {
-  const newTransaction = Object.assign({}, transaction);
-  newTransaction.executionId = result.id;
-  newTransaction.state = TransactionState.SUBMITTED;
-  return newTransaction
 }

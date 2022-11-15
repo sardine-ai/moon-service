@@ -4,7 +4,8 @@ import { swapUsdcToEthUninjected } from "./uniswap";
 import { buyClubHouseNFTUninjected } from "./clubhouse";
 import { buyGenieNFTUninjected } from "./genie";
 import { transferFundsUninjected } from "./transfer-funds";
-import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, executeBundleUninjected, ExecuteBundle, TestTransactionSubmissionClient } from "../clients/transactions";
+import { executeBundleUninjected, ExecuteBundle } from "../clients/transactions/helpers";
+import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, TestTransactionSubmissionClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
 import getCryptoConfig from "../config/crypto-config";
 import getFireblocksConfig from "../config/fireblocks-config";
@@ -37,7 +38,7 @@ const openSeaClient: OpenSeaClient = new OpenSeaClient(logger, cryptoConfig.ethC
   apiKey: cryptoConfig.openSeaAPIKey,
 }, logger.info))
 
-const executeBundle: ExecuteBundle = executeBundleUninjected(transactionSubmissionClient, updateTransaction)
+const executeBundle: ExecuteBundle = executeBundleUninjected(transactionSubmissionClient, updateTransaction, logger)
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(logger, cryptoConfig, transactionSubmissionClient);
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(logger, transactionSubmissionClient);

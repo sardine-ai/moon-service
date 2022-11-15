@@ -18,7 +18,7 @@ const CHAIN_TO_ASSET_ID: {[key: string]: string } = {
   [Chain.MUMBAI]: 'MATIC_POLYGON_MUMBAI',
 }
 
-const CHAIN_IDS: {[key: string]: number }  = {
+export const CHAIN_TO_CHAIN_ID: {[key: string]: number }  = {
   [Chain.MAINNET]: 1,
   [Chain.ROPSTEN]: 3,
   [Chain.GOERLI]: 5,
@@ -64,11 +64,11 @@ export interface CryptoConfig {
 
 const getCryptoConfig = (): CryptoConfig => {
   const ethChain = process.env.ETH_CHAIN || EthChain.GOERLI;
-  const ethChainId = CHAIN_IDS[ethChain];
+  const ethChainId = CHAIN_TO_CHAIN_ID[ethChain];
   const ethAssetId = CHAIN_TO_ASSET_ID[ethChain];
 
   const polygonChain = process.env.POLYGON_CHAIN || PolygonChain.MUMBAI;
-  const polygonChainId = CHAIN_IDS[polygonChain];
+  const polygonChainId = CHAIN_TO_CHAIN_ID[polygonChain];
   const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
 
   const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;

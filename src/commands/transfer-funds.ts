@@ -1,5 +1,5 @@
 import { TransferEvmFundsParams } from "../types/transfer";
-import { ExecuteBundle } from "../clients/transactions";
+import { ExecuteBundle } from "../clients/transactions/helpers";
 import { buildEvmTransferTransaction } from "../clients/evm";
 import winston from "winston";
 import { createBundle, Bundle, BundleOperations } from "../types/models";
