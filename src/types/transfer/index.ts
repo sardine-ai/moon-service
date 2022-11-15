@@ -10,7 +10,7 @@ export class TransferEvmFundsParams {
   @IsDefined()
   @Expose()
   @IsPositive({message: "Please submit an amoount greater than 0"})
-  amountInAsset: number
+  amountInAsset: number;
 
   @Expose()
   @Default("NATIVE")

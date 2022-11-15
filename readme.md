@@ -39,14 +39,13 @@ Docker setup coming soon...
 ## Features
 to use a feature make sure your server is running
 
-### Transfer Funds (in progress)
+### Transfer Funds
 _This feature allows crypto backend to send api requests to wallet service to transfer funds to different addresses in different currencies_
 Steps for Transfering WETH on Polygon Mumbai using your Public Private Key Pair:
-1. Join the polygon discord server: https://discord.gg/ctfKkChkZC
-2. In the `matic-faucet` channel use the commands to request matic
-3. Go to`https://uniswap.org/`, launch the app and switch to `polygon-mumbai`
-4. Swap your matic for WETH
-5. Call `localhost:8000/api/evm/transfer-funds` with the following body:
+1. Go to the mumbai faucer and request test polygon at: `https://faucet.polygon.technology/` 
+2. Go to`https://uniswap.org/`, launch the app and switch to `polygon-mumbai`
+3. Swap your matic for WETH
+4. Call `localhost:8000/api/evm/transfer-funds` with the following body:
 ```
 {
     "amountInAsset": 0.00001,
