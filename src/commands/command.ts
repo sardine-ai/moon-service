@@ -6,12 +6,12 @@ import { Logger } from "winston";
 
 export const commandUninjected = (
   logger: Logger,
-  buildBundle: (params: CommandParams) => Bundle,
+  buildBundle: (params: CommandParams) => Promise<Bundle>,
   storeBundle: StoreBundle,
   executeBundle: ExecuteBundle,
 ) => async (params: CommandParams) => {
   logger.info(`Processing Order: ${JSON.stringify(params)}`)
-  const bundle = buildBundle(params);
+  const bundle = await buildBundle(params);
   await storeBundle(bundle);
   return await executeBundle(bundle);
 }

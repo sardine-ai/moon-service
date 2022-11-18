@@ -9,7 +9,7 @@ import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, Test
 import { GenieClient } from "../clients/genie";
 import getCryptoConfig from "../config/crypto-config";
 import getFireblocksConfig from "../config/fireblocks-config";
-import { buySeaportNFTUninjected } from "./seaport";
+import { buildBuySeaportNftBundleUninjected } from "./seaport";
 import { OpenSeaClient } from "../clients/opensea";
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
@@ -33,18 +33,22 @@ if (process.argv.length > 2 && process.argv[2] == "fireblocks") {
 }
 const genieClient: GenieClient = new GenieClient(logger);
 
-const provider: any = new Web3.providers.HttpProvider(cryptoConfig.ethRPC);
-const openSeaClient: OpenSeaClient = new OpenSeaClient(logger, cryptoConfig.ethChain, cryptoConfig.polygonChain, new OpenSeaSDK(provider, {
+const ethProvider: any = new Web3.providers.HttpProvider(cryptoConfig.ethRPC);
+const ethOpenSea = new OpenSeaSDK(ethProvider, {
   networkName: cryptoConfig.openSeaNetwork as Network,
   apiKey: cryptoConfig.openSeaAPIKey,
-}, logger.info))
+})
+
+const openSeaClient: OpenSeaClient = new OpenSeaClient(logger, cryptoConfig, ethOpenSea)
 
 const executeBundle: ExecuteBundle = executeBundleUninjected(transactionSubmissionClient, updateTransaction, logger)
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(logger, cryptoConfig, transactionSubmissionClient); 
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(logger, transactionSubmissionClient);
 export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactionSubmissionClient, cryptoConfig);
-export const buySeaportNFT = buySeaportNFTUninjected(logger, openSeaClient, transactionSubmissionClient, cryptoConfig);
 
 export const transferFunds = commandUninjected(logger, buildTransferFundsBundle, storeBundle, executeBundle); // <----- Every command should look like this
+
+const buildBuyNftBundle = buildBuySeaportNftBundleUninjected(openSeaClient);
+export const buyNft = commandUninjected(logger, buildBuyNftBundle, storeBundle, executeBundle); 
 

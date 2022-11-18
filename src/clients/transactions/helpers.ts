@@ -8,7 +8,7 @@ import { Logger } from "winston";
 
 export const getGasDetails = async (fromAddress: string, transaction: Transaction, alchemy: AlchemyWeb3): Promise<GasDetails> => {
   const gasLimit = await alchemy.eth.estimateGas({
-    from: "0x54191b9ebB420462fcaf87CD4dc75BDe6481E0d0",
+    from: fromAddress,
     to: transaction.to,
     data: transaction.callData,
     value: transaction.value

@@ -4,7 +4,7 @@ import { createBundle, Bundle, BundleOperations } from "../types/models";
 import { setStartingTransaction, updateTransactionWithBundleId } from "./utils";
 
 
-export const buildTransferFundsBundle = (params: TransferEvmFundsParams): Bundle => {
+export const buildTransferFundsBundle = async (params: TransferEvmFundsParams): Promise<Bundle> => {
   let bundle = createBundle(BundleOperations.TRANSFER_FUNDS);
   // TODO: Logic to check if we have the funds?
   // ??

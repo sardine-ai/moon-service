@@ -1,28 +1,21 @@
-import { ITransactionSubmissionClient } from "../clients/transactions";
 import { OpenSeaClient } from "../clients/opensea";
-import { CryptoConfig } from "../config/crypto-config";
-import winston from "winston";
+import { BuyNftParams } from "../types/nft";
+import { createBundle, Bundle, BundleOperations } from "../types/models";
+import { setStartingTransaction, updateTransactionWithBundleId } from "./utils";
 
-export const buySeaportNFTUninjected = (
-  logger: winston.Logger,
-  openSeaClient: OpenSeaClient,
-  _transactionClient: ITransactionSubmissionClient,
-  cryptoConfig: CryptoConfig
-) => async (nftId: number, contractAddress: string, recipientAddress: string) => {
-  const order = await openSeaClient.getOrder(nftId, contractAddress);
-  const callData = await openSeaClient.getFulfillOrderCallData(order.protocolData, cryptoConfig.sardinePublicKey, recipientAddress);
-  logger.info("Got Call Data:", callData);
-  // await transactionClient.sendTransaction({
-  //   from: callData.from,
-  //   to: callData.to,
-  //   gas: callData.gasLimit?.toString(),
-  //   gasPrice: callData.gasPrice?.toString(),
-  //   maxPriorityFeePerGas: callData.maxPriorityFeePerGas?.toString(),
-  //   maxFeePerGas: callData.maxFeePerGas?.toString(),
-  //   data: callData.data,
-  //   value: callData.value?.toString(),
-  //   chainId: callData.chainId,
-  //   chain: cryptoConfig.ethChain,
-  //   assetSymbol: "ETH"
-  // });
+export const buildBuySeaportNftBundleUninjected = (
+  opensea: OpenSeaClient
+) => async (params: BuyNftParams): Promise<Bundle> => {
+  let bundle = createBundle(BundleOperations.BUY_NFT);
+  switch (params.platform) {
+    case "opensea": {
+      let transaction = await opensea.buildTransaction(params);
+      console.log("transaction", transaction);
+      transaction = updateTransactionWithBundleId(transaction, bundle.id);
+      bundle.transactions.push(transaction);
+      break;
+    }
+  }
+  bundle = setStartingTransaction(bundle);
+  return bundle;
 }

@@ -1,37 +1,14 @@
 interface AssetToFireblocksAssetId {
-  [key: string]: {
-    [key: string]: string
-  }
-}
-
-interface GetFireblocksAssetIdParams {
-  chain: string,
-  assetSymbol: string
+  [key: string]: string
 }
 
 const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
-  "goerli": {
-    "ETH": "",
-    "USDC": "",
-    "WETH": "",
-  },
-  "mainnet": {
-    "ETH": "",
-    "USDC": "",
-    "WETH": "",
-  },
-  "polygon_test": {
-    "MATIC": "MATIC_POLYGON_MUMBAI",
-    "USDC": "USDC_POLYGON_TEST_2",
-    "WETH": "WETH_POLYGON_TEST",
-  },
-  "polygon": {
-    "MATIC": "MATIC",
-    "USDC": "",
-    "WETH": "WETH_POLYGON",
-  }
+  "goerli": "",
+  "mainnet": "ETH",
+  "polygon_test": "MATIC_POLYGON_MUMBAI",
+  "polygon": "MATIC_POLYGON"
 }
 
-export const getFireblocksAssetId = ({chain, assetSymbol}: GetFireblocksAssetIdParams): string => {
-  return ASSET_TO_FIREBLOCKS_ASSET_ID[chain][assetSymbol]
+export const getFireblocksAssetId = (chain: string): string => {
+  return ASSET_TO_FIREBLOCKS_ASSET_ID[chain]
 }

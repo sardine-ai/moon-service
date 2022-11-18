@@ -44,7 +44,7 @@ abstract class TransactionSubmissionClient implements ITransactionSubmissionClie
       case this.cryptoConfig.polygonChain:
         return this.polygonWeb3;
       default:
-        throw new Error("Unsupported Chain");
+        throw new Error(`Unsupported Chain: ${chain}`);
     }
   }
   
@@ -66,6 +66,7 @@ abstract class TransactionSubmissionClient implements ITransactionSubmissionClie
   async convertTransactionToEvmTransaction(transaction: Transaction): Promise<EvmTransaction> {
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
     const fromAddress =  await this.getFromAddress(transaction.chain, transaction.assetSymbol);
+    console.log("from address", fromAddress);
     const nonce = await alchemyWeb3.eth.getTransactionCount(fromAddress, 'latest');
     const gasDetails = await getGasDetails(fromAddress, transaction, alchemyWeb3);
     return this.buildEvmTransaction(transaction, fromAddress, nonce, gasDetails);
@@ -105,8 +106,8 @@ export class FireblocksClient extends TransactionSubmissionClient {
           type: PeerType.VAULT_ACCOUNT,
           id: vaultAccount.id
       },
-      gasPrice: transaction.gasPrice != undefined ? formatUnits(transaction.gasPrice.toString(), "gwei") : undefined,
-      gasLimit: transaction?.gas,
+      gasPrice: transaction.maxPriorityFeePerGas != undefined ? formatUnits(transaction.maxPriorityFeePerGas.toString(), "gwei") : undefined,
+      gasLimit: transaction.gas,
       destination: {
           type: PeerType.ONE_TIME_ADDRESS,
           id: "",
@@ -130,9 +131,9 @@ export class FireblocksClient extends TransactionSubmissionClient {
     return potentialVaults[0];
   }
 
-  async getVaultAccount(chain: string, assetSymbol: string): Promise<FireblocksVaultAccount | undefined> {
+  async getVaultAccount(chain: string): Promise<FireblocksVaultAccount | undefined> {
     const fireblocks = await this.getOrSetFireblocksSdk();
-    const fireblocksAssetId = getFireblocksAssetId({chain, assetSymbol});
+    const fireblocksAssetId = getFireblocksAssetId(chain);
     const potentialVaults = await fireblocks.getVaultAccountsWithPageInfo({assetId: fireblocksAssetId});
     if (potentialVaults.accounts && potentialVaults.accounts.length > 0) {
       return {
@@ -143,12 +144,11 @@ export class FireblocksClient extends TransactionSubmissionClient {
     return undefined;
   }
 
-  async getFromAddress(chain: string, assetSymbol: string): Promise<string> {
+  async getFromAddress(chain: string): Promise<string> {
     const fireblocks = await this.getOrSetFireblocksSdk();
-    const vaultAccount = await this.getVaultAccount(chain, assetSymbol);
+    const vaultAccount = await this.getVaultAccount(chain);
     if (vaultAccount) {
-      const fireblocksAssetId = getFireblocksAssetId({chain, assetSymbol});
-      const depositAddresses = await fireblocks.getDepositAddresses(vaultAccount.id, fireblocksAssetId);
+      const depositAddresses = await fireblocks.getDepositAddresses(vaultAccount.id, vaultAccount.assetId);
       return depositAddresses[0].address;
     }
     this.logger.error("No address found");
@@ -158,12 +158,19 @@ export class FireblocksClient extends TransactionSubmissionClient {
   async sendTransaction(transaction: Transaction): Promise<any> {
     // TODO: if the address is passed in the transaction we will want to get the vault id associated with that address
     // need a getVaultFromAddress method
-    const vaultAccount = await this.getVaultAccount(transaction.chain, transaction.assetSymbol);
+    const vaultAccount = await this.getVaultAccount(transaction.chain);
     if (vaultAccount) {
       const evmTransaction = await this.convertTransactionToEvmTransaction(transaction);
       const txArguments = this.getTransactionArguments(evmTransaction, vaultAccount);
+      console.log(txArguments);
       const fireblocks = await this.getOrSetFireblocksSdk();
-      return fireblocks.createTransaction(txArguments);
+      try {
+        const response = await fireblocks.createTransaction(txArguments);
+        console.log("response", response)
+        return response;
+      } catch (error) {
+        console.log("error", error)
+      }
     }
     this.logger.error("No vault acccount found");
     return;
@@ -208,6 +215,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
   async sendTransaction(transaction: Transaction): Promise<any> {
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
     const evmTransaction = await this.convertTransactionToEvmTransaction(transaction);
+    console.log("Signing evm transaction", evmTransaction);
     const signedTransaction = await this.signTransaction(alchemyWeb3, evmTransaction);
     return this.sendSignedTransaction(alchemyWeb3, signedTransaction);
   }

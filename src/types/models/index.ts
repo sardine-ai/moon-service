@@ -1,7 +1,8 @@
 import { v4 as uuidV4 } from "uuid";
 
 export enum BundleOperations {
-  TRANSFER_FUNDS = "TRANSFER_FUNDS"
+  TRANSFER_FUNDS = "TRANSFER_FUNDS",
+  BUY_NFT = "BUY_NFT"
 }
 
 export interface Bundle {

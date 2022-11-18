@@ -10,7 +10,7 @@ const commandTryCatchWrapper = (
   try {
     res.json(await command(req.body)).status(200);
   } catch (err: unknown) {
-    Logger.error("An Error Occured while processing Buy Genie NFT", err);
+    Logger.error("An Error Occured while processing request", err);
     res.status(500);
   }
 }
@@ -18,6 +18,7 @@ const commandTryCatchWrapper = (
 export const buyGenieNftController = commandTryCatchWrapper(commands.buyGenieNFT);
 export const buyClubHouseNftController = commandTryCatchWrapper(commands.buyClubHouseNFT);
 export const transferEvmFundsController = commandTryCatchWrapper(commands.transferFunds);
+export const buyNftController = commandTryCatchWrapper(commands.buyNft);
 
 export const receiveFireblocksWebhook = async (req: Request, res: Response) => {
   try {
