@@ -1,0 +1,58 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        on_going_build=($(gcloud builds list --ongoing --format='value(id)' --filter="substitutions.TRIGGER_NAME=$TRIGGER_NAME" | xargs))
+        for (( i=0; i<${#on_going_build[@]}; i++ )); do
+          if [ "$i" -gt "0" ]; then # skip current
+            echo "Cancelling build ${on_going_build[i]}"
+            gcloud builds cancel ${on_going_build[i]}
+          fi
+        done
+  - name: docker
+    args:
+      [
+        "build",
+        "-t",
+        "gcr.io/$PROJECT_ID/moon-service:$SHORT_SHA",
+        "-f",
+        "Dockerfile.dev",
+        ".",
+      ]
+  - name: docker
+    args:
+      [
+        "tag",
+        "gcr.io/$PROJECT_ID/moon-service:$SHORT_SHA",
+        "gcr.io/$PROJECT_ID/moon-service:latest",
+      ]
+  - name: docker
+    args: ["push", "gcr.io/$PROJECT_ID/moon-service", "--all-tags"]
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "services"
+      - "update"
+      - "moon-service"
+      - "--image"
+      - "gcr.io/$PROJECT_ID/moon-service:$SHORT_SHA"
+      - "--region"
+      - "us-central1"
+      - "--platform"
+      - "managed"
+      - --update-env-vars
+      - RELEASE=$SHORT_SHA
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "services"
+      - "update-traffic"
+      - "moon-service"
+      - "--to-latest"
+      - "--region"
+      - "us-central1"
+timeout: 1000s
