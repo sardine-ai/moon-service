@@ -101,7 +101,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
   getTransactionArguments(transaction: EvmTransaction, vaultAccount: FireblocksVaultAccount): TransactionArguments {
     const txArguments: TransactionArguments = {
       operation: TransactionOperation.CONTRACT_CALL,
-      assetId: vaultAccount.assetId,
+      assetId: getFireblocksAssetId({chain: transaction.chain}),
       source: {
           type: PeerType.VAULT_ACCOUNT,
           id: vaultAccount.id
@@ -131,9 +131,9 @@ export class FireblocksClient extends TransactionSubmissionClient {
     return potentialVaults[0];
   }
 
-  async getVaultAccount(chain: string): Promise<FireblocksVaultAccount | undefined> {
+  async getVaultAccount(chain: string, assetSymbol: string): Promise<FireblocksVaultAccount | undefined> {
     const fireblocks = await this.getOrSetFireblocksSdk();
-    const fireblocksAssetId = getFireblocksAssetId(chain);
+    const fireblocksAssetId = getFireblocksAssetId({chain, assetSymbol});
     const potentialVaults = await fireblocks.getVaultAccountsWithPageInfo({assetId: fireblocksAssetId});
     if (potentialVaults.accounts && potentialVaults.accounts.length > 0) {
       return {
@@ -144,9 +144,9 @@ export class FireblocksClient extends TransactionSubmissionClient {
     return undefined;
   }
 
-  async getFromAddress(chain: string): Promise<string> {
+  async getFromAddress(chain: string, assetSymbol: string): Promise<string> {
     const fireblocks = await this.getOrSetFireblocksSdk();
-    const vaultAccount = await this.getVaultAccount(chain);
+    const vaultAccount = await this.getVaultAccount(chain, assetSymbol);
     if (vaultAccount) {
       const depositAddresses = await fireblocks.getDepositAddresses(vaultAccount.id, vaultAccount.assetId);
       return depositAddresses[0].address;
@@ -158,7 +158,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
   async sendTransaction(transaction: Transaction): Promise<any> {
     // TODO: if the address is passed in the transaction we will want to get the vault id associated with that address
     // need a getVaultFromAddress method
-    const vaultAccount = await this.getVaultAccount(transaction.chain);
+    const vaultAccount = await this.getVaultAccount(transaction.chain, transaction.assetSymbol);
     if (vaultAccount) {
       const evmTransaction = await this.convertTransactionToEvmTransaction(transaction);
       const txArguments = this.getTransactionArguments(evmTransaction, vaultAccount);

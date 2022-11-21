@@ -20,7 +20,7 @@ export const getGasDetails = async (fromAddress: string, transaction: Transactio
   }
 }
 
-export type ExecuteBundle = (bundle: Bundle) => Promise<void>
+export type ExecuteBundle = (bundle: Bundle) => Promise<any>
 
 export const executeBundleUninjected = (
   transactionSubmissionClient: ITransactionSubmissionClient,
@@ -34,6 +34,7 @@ export const executeBundleUninjected = (
     logger.info(`Transaction result ${JSON.stringify(result)}`);
     transaction = updateTransactionWithResult(transaction, result);
     updateTransaction(transaction);
+    return result;
   }
 }
 

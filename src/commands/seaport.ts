@@ -1,4 +1,4 @@
-import { OpenSeaClient } from "../clients/opensea";
+import { OpenSeaClient } from "../clients/openSea"
 import { BuyNftParams } from "../types/nft";
 import { createBundle, Bundle, BundleOperations } from "../types/models";
 import { setStartingTransaction, updateTransactionWithBundleId } from "./utils";

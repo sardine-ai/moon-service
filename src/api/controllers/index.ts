@@ -5,13 +5,13 @@ import Logger from '../../loaders/logger';
 import { CommandParams } from '../../types/command';
 
 const commandTryCatchWrapper = (
-  command: (command: CommandParams) => Promise<void>
+  command: (command: CommandParams) => Promise<any>
 ) => async (req: Request, res: Response) => {
   try {
     res.json(await command(req.body)).status(200);
   } catch (err: unknown) {
     Logger.error("An Error Occured while processing request", err);
-    res.status(500);
+    res.send(`An Error Occured while processing request: ${err}`).status(500);
   }
 }
 

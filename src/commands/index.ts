@@ -10,7 +10,7 @@ import { GenieClient } from "../clients/genie";
 import getCryptoConfig from "../config/crypto-config";
 import getFireblocksConfig from "../config/fireblocks-config";
 import { buildBuySeaportNftBundleUninjected } from "./seaport";
-import { OpenSeaClient } from "../clients/opensea";
+import { OpenSeaClient } from "../clients/openSea";
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
 import logger from "../loaders/logger";
