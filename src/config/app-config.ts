@@ -18,7 +18,7 @@ export interface AppConfig {
 
 const getAppConfig = (): AppConfig => {
   return {
-    port: parseInt(process.env.PORT || "8000", 10),
+    port: parseInt(process.env.NODE_PORT || "8000", 10),
     logs: {
       level: process.env.LOG_LEVEL || 'silly',
     },
