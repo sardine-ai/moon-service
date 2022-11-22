@@ -1,10 +1,9 @@
-import dotenv from 'dotenv';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import dotenv from 'dotenv';
 
 const envFound = dotenv.config();
 if (envFound.error) {
-  // This error should crash whole process
-  throw new Error("⚠️  Couldn't find .env file  ⚠️");
+  console.log("⚠️  Couldn't find .env file  ⚠️ (Using pure environment variables instead)");
 }
 
 export interface FireblocksConfig {

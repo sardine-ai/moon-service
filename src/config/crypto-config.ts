@@ -3,11 +3,10 @@ import { Chain } from "fireblocks-defi-sdk";
 
 const envFound = dotenv.config();
 if (envFound.error) {
-  // This error should crash whole process
-  throw new Error("⚠️  Couldn't find .env file  ⚠️");
+  console.log("⚠️  Couldn't find .env file  ⚠️ (Using pure environment variables instead)");
 }
 
-const CHAIN_TO_ASSET_ID: {[key: string]: string } = {
+const CHAIN_TO_ASSET_ID: { [key: string]: string } = {
   [Chain.MAINNET]: 'ETH',
   [Chain.ROPSTEN]: 'ETH_TEST',
   [Chain.GOERLI]: 'ETH_TEST3',
@@ -18,7 +17,7 @@ const CHAIN_TO_ASSET_ID: {[key: string]: string } = {
   [Chain.MUMBAI]: 'MATIC_POLYGON_MUMBAI',
 }
 
-export const CHAIN_TO_CHAIN_ID: {[key: string]: number }  = {
+export const CHAIN_TO_CHAIN_ID: { [key: string]: number } = {
   [Chain.MAINNET]: 1,
   [Chain.ROPSTEN]: 3,
   [Chain.GOERLI]: 5,
