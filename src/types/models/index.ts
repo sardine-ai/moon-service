@@ -1,19 +1,19 @@
 import { v4 as uuidV4 } from "uuid";
 
-export enum BundleOperations {
+export enum Operation {
   TRANSFER_FUNDS = "TRANSFER_FUNDS",
   BUY_NFT = "BUY_NFT"
 }
 
 export interface Bundle {
   id: string;
-  operation: string;
+  operation: Operation;
   transactions: Array<Transaction>
 }
 
-export const createBundle = (operation: BundleOperations): Bundle => ({
+export const createBundle = (operation: Operation): Bundle => ({
   id: uuidV4(),
-  operation: operation.toString(),
+  operation: operation,
   transactions: new Array<Transaction>()
 })
 
@@ -43,4 +43,5 @@ export interface Transaction {
   callData?: string;
   chain: string;
   assetSymbol: string;
+  operation: Operation;
 }

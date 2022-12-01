@@ -12,10 +12,12 @@ import { getFireblocksAssetId } from "../../utils/fireblocks-utils";
 import winston from 'winston';
 import { Transaction } from "../../types/models";
 import { getGasDetails } from "./helpers";
+import { TransactionQuote } from "../../types/quote";
 
 export interface ITransactionSubmissionClient {
-  sendTransaction(transaction: Transaction): Promise<any>
-  getFromAddress(chain: string, assetSymbol: string): Promise<string> | string
+  sendTransaction(transaction: Transaction): Promise<any>;
+  getFromAddress(chain: string, assetSymbol: string): Promise<string> | string;
+  quoteTransaction(transaction: Transaction): Promise<TransactionQuote>;
 }
 
 abstract class TransactionSubmissionClient implements ITransactionSubmissionClient {
@@ -27,6 +29,26 @@ abstract class TransactionSubmissionClient implements ITransactionSubmissionClie
     this.cryptoConfig = cryptoConfig;
     this.ethWeb3 = createAlchemyWeb3(cryptoConfig.ethRPC);
     this.polygonWeb3 = createAlchemyWeb3(cryptoConfig.maticRPC);
+  }
+
+  async quoteTransaction(transaction: Transaction): Promise<TransactionQuote> {
+    const cost = Number(formatEther(transaction.value || "0"));
+
+    const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
+    const fromAddress =  await this.getFromAddress(transaction.chain, transaction.assetSymbol);
+    const gasDetails = await getGasDetails(fromAddress, transaction, alchemyWeb3);
+    const gasCost = Number(
+      formatEther(
+        Number(gasDetails.gasLimit || 0) * (Number(gasDetails.maxPriorityFee) + Number(gasDetails.baseFeePerGas || 0))
+      )
+    )
+
+    return {
+      totalCost: cost + gasCost,
+      cost: cost,
+      gasCost: gasCost,
+      currency: transaction.chain 
+    }
   }
   
   sendTransaction(_transaction: Transaction): Promise<any> {
@@ -116,7 +138,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
           }
       },
       note: transaction.txNote || '',
-      amount: transaction.value?.toString() || formatEther("0"),
+      amount: formatEther(transaction.value?.toString() || "0"),
     }
     if (transaction.data) {
       txArguments.extraParameters = {
@@ -230,6 +252,10 @@ export class TestTransactionSubmissionClient implements ITransactionSubmissionCl
 
   constructor(logger: winston.Logger) {
     this.logger = logger;
+  }
+
+  quoteTransaction(transaction: Transaction): Promise<any> {
+    throw new Error("Method not implemented.");
   }
 
   async sendTransaction(_transaction: Transaction): Promise<any> {

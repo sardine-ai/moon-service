@@ -1,21 +1,21 @@
 import { executeBundleUninjected } from "../../src/clients/transactions/helpers";
 import { buildTransferFundsBundle } from "../../src/commands/transfer-funds";
 import { getBundle, storeBundle, updateTransaction } from "../../src/repositories/test-repository";
-import { Bundle, BundleOperations, createBundle, TransactionState } from "../../src/types/models";
+import { Bundle, Operation, createBundle, TransactionState } from "../../src/types/models";
 import logger from "../../src/loaders/logger";
 import { TestTransactionSubmissionClient } from "../../src/clients/transactions";
 
 describe('Testing Bundle Logic', () => {
   test('it should create a Bundle', () => {
-    const bundle = createBundle(BundleOperations.TRANSFER_FUNDS);
-    expect(bundle.operation).toEqual(BundleOperations.TRANSFER_FUNDS);
+    const bundle = createBundle(Operation.TRANSFER_FUNDS);
+    expect(bundle.operation).toEqual(Operation.TRANSFER_FUNDS);
     expect(bundle.transactions.length).toEqual(0);
   });
 
   let bundle: Bundle;
 
-  test('it should create a transfer funds bundle', () => {
-    bundle = buildTransferFundsBundle({
+  test('it should create a transfer funds bundle', async () => {
+    const bundle = await buildTransferFundsBundle({
       amountInAsset: 1,
       assetSymbol: "WETH",
       chain: "polygon_test",

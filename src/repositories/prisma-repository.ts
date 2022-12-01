@@ -32,7 +32,8 @@ export const transactionToPrismaBaseTransaction = (transaction: Transaction): Tr
   isStarting: transaction.isStarting,
   transactionHash: transaction.transactionHash ?? null,
   executionId: transaction.executionId ?? null,
-  state: transactionStateToTransactionStateInPrisma(transaction.state)
+  state: transactionStateToTransactionStateInPrisma(transaction.state),
+  operation: transaction.operation
 });
 
 export const transactionToPrismaEvmTransaction = (transaction: Transaction): EvmTransactionInPrisma => ({

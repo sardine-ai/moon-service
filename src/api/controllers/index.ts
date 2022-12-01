@@ -19,6 +19,7 @@ export const buyGenieNftController = commandTryCatchWrapper(commands.buyGenieNFT
 export const buyClubHouseNftController = commandTryCatchWrapper(commands.buyClubHouseNFT);
 export const transferEvmFundsController = commandTryCatchWrapper(commands.transferFunds);
 export const buyNftController = commandTryCatchWrapper(commands.buyNft);
+export const buyNftQuoteController = commandTryCatchWrapper(commands.quoteBuyNft);
 
 export const receiveFireblocksWebhook = async (req: Request, res: Response) => {
   try {

@@ -4,6 +4,7 @@ import { ITransactionSubmissionClient } from "./index";
 import { GasDetails } from "src/types/evm";
 import { AlchemyWeb3 } from "@alch/alchemy-web3";
 import { Logger } from "winston";
+import { BundleQuote } from "../../types/quote";
 
 
 export const getGasDetails = async (fromAddress: string, transaction: Transaction, alchemy: AlchemyWeb3): Promise<GasDetails> => {
@@ -14,13 +15,16 @@ export const getGasDetails = async (fromAddress: string, transaction: Transactio
     value: transaction.value
   })
   const maxPriorityFeePerGas = await alchemy.eth.getMaxPriorityFeePerGas()
+  const feeHistory = await alchemy.eth.getFeeHistory(1, "latest", []);
   return {
     maxPriorityFee: maxPriorityFeePerGas,
-    gasLimit: gasLimit.toString()
+    gasLimit: gasLimit.toString(),
+    baseFeePerGas: parseInt(feeHistory.baseFeePerGas[0], 16).toString()
   }
 }
 
 export type ExecuteBundle = (bundle: Bundle) => Promise<any>
+export type QuoteBundle = (bundle: Bundle) => Promise<BundleQuote>
 
 export const executeBundleUninjected = (
   transactionSubmissionClient: ITransactionSubmissionClient,
@@ -29,12 +33,33 @@ export const executeBundleUninjected = (
 ) => async (bundle: Bundle) => {
   let transaction = getReadyTransaction(bundle.transactions);
   if (transaction) {
-    logger.info(`Submitting transaction: ${JSON.stringify(transaction)}`, );
+    logger.info(`Submitting transaction: ${JSON.stringify(transaction)}`);
     const result = await transactionSubmissionClient.sendTransaction(transaction);
     logger.info(`Transaction result ${JSON.stringify(result)}`);
     transaction = updateTransactionWithResult(transaction, result);
     updateTransaction(transaction);
     return result;
+  }
+}
+
+export const quoteBundleUninjected = (
+  transactionSubmissionClient: ITransactionSubmissionClient,
+  logger: Logger
+) => async (bundle: Bundle) => {
+  const transactionQuotes = await Promise.all(bundle.transactions.map(async transaction => {
+    logger.info(`Quoting transaction: ${JSON.stringify(transaction)}`);
+    const transactionQuote = await transactionSubmissionClient.quoteTransaction(transaction);
+    return transactionQuote;
+  }));
+  logger.info(`Transaction Quotes: ${JSON.stringify(transactionQuotes)}`);
+  const totalCost = transactionQuotes.reduce(
+    (accumulator, transactionQuote) => accumulator + transactionQuote.totalCost,
+    0
+  );
+  logger.info(`Total cost: ${totalCost}`);
+  return {
+    totalCost: totalCost,
+    transactionQuotes: transactionQuotes
   }
 }
 

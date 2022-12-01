@@ -4,18 +4,18 @@ import { swapUsdcToEthUninjected } from "./uniswap";
 import { buyClubHouseNFTUninjected } from "./clubhouse";
 import { buyGenieNFTUninjected } from "./genie";
 import { buildTransferFundsBundle } from "./transfer-funds";
-import { executeBundleUninjected, ExecuteBundle } from "../clients/transactions/helpers";
+import { executeBundleUninjected, quoteBundleUninjected, ExecuteBundle, QuoteBundle } from "../clients/transactions/helpers";
 import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, TestTransactionSubmissionClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
 import getCryptoConfig from "../config/crypto-config";
 import getFireblocksConfig from "../config/fireblocks-config";
-import { buildBuySeaportNftBundleUninjected } from "./seaport";
+import { buildBuyNftBundleUninjected } from "./seaport";
 import { OpenSeaClient } from "../clients/openSea";
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
 import logger from "../loaders/logger";
 import { storeBundle, updateTransaction } from "../repositories/prisma-repository";
-import { commandUninjected } from "./command";
+import { commandUninjected, quoteCommandUninjected } from "./command";
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig()
@@ -42,6 +42,7 @@ const ethOpenSea = new OpenSeaSDK(ethProvider, {
 const openSeaClient: OpenSeaClient = new OpenSeaClient(logger, cryptoConfig, ethOpenSea)
 
 const executeBundle: ExecuteBundle = executeBundleUninjected(transactionSubmissionClient, updateTransaction, logger)
+const quoteBundle: QuoteBundle = quoteBundleUninjected(transactionSubmissionClient, logger)
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(logger, cryptoConfig, transactionSubmissionClient); 
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(logger, transactionSubmissionClient);
@@ -49,6 +50,7 @@ export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactio
 
 export const transferFunds = commandUninjected(logger, buildTransferFundsBundle, storeBundle, executeBundle); // <----- Every command should look like this
 
-const buildBuyNftBundle = buildBuySeaportNftBundleUninjected(openSeaClient);
-export const buyNft = commandUninjected(logger, buildBuyNftBundle, storeBundle, executeBundle); 
+const buildBuyNftBundle = buildBuyNftBundleUninjected(openSeaClient);
+export const buyNft = commandUninjected(logger, buildBuyNftBundle, storeBundle, executeBundle);
+export const quoteBuyNft = quoteCommandUninjected(logger, buildBuyNftBundle, quoteBundle);
 

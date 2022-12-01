@@ -38,6 +38,7 @@ model Transaction {
   transactionHash String?
   executionId String?
   state TransactionState
+  operation String @default("UNKNOWN")
 
   // add inherited types here
   evmTransaction EvmTransaction?
