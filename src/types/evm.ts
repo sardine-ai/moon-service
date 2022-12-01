@@ -24,6 +24,7 @@ export interface GasDetails {
   maxPriorityFee?: string;
   gasPrice?: string;
   gasLimit?: string;
+  baseFeePerGas?: string;
 }
 
 export interface PolgyonGasDetails {

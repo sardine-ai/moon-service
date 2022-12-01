@@ -8,7 +8,8 @@ import {
   buyGenieNftController, 
   buyClubHouseNftController, 
   transferEvmFundsController, 
-  buyNftController 
+  buyNftController,
+  buyNftQuoteController
 } from '../controllers';
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.use('/v1/buy-genie-nft', buyGenieNftController);
 router.use('/v1/buy-club-house-nft', validationMw(BuyClubHouseNFTParams), buyClubHouseNftController);
 router.use('/v1/transfer-funds', validationMw(TransferEvmFundsParams), transferEvmFundsController);
 router.use('/v1/buy-nft', validationMw(BuyNftParams), buyNftController);
+router.use('/v1/quote/buy-nft', validationMw(BuyNftParams), buyNftQuoteController);
 router.use('/v1/fireblocks-webhook', receiveFireblocksWebhook);
 
 export default router;

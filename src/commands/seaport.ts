@@ -1,12 +1,12 @@
 import { OpenSeaClient } from "../clients/openSea"
 import { BuyNftParams } from "../types/nft";
-import { createBundle, Bundle, BundleOperations } from "../types/models";
+import { createBundle, Bundle, Operation } from "../types/models";
 import { setStartingTransaction, updateTransactionWithBundleId } from "./utils";
 
-export const buildBuySeaportNftBundleUninjected = (
+export const buildBuyNftBundleUninjected = (
   opensea: OpenSeaClient
 ) => async (params: BuyNftParams): Promise<Bundle> => {
-  let bundle = createBundle(BundleOperations.BUY_NFT);
+  let bundle = createBundle(Operation.BUY_NFT);
   switch (params.platform) {
     case "opensea": {
       let transaction = await opensea.buildTransaction(params);

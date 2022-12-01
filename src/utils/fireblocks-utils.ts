@@ -11,7 +11,8 @@ interface GetFireblocksAssetIdParams {
 
 const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
   "goerli": {
-    "NATIVE": "",
+    "goerli": "ETH_TEST3",
+    "NATIVE": "ETH_TEST3",
     "USDC": "",
     "WETH": "",
   },
@@ -21,11 +22,13 @@ const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
     "WETH": "",
   },
   "polygon_test": {
+    "polygon_test": "MATIC_POLYGON_MUMBAI",
     "NATIVE": "MATIC_POLYGON_MUMBAI",
     "USDC": "USDC_POLYGON_TEST_2",
     "WETH": "WETH_POLYGON_TEST",
   },
   "polygon": {
+    "polygon": "polygon",
     "NATIVE": "MATIC",
     "USDC": "",
     "WETH": "WETH_POLYGON",
@@ -33,5 +36,9 @@ const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
 }
 
 export const getFireblocksAssetId = ({chain, assetSymbol}: GetFireblocksAssetIdParams): string => {
-  return ASSET_TO_FIREBLOCKS_ASSET_ID[chain][assetSymbol || "NATIVE"]
+  const assetId = ASSET_TO_FIREBLOCKS_ASSET_ID[chain][assetSymbol || "NATIVE"]
+  if (assetId) {
+    return assetId
+  }
+  throw new Error(`No Fireblocks Asset Id for Chain: ${chain} and Assey Symbol ${assetSymbol}`);
 }

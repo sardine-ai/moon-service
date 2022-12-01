@@ -5,7 +5,7 @@ import { OpenSeaSDK } from 'opensea-js'
 import { BuyNftParams } from '../types/nft';
 import winston from 'winston';
 import { CryptoConfig } from '../config/crypto-config';
-import { Transaction, TransactionState } from "../types/models";
+import { Operation, Transaction, TransactionState } from "../types/models";
 
 export interface IOpenSeaClient {
   ethOpenSea: OpenSeaSDK;
@@ -58,7 +58,8 @@ export class OpenSeaClient implements IOpenSeaClient {
       value: callData.value?.toString(),
       callData: callData.data,
       chain: buyNftParams.chain,
-      assetSymbol: buyNftParams.chain
+      assetSymbol: buyNftParams.chain,
+      operation: Operation.BUY_NFT
     }
   }
 }

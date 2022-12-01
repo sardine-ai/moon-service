@@ -1,12 +1,11 @@
-import { Bundle } from "../types/models";
-import { ExecuteBundle } from "../clients/transactions/helpers";
+import { ExecuteBundle, QuoteBundle } from "../clients/transactions/helpers";
 import { StoreBundle } from "../repositories/base-repository";
-import { CommandParams } from "../types/command";
+import { BuildBundle, CommandParams } from "../types/command";
 import { Logger } from "winston";
 
 export const commandUninjected = (
   logger: Logger,
-  buildBundle: (params: CommandParams) => Promise<Bundle>,
+  buildBundle: BuildBundle,
   storeBundle: StoreBundle,
   executeBundle: ExecuteBundle,
 ) => async (params: CommandParams) => {
@@ -15,3 +14,14 @@ export const commandUninjected = (
   await storeBundle(bundle);
   return await executeBundle(bundle);
 }
+
+export const quoteCommandUninjected = (
+  logger: Logger,
+  buildBundle: BuildBundle,
+  quoteBundle: QuoteBundle
+) => async (params: CommandParams) => {
+  logger.info(`Processing Quote: ${JSON.stringify(params)}`)
+  const bundle = await buildBundle(params);
+  return await quoteBundle(bundle);
+}
+
