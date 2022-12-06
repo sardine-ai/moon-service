@@ -65,7 +65,6 @@ export const quoteBuyNft = quoteCommandUninjected(logger, buildBuyNftBundle, quo
 export const handleFireblocksWebhook = handleFireblocksWebhookUninjected(
   getBundleByTransactionExecutionId,
   updateTransaction,
-  getBundle,
   notifySubscribers
 );
 
