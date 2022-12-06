@@ -1,4 +1,5 @@
-import { Bundle, Transaction } from "src/types/models";
+import { update } from "lodash";
+import { Bundle, Transaction } from "../types/models";
 
 export const setStartingTransaction = (bundle: Bundle): Bundle => {
   const newBundle = Object.assign({}, bundle);
@@ -12,3 +13,11 @@ export const updateTransactionWithBundleId = (transaction: Transaction, bundleId
   newTransaction.bundleId = bundleId;
   return newTransaction;
 } 
+
+export const updateTransactionWithCosts = (
+  transaction: Transaction, cost: string, gasCost: string
+) => {
+  transaction = update(transaction, 'cost', (_c) => cost);
+  transaction = update(transaction, 'gasCost', (_g) => gasCost);
+  return transaction;
+}

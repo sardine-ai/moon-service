@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { v4 as uuidV4 } from "uuid";
 import { OpenSeaSDK } from 'opensea-js'

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Erc20Token } from "src/types/evm";
+import { Erc20Token } from "../types/evm";
 import { getAssetContractDetails } from "../utils/crypto-utils";
 import { AbiItem } from "web3-utils"
 import abi from "../abi/ERC20ABI.json";
 import { Transaction, TransactionState, Operation } from "../types/models";
 import { v4 as uuidV4 } from "uuid";
-import { TransferEvmFundsParams } from "src/types/transfer";
+import { TransferEvmFundsParams } from "../types/transfer";
 import Web3 from "web3";
 
 export const loadContract = (assetContractAddress: string): any => {

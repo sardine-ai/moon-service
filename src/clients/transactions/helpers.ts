@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Bundle, Transaction, TransactionState } from "../../types/models";
 import { UpdateTransaction } from "../../repositories/base-repository";
 import { ITransactionSubmissionClient } from "./index";
-import { GasDetails } from "src/types/evm";
+import { GasDetails } from "../../types/evm";
 import { AlchemyWeb3 } from "@alch/alchemy-web3";
 import { Logger } from "winston";
-import { BundleQuote } from "../../types/quote";
+import { BundleReceiptResponse, getBundleReceiptTotalCost } from "../../types/receipt";
+import { buildBundleReceiptResponse } from "../../types/receipt";
 
 
 export const getGasDetails = async (fromAddress: string, transaction: Transaction, alchemy: AlchemyWeb3): Promise<GasDetails> => {
@@ -23,14 +26,14 @@ export const getGasDetails = async (fromAddress: string, transaction: Transactio
   }
 }
 
-export type ExecuteBundle = (bundle: Bundle) => Promise<any>
-export type QuoteBundle = (bundle: Bundle) => Promise<BundleQuote>
+export type ExecuteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>
+export type QuoteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>
 
 export const executeBundleUninjected = (
   transactionSubmissionClient: ITransactionSubmissionClient,
   updateTransaction: UpdateTransaction,
   logger: Logger
-) => async (bundle: Bundle) => {
+) => async (bundle: Bundle): Promise<BundleReceiptResponse> => {
   let transaction = getReadyTransaction(bundle.transactions);
   if (transaction) {
     logger.info(`Submitting transaction: ${JSON.stringify(transaction)}`);
@@ -40,26 +43,25 @@ export const executeBundleUninjected = (
     updateTransaction(transaction);
     return result;
   }
+  const bundleReceiptResponse = buildBundleReceiptResponse(bundle);
+  return bundleReceiptResponse;
 }
 
 export const quoteBundleUninjected = (
   transactionSubmissionClient: ITransactionSubmissionClient,
   logger: Logger
-) => async (bundle: Bundle) => {
+) => async (bundle: Bundle): Promise<BundleReceiptResponse> => {
   const transactionQuotes = await Promise.all(bundle.transactions.map(async transaction => {
     logger.info(`Quoting transaction: ${JSON.stringify(transaction)}`);
     const transactionQuote = await transactionSubmissionClient.quoteTransaction(transaction);
     return transactionQuote;
   }));
   logger.info(`Transaction Quotes: ${JSON.stringify(transactionQuotes)}`);
-  const totalCost = transactionQuotes.reduce(
-    (accumulator, transactionQuote) => accumulator + transactionQuote.totalCost,
-    0
-  );
+  const totalCost = getBundleReceiptTotalCost(transactionQuotes);
   logger.info(`Total cost: ${totalCost}`);
   return {
     totalCost: totalCost,
-    transactionQuotes: transactionQuotes
+    transactionReceipts: transactionQuotes
   }
 }
 

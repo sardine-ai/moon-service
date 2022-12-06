@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Erc20Token, PolgyonGasDetails, EthGasDetails, GasDetails } from "src/types/evm"
+import { Erc20Token, PolgyonGasDetails, EthGasDetails, GasDetails } from "../types/evm"
 
 const CHAIN_TO_GAS_URL: { [name: string]: string } = {
   "polygon_test": "https://gasstation-mumbai.matic.today/v2",

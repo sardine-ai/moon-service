@@ -1,29 +1,72 @@
-import crypto from "crypto";
+import { update } from "lodash";
+import { 
+  GetBundleByTransactionExecutionId, 
+  UpdateTransaction, 
+  GetBundle
+} from "../repositories/base-repository";
+import { 
+  getTransactionState, 
+  Transaction, 
+  TransactionState
+} from "../types/models";
+import { 
+  buildBundleReceiptResponse
+} from "../types/receipt";
+import {
+  updateTransactionWithCosts
+} from "./utils";
+import {
+  NotifySubscribers
+} from "../clients/notifications";
+import { FireblocksWebhookResponse } from "../types/fireblocks";
 
-const FIREBLOCKS_WEBHOOK_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
-MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0+6wd9OJQpK60ZI7qnZG
-jjQ0wNFUHfRv85Tdyek8+ahlg1Ph8uhwl4N6DZw5LwLXhNjzAbQ8LGPxt36RUZl5
-YlxTru0jZNKx5lslR+H4i936A4pKBjgiMmSkVwXD9HcfKHTp70GQ812+J0Fvti/v
-4nrrUpc011Wo4F6omt1QcYsi4GTI5OsEbeKQ24BtUd6Z1Nm/EP7PfPxeb4CP8KOH
-clM8K7OwBUfWrip8Ptljjz9BNOZUF94iyjJ/BIzGJjyCntho64ehpUYP8UJykLVd
-CGcu7sVYWnknf1ZGLuqqZQt4qt7cUUhFGielssZP9N9x7wzaAIFcT3yQ+ELDu1SZ
-dE4lZsf2uMyfj58V8GDOLLE233+LRsRbJ083x+e2mW5BdAGtGgQBusFfnmv5Bxqd
-HgS55hsna5725/44tvxll261TgQvjGrTxwe7e5Ia3d2Syc+e89mXQaI/+cZnylNP
-SwCCvx8mOM847T0XkVRX3ZrwXtHIA25uKsPJzUtksDnAowB91j7RJkjXxJcz3Vh1
-4k182UFOTPRW9jzdWNSyWQGl/vpe9oQ4c2Ly15+/toBo4YXJeDdDnZ5c/O+KKadc
-IMPBpnPrH/0O97uMPuED+nI6ISGOTMLZo35xJ96gPBwyG5s2QxIkKPXIrhgcgUnk
-tSM7QYNhlftT4/yVvYnk0YcCAwEAAQ==
------END PUBLIC KEY-----`.replace(/\\n/g, "\n");
-
-export const receiveFireblocksWebhook = async (req: any) => {
-  console.log("hello world", req);
-  const message = JSON.stringify(req.body);
-  const signature = req.headers("Fireblocks-Signature");
-
-  const verifier = crypto.createVerify('RSA-SHA512');
-  verifier.write(message);
-  verifier.end();
-  
-  const isVerified = verifier.verify(FIREBLOCKS_WEBHOOK_PUBLIC_KEY, signature, "base64");
-  console.log("Verified:", isVerified);
+export const handleFireblocksWebhookUninjected = (
+  getBundleByTransactionExecutionId: GetBundleByTransactionExecutionId,
+  updateTransaction: UpdateTransaction,
+  getBundle: GetBundle,
+  notifySubscribers: NotifySubscribers
+) => async (fireblocksWebhookResponse: FireblocksWebhookResponse) => {
+  console.log(fireblocksWebhookResponse);
+  const bundle = await getBundleByTransactionExecutionId(fireblocksWebhookResponse.data.id);
+  if (bundle) {
+    const transactionIndex = bundle.transactions.findIndex(transaction => transaction.executionId == fireblocksWebhookResponse.data.id);
+    if (transactionIndex) {
+      let transaction = bundle.transactions[transactionIndex];
+      const newState = getTransactionState(fireblocksWebhookResponse.data.status);
+      console.log("newState", newState)
+      if (transaction?.state != newState && newState != TransactionState.UNDEFINED) {
+        transaction = update(transaction, "state", (_s) => newState) as Transaction;
+        transaction = update(transaction, "transactionHash", (_h => fireblocksWebhookResponse.data.txHash)) as Transaction;
+        console.log("update Transaction", transaction)
+        switch (newState) {
+          case TransactionState.COMPLETED: {
+            transaction = updateTransactionWithCosts(
+              transaction,
+              fireblocksWebhookResponse.data.amountInfo.netAmount,
+              fireblocksWebhookResponse.data.feeInfo.networkFee,
+            );
+            console.log("complete Transaction", transaction)
+            break;
+          }
+          case TransactionState.FAILED: {
+            // Need to figure out what to do here: retry or rollback?
+            break;
+          }
+          case TransactionState.CANCELLED || TransactionState.REJECTED: {
+            // Rejected by sardine
+            break;
+          }
+          case TransactionState.BLOCKED: {
+            // Rejected by policy
+            break;
+          }
+        }
+        updateTransaction(transaction);
+        bundle.transactions[transactionIndex] = transaction
+        console.log("Bundle", bundle);
+        const bundleReceiptResponse = buildBundleReceiptResponse(bundle);
+        notifySubscribers(bundleReceiptResponse);
+      }
+    }
+  }
 }

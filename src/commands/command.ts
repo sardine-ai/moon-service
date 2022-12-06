@@ -11,7 +11,7 @@ export const commandUninjected = (
 ) => async (params: CommandParams) => {
   logger.info(`Processing Order: ${JSON.stringify(params)}`)
   const bundle = await buildBundle(params);
-  await storeBundle(bundle);
+  storeBundle(bundle);
   return await executeBundle(bundle);
 }
 
@@ -24,4 +24,3 @@ export const quoteCommandUninjected = (
   const bundle = await buildBundle(params);
   return await quoteBundle(bundle);
 }
-
