@@ -28,9 +28,11 @@ export const handleFireblocksWebhookUninjected = (
 ) => async (fireblocksWebhookResponse: FireblocksWebhookResponse) => {
   console.log(fireblocksWebhookResponse);
   const bundle = await getBundleByTransactionExecutionId(fireblocksWebhookResponse.data.id);
+  console.log("bundle", bundle);
   if (bundle) {
     const transactionIndex = bundle.transactions.findIndex(transaction => transaction.executionId == fireblocksWebhookResponse.data.id);
-    if (transactionIndex) {
+    console.log("transactionIndex", transactionIndex);
+    if (transactionIndex != -1) {
       let transaction = bundle.transactions[transactionIndex];
       const newState = getTransactionState(fireblocksWebhookResponse.data.status);
       console.log("newState", newState)
