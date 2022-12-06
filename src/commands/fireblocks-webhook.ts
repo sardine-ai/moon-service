@@ -23,7 +23,6 @@ import { FireblocksWebhookResponse } from "../types/fireblocks";
 export const handleFireblocksWebhookUninjected = (
   getBundleByTransactionExecutionId: GetBundleByTransactionExecutionId,
   updateTransaction: UpdateTransaction,
-  getBundle: GetBundle,
   notifySubscribers: NotifySubscribers
 ) => async (fireblocksWebhookResponse: FireblocksWebhookResponse) => {
   console.log(fireblocksWebhookResponse);
