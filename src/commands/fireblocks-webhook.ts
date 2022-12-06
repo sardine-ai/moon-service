@@ -1,8 +1,7 @@
 import { update } from "lodash";
 import { 
   GetBundleByTransactionExecutionId, 
-  UpdateTransaction, 
-  GetBundle
+  UpdateTransaction,
 } from "../repositories/base-repository";
 import { 
   getTransactionState, 

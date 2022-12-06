@@ -18,7 +18,6 @@ import logger from "../loaders/logger";
 import { 
   storeBundle, 
   updateTransaction,
-  getBundle,
   getBundleByTransactionExecutionId
 } from "../repositories/prisma-repository";
 import { commandUninjected, quoteCommandUninjected } from "./command";
