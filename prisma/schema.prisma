@@ -39,6 +39,10 @@ model Transaction {
   executionId String?
   state TransactionState
   operation String @default("UNKNOWN")
+  cost String?
+  gasCost String?
+  chain String
+  assetSymbol String
 
   // add inherited types here
   evmTransaction EvmTransaction?
@@ -51,6 +55,4 @@ model EvmTransaction {
   to String
   value String?
   callData String?
-  chain String
-  assetSymbol String
 }

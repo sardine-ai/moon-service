@@ -12,12 +12,12 @@ import { getFireblocksAssetId } from "../../utils/fireblocks-utils";
 import winston from 'winston';
 import { Transaction } from "../../types/models";
 import { getGasDetails } from "./helpers";
-import { TransactionQuote } from "../../types/quote";
+import { QuoteTransactionReceiptResponse } from "../../types/receipt";
 
 export interface ITransactionSubmissionClient {
   sendTransaction(transaction: Transaction): Promise<any>;
   getFromAddress(chain: string, assetSymbol: string): Promise<string> | string;
-  quoteTransaction(transaction: Transaction): Promise<TransactionQuote>;
+  quoteTransaction(transaction: Transaction): Promise<QuoteTransactionReceiptResponse>;
 }
 
 abstract class TransactionSubmissionClient implements ITransactionSubmissionClient {
@@ -31,23 +31,21 @@ abstract class TransactionSubmissionClient implements ITransactionSubmissionClie
     this.polygonWeb3 = createAlchemyWeb3(cryptoConfig.maticRPC);
   }
 
-  async quoteTransaction(transaction: Transaction): Promise<TransactionQuote> {
-    const cost = Number(formatEther(transaction.value || "0"));
+  async quoteTransaction(transaction: Transaction): Promise<QuoteTransactionReceiptResponse> {
+    const cost = formatEther(transaction.value || "0");
 
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
     const fromAddress =  await this.getFromAddress(transaction.chain, transaction.assetSymbol);
     const gasDetails = await getGasDetails(fromAddress, transaction, alchemyWeb3);
-    const gasCost = Number(
-      formatEther(
-        Number(gasDetails.gasLimit || 0) * (Number(gasDetails.maxPriorityFee) + Number(gasDetails.baseFeePerGas || 0))
-      )
+    const gasCost = formatEther(
+      Number(gasDetails.gasLimit || 0) * (Number(gasDetails.maxPriorityFee) + Number(gasDetails.baseFeePerGas || 0))
     )
-
     return {
-      totalCost: cost + gasCost,
+      totalCost: Number(cost) + Number(gasCost),
       cost: cost,
       gasCost: gasCost,
-      currency: transaction.chain 
+      currency: transaction.chain,
+      operation: transaction.operation
     }
   }
   
@@ -122,7 +120,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
 
   getTransactionArguments(transaction: EvmTransaction, vaultAccount: FireblocksVaultAccount): TransactionArguments {
     const txArguments: TransactionArguments = {
-      operation: TransactionOperation.CONTRACT_CALL,
+      operation: TransactionOperation.TRANSFER,
       assetId: getFireblocksAssetId({chain: transaction.chain}),
       source: {
           type: PeerType.VAULT_ACCOUNT,
@@ -144,6 +142,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
       txArguments.extraParameters = {
         contractCallData: transaction.data
       }
+      txArguments.operation = TransactionOperation.CONTRACT_CALL;
     }
     return txArguments
   }
@@ -254,7 +253,7 @@ export class TestTransactionSubmissionClient implements ITransactionSubmissionCl
     this.logger = logger;
   }
 
-  quoteTransaction(transaction: Transaction): Promise<any> {
+  quoteTransaction(_transaction: Transaction): Promise<QuoteTransactionReceiptResponse> {
     throw new Error("Method not implemented.");
   }
 

@@ -1,6 +1,7 @@
 import { v4 as uuidV4 } from "uuid";
 
 export enum Operation {
+  UNKNOWN = "UNKNOWN",
   TRANSFER_FUNDS = "TRANSFER_FUNDS",
   BUY_NFT = "BUY_NFT"
 }
@@ -31,17 +32,26 @@ export enum TransactionState {
   RETRYING = "RETRYING",
 }
 
-export interface Transaction {
+export const getTransactionState = (state: string): TransactionState => {
+  return TransactionState[state as keyof typeof TransactionState] || TransactionState.UNDEFINED
+}
+
+export interface BaseTransaction {
   id: string;
   bundleId?: string;
   isStarting: boolean;
   transactionHash?: string;
   executionId?: string;
   state: TransactionState;
-  to: string;
-  value?: string;
-  callData?: string;
+  operation: Operation;
+  cost?: string;
+  gasCost?: string;
   chain: string;
   assetSymbol: string;
-  operation: Operation;
+}
+
+export type Transaction = BaseTransaction & {
+  to: string;
+  value?: string;
+  callData?: string; 
 }

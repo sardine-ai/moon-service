@@ -12,7 +12,8 @@ export interface AppConfig {
   },
   api: {
     prefix: string
-  }
+  },
+  cryptoBackendUrl: string
 }
 
 const getAppConfig = (): AppConfig => {
@@ -23,7 +24,8 @@ const getAppConfig = (): AppConfig => {
     },
     api: {
       prefix: '/api',
-    }
+    },
+    cryptoBackendUrl: process.env.CRYPTO_BACKEND_URL || ""
   }
 }
 

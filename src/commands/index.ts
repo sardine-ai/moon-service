@@ -4,6 +4,7 @@ import { swapUsdcToEthUninjected } from "./uniswap";
 import { buyClubHouseNFTUninjected } from "./clubhouse";
 import { buyGenieNFTUninjected } from "./genie";
 import { buildTransferFundsBundle } from "./transfer-funds";
+import { handleFireblocksWebhookUninjected } from "./fireblocks-webhook";
 import { executeBundleUninjected, quoteBundleUninjected, ExecuteBundle, QuoteBundle } from "../clients/transactions/helpers";
 import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, TestTransactionSubmissionClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
@@ -14,8 +15,14 @@ import { OpenSeaClient } from "../clients/openSea";
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
 import logger from "../loaders/logger";
-import { storeBundle, updateTransaction } from "../repositories/prisma-repository";
+import { 
+  storeBundle, 
+  updateTransaction,
+  getBundle,
+  getBundleByTransactionExecutionId
+} from "../repositories/prisma-repository";
 import { commandUninjected, quoteCommandUninjected } from "./command";
+import { notifySubscribers } from "../clients/notifications";
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig()
@@ -49,8 +56,16 @@ export const buyClubHouseNFT = buyClubHouseNFTUninjected(logger, transactionSubm
 export const buyGenieNFT = buyGenieNFTUninjected(logger, genieClient, transactionSubmissionClient, cryptoConfig);
 
 export const transferFunds = commandUninjected(logger, buildTransferFundsBundle, storeBundle, executeBundle); // <----- Every command should look like this
+export const quoteTransferFunds = quoteCommandUninjected(logger, buildTransferFundsBundle, quoteBundle);
 
 const buildBuyNftBundle = buildBuyNftBundleUninjected(openSeaClient);
 export const buyNft = commandUninjected(logger, buildBuyNftBundle, storeBundle, executeBundle);
 export const quoteBuyNft = quoteCommandUninjected(logger, buildBuyNftBundle, quoteBundle);
+
+export const handleFireblocksWebhook = handleFireblocksWebhookUninjected(
+  getBundleByTransactionExecutionId,
+  updateTransaction,
+  getBundle,
+  notifySubscribers
+);
 

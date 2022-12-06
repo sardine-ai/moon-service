@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Response, Request } from 'express';
 import * as commands from '../../commands/index';
-import { receiveFireblocksWebhook as receiveFireblocksWebhookCommand } from '../../commands/fireblocks-webhook'; 
 import Logger from '../../loaders/logger';
 import { CommandParams } from '../../types/command';
 
@@ -18,15 +19,7 @@ const commandTryCatchWrapper = (
 export const buyGenieNftController = commandTryCatchWrapper(commands.buyGenieNFT);
 export const buyClubHouseNftController = commandTryCatchWrapper(commands.buyClubHouseNFT);
 export const transferEvmFundsController = commandTryCatchWrapper(commands.transferFunds);
+export const transferEvmFundsQuoteController = commandTryCatchWrapper(commands.quoteTransferFunds);
 export const buyNftController = commandTryCatchWrapper(commands.buyNft);
 export const buyNftQuoteController = commandTryCatchWrapper(commands.quoteBuyNft);
-
-export const receiveFireblocksWebhook = async (req: Request, res: Response) => {
-  try {
-    Logger.info("Handling Transfer Funds");
-    await receiveFireblocksWebhookCommand(req.body)
-    res.send("ok");
-  } catch (err: unknown) {
-    Logger.error("An Error Occured while processing Handling Transfer Funds", err);
-  }
-}
+export const fireblocksWebhookController = commandTryCatchWrapper(commands.handleFireblocksWebhook);
