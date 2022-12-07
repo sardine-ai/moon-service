@@ -61,6 +61,7 @@ export const quoteBundleUninjected = (
   logger.info(`Total cost: ${totalCost}`);
   return {
     totalCost: totalCost,
+    currency: transactionQuotes[0].currency,
     transactionReceipts: transactionQuotes
   }
 }
