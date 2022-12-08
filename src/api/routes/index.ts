@@ -1,4 +1,4 @@
-// import express from 'express';
+import express from 'express';
 // import { BuyClubHouseNFTParams } from '../../types/clubhouse/index';
 // import { TransferEvmFundsParams } from '../../types/transfer/index';
 // import { BuyNftParams } from '../../types/nft';
@@ -12,7 +12,7 @@
 //   fireblocksWebhookController
 // } from '../controllers';
 
-// const router = express.Router();
+const router = express.Router();
 
 // router.use('/v1/buy-genie-nft', buyGenieNftController);
 // router.use('/v1/buy-club-house-nft', validationMw(BuyClubHouseNFTParams), buyClubHouseNftController);
@@ -22,4 +22,4 @@
 // router.use('/v1/fireblocks-webhook', validateFireblocksSignatureMw, fireblocksWebhookController);
 // router.use('/v1/get-bundle-status', validateFireblocksSignatureMw, fireblocksWebhookController);
 
-// export default router;
+export default router;
