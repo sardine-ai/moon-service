@@ -1,58 +1,58 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// // This is your Prisma schema file,
+// // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
-}
+// generator client {
+//   provider = "prisma-client-js"
+// }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
 
-model Bundle {
-  id           String        @id @default(uuid())
-  operation    String
-  transactions Transaction[]
-}
+// model Bundle {
+//   id           String        @id @default(uuid())
+//   operation    String
+//   transactions Transaction[]
+// }
 
-enum TransactionState {
-  UNDEFINED
-  CREATED
-  SUBMITTED
-  BROADCASTING
-  CONFIRMING
-  COMPLETED
-  CANCELLED
-  REJECTED
-  BLOCKED
-  FAILED
-  RETRYING
-}
+// enum TransactionState {
+//   UNDEFINED
+//   CREATED
+//   SUBMITTED
+//   BROADCASTING
+//   CONFIRMING
+//   COMPLETED
+//   CANCELLED
+//   REJECTED
+//   BLOCKED
+//   FAILED
+//   RETRYING
+// }
 
-model Transaction {
-  id         String  @id @default(uuid())
-  bundle     Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
-  bundleId   String
-  isStarting Boolean @default(false)
-  transactionHash String?
-  executionId String?
-  state TransactionState
-  operation String @default("UNKNOWN")
-  cost String?
-  gasCost String?
-  chain String
-  assetSymbol String
+// model Transaction {
+//   id         String  @id @default(uuid())
+//   bundle     Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+//   bundleId   String
+//   isStarting Boolean @default(false)
+//   transactionHash String?
+//   executionId String?
+//   state TransactionState
+//   operation String @default("UNKNOWN")
+//   cost String?
+//   gasCost String?
+//   chain String
+//   assetSymbol String
 
-  // add inherited types here
-  evmTransaction EvmTransaction?
-}
+//   // add inherited types here
+//   evmTransaction EvmTransaction?
+// }
 
-model EvmTransaction {
-  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
-  transactionId String      @id
+// model EvmTransaction {
+//   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+//   transactionId String      @id
   
-  to String
-  value String?
-  callData String?
-}
+//   to String
+//   value String?
+//   callData String?
+// }
