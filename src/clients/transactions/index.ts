@@ -74,6 +74,7 @@ abstract class TransactionSubmissionClient implements ITransactionSubmissionClie
       to: transaction.to,
       gas: gasDetails.gasLimit,
       maxPriorityFeePerGas: gasDetails.maxPriorityFee,
+      maxFeePerGas: (2 * Number(gasDetails?.baseFeePerGas || "0") + Number(gasDetails?.maxPriorityFee || "0")).toString(),
       data: transaction.callData,
       value: transaction.value,
       chainId: CHAIN_TO_CHAIN_ID[transaction.chain],
@@ -126,7 +127,8 @@ export class FireblocksClient extends TransactionSubmissionClient {
           type: PeerType.VAULT_ACCOUNT,
           id: vaultAccount.id
       },
-      gasPrice: transaction.maxPriorityFeePerGas != undefined ? formatUnits(transaction.maxPriorityFeePerGas.toString(), "gwei") : undefined,
+      priorityFee: formatUnits(transaction?.maxPriorityFeePerGas || "0", "gwei"),
+      maxFee: formatUnits(transaction?.maxFeePerGas || "0", "gwei"),
       gasLimit: transaction.gas,
       destination: {
           type: PeerType.ONE_TIME_ADDRESS,
@@ -136,7 +138,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
           }
       },
       note: transaction.txNote || '',
-      amount: formatEther(transaction.value?.toString() || "0"),
+      amount: formatEther(transaction?.value || "0"),
     }
     if (transaction.data) {
       txArguments.extraParameters = {

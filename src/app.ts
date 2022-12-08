@@ -11,22 +11,6 @@ async function startServer() {
   await loader(app);
   const appConfig = getAppConfig()
 
-  // https
-  // .createServer(
-  //   {
-  //     key: fs.readFileSync("server.key"),
-  //     cert: fs.readFileSync("server.cert"),
-  //   },
-  //   app
-  // )
-  // .listen(appConfig.port, () => {
-  //   Logger.info(`
-  //     ################################################
-  //     🛡️  Server listening on https port: ${appConfig.port} 🛡️
-  //     ################################################
-  //   `);
-  // });
-
   app.listen(appConfig.port, () => {
     Logger.info(`
       ################################################
