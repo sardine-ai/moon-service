@@ -2,11 +2,12 @@
 
 import { IsDefined, IsIn, Min } from "class-validator";
 import { Expose } from "class-transformer";
-import { IsValidEvmAddress } from "../decorators";
+import { IsValidEvmAddress } from "./decorators";
+import { BaseRequest } from "./base-request";
 
 const VALID_ASSET_IDS = ["MATIC"]
 
-export class BuyClubHouseNFTParams {
+export class BuyClubHouseNFTParams extends BaseRequest {
   @IsDefined()
   @Expose()
   @IsIn(VALID_ASSET_IDS, {message: `Asset Id must be one of ${VALID_ASSET_IDS.toString()}`})

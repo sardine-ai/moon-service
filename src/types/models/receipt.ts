@@ -1,4 +1,4 @@
-import { Bundle, Operation, TransactionState, BaseTransaction } from "./models";
+import { Bundle, Operation, TransactionState, BaseTransaction } from ".";
 
 export type TransactionReceipts = Array<
   QuoteTransactionReceiptResponse 

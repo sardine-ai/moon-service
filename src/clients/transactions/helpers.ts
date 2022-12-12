@@ -6,8 +6,8 @@ import { ITransactionSubmissionClient } from "./index";
 import { GasDetails } from "../../types/evm";
 import { AlchemyWeb3 } from "@alch/alchemy-web3";
 import { Logger } from "winston";
-import { BundleReceiptResponse, getBundleReceiptTotalCost } from "../../types/receipt";
-import { buildBundleReceiptResponse } from "../../types/receipt";
+import { BundleReceiptResponse, getBundleReceiptTotalCost } from "../../types/models/receipt";
+import { buildBundleReceiptResponse } from "../../types/models/receipt";
 
 
 export const getGasDetails = async (fromAddress: string, transaction: Transaction, alchemy: AlchemyWeb3): Promise<GasDetails> => {

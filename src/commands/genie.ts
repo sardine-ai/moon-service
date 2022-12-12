@@ -1,6 +1,6 @@
 import { ITransactionSubmissionClient } from "../clients/transactions";
 import { GenieClient } from "../clients/genie";
-import { BuyGenieNFTParams, GenieCallDataResponse } from "../types/genie/index";
+import { BuyGenieNFTParams, GenieCallDataResponse } from "../types/genie";
 import { swapUsdcToEth } from "./index";
 import { CryptoConfig } from "../config/crypto-config";
 import winston from "winston";

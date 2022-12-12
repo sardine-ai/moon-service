@@ -9,15 +9,14 @@ export const setStartingTransaction = (bundle: Bundle): Bundle => {
 }
 
 export const updateTransactionWithBundleId = (transaction: Transaction, bundleId: string): Transaction => {
-  const newTransaction = Object.assign({}, transaction);
-  newTransaction.bundleId = bundleId;
+  const newTransaction = update(transaction, 'bundleId', (_b) => bundleId);
   return newTransaction;
 } 
 
 export const updateTransactionWithCosts = (
   transaction: Transaction, cost: string, gasCost: string
 ) => {
-  transaction = update(transaction, 'cost', (_c) => cost);
-  transaction = update(transaction, 'gasCost', (_g) => gasCost);
-  return transaction;
+  let newTransaction = update(transaction, 'cost', (_c) => cost);
+  newTransaction = update(newTransaction, 'gasCost', (_g) => gasCost);
+  return newTransaction;
 }

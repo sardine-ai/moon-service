@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { BaseRequest } from "./base-request";
 import { IsDefined, IsIn, IsPositive } from "class-validator";
 import { Expose } from "class-transformer";
-import { IsValidEvmAddress } from "../decorators";
+import { IsValidEvmAddress } from "./decorators";
 
 const VALID_CHAINS = ["mainnet", "goerli", "polygon", "polygon_test"]
 const VALID_ASSET_SYMBOLS = ["NATIVE", "USDC", "WETH"]
 
-export class TransferEvmFundsParams {
+export class TransferEvmFundsParams extends BaseRequest {
   @IsDefined()
   @Expose()
   @IsPositive({message: "Please submit an amoount greater than 0"})

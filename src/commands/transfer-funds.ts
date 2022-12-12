@@ -1,4 +1,4 @@
-import { TransferEvmFundsParams } from "../types/transfer";
+import { TransferEvmFundsParams } from "../types/requests/transfer";
 import { buildEvmTransferTransaction } from "../clients/evm";
 import { createBundle, Bundle, Operation } from "../types/models";
 import { setStartingTransaction, updateTransactionWithBundleId } from "./utils";

@@ -3,13 +3,15 @@
 
 import { v4 as uuidV4 } from "uuid";
 import { OpenSeaSDK } from 'opensea-js'
-import { BuyNftParams } from '../types/nft';
+import { BuyNftParams } from '../types/requests/nft';
 import winston from 'winston';
 import { CryptoConfig } from '../config/crypto-config';
 import { Operation, Transaction, TransactionState } from "../types/models";
+import { NftNotFoundError } from "../types/errors";
 
 export interface IOpenSeaClient {
   ethOpenSea: OpenSeaSDK;
+  buildTransaction(params: BuyNftParams): Promise<Transaction>;
 }
 
 export class OpenSeaClient implements IOpenSeaClient {
@@ -24,28 +26,34 @@ export class OpenSeaClient implements IOpenSeaClient {
   }
 
   async getOrder(nftId: string, assetContractAddress: string) {
-    console.log("getting order");
-    const order = await this.ethOpenSea.api.getOrder({
-      side: "ask",
-      tokenId: nftId.toString(), 
-      assetContractAddress: assetContractAddress
-    })
-    return order;
+    try {
+      const order = await this.ethOpenSea.api.getOrder({
+        side: "ask",
+        tokenId: nftId.toString(), 
+        assetContractAddress: assetContractAddress
+      })
+      return order;
+    } catch (error) {
+      throw new NftNotFoundError()
+    }
   }
 
   async getFulfillOrderCallData(protocalData: any, accountAddress: string, recipientAddress: string) {
-    const { actions } = await this.ethOpenSea.seaport.fulfillOrder({
-      order: protocalData,
-      accountAddress,
-      recipientAddress,
-    })
-    const callData = await actions[0].transactionMethods.buildTransaction();
-    return callData;
+    try {
+      const { actions } = await this.ethOpenSea.seaport.fulfillOrder({
+        order: protocalData,
+        accountAddress,
+        recipientAddress,
+      })
+      const callData = await actions[0].transactionMethods.buildTransaction();
+      return callData;
+    } catch (error) {
+      throw new NftNotFoundError()
+    }
   }
 
   async buildTransaction(buyNftParams: BuyNftParams): Promise<Transaction> {
     const order = await this.getOrder(buyNftParams.nftId, buyNftParams.contractAddress);
-    console.log("order", order);
     const callData = await this.getFulfillOrderCallData(
       order.protocolData, 
       this.cryptoConfig.sardinePublicKey, 
@@ -64,3 +72,22 @@ export class OpenSeaClient implements IOpenSeaClient {
     }
   }
 }
+
+export class TestOpenSeaClient implements IOpenSeaClient {
+  ethOpenSea: OpenSeaSDK;
+
+  async buildTransaction(buyNftParams: BuyNftParams): Promise<Transaction> {
+    return {
+      id: "0",
+      isStarting: false,
+      state: TransactionState.CREATED,
+      to: buyNftParams.contractAddress,
+      value: "1",
+      callData: "0xcallData",
+      chain: buyNftParams.chain,
+      assetSymbol: buyNftParams.chain,
+      operation: Operation.BUY_NFT
+    }
+  }
+}
+

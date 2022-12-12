@@ -1,7 +1,11 @@
 import { ExecuteBundle, QuoteBundle } from "../clients/transactions/helpers";
-import { StoreBundle } from "../repositories/base-repository";
+import { GetBundle, StoreBundle } from "../repositories/base-repository";
 import { BuildBundle, CommandParams } from "../types/command";
 import { Logger } from "winston";
+import { GetBundleStatus } from "src/types/requests";
+import { 
+  buildBundleReceiptResponse
+} from "../types/models/receipt";
 
 export const commandUninjected = (
   logger: Logger,
@@ -23,4 +27,15 @@ export const quoteCommandUninjected = (
   logger.info(`Processing Quote: ${JSON.stringify(params)}`)
   const bundle = await buildBundle(params);
   return await quoteBundle(bundle);
+}
+
+export const getBundleStatusUninjected = (
+  getBundle: GetBundle
+) => async (getBundleStatus: GetBundleStatus) => {
+  const bundle = await getBundle(getBundleStatus.bundleId);
+  if (bundle) {
+    const bundleReceipt = buildBundleReceiptResponse(bundle);
+    return bundleReceipt
+  } 
+  throw new Error(`Bundle Id ${getBundleStatus.bundleId} Not Found`)
 }

@@ -12,7 +12,7 @@ import { getFireblocksAssetId } from "../../utils/fireblocks-utils";
 import winston from 'winston';
 import { Transaction } from "../../types/models";
 import { getGasDetails } from "./helpers";
-import { QuoteTransactionReceiptResponse } from "../../types/receipt";
+import { QuoteTransactionReceiptResponse } from "../../types/models/receipt";
 
 export interface ITransactionSubmissionClient {
   sendTransaction(transaction: Transaction): Promise<any>;
@@ -87,7 +87,6 @@ abstract class TransactionSubmissionClient implements ITransactionSubmissionClie
   async convertTransactionToEvmTransaction(transaction: Transaction): Promise<EvmTransaction> {
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
     const fromAddress =  await this.getFromAddress(transaction.chain, transaction.assetSymbol);
-    console.log("from address", fromAddress);
     const nonce = await alchemyWeb3.eth.getTransactionCount(fromAddress, 'latest');
     const gasDetails = await getGasDetails(fromAddress, transaction, alchemyWeb3);
     return this.buildEvmTransaction(transaction, fromAddress, nonce, gasDetails);

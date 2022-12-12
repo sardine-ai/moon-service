@@ -15,7 +15,7 @@ describe('Testing Bundle Logic', () => {
   let bundle: Bundle;
 
   test('it should create a transfer funds bundle', async () => {
-    const bundle = await buildTransferFundsBundle({
+    bundle = await buildTransferFundsBundle({
       amountInAsset: 1,
       assetSymbol: "WETH",
       chain: "polygon_test",
@@ -39,6 +39,7 @@ describe('Testing Bundle Logic', () => {
   )
 
   test('it should store the bundle', async () => {
+    console.log("bundle", bundle);
     executeBundle(bundle);
     const storedbundle = await getBundle(bundle.id);
     expect(storedbundle?.transactions[0].state).toEqual(TransactionState.SUBMITTED);

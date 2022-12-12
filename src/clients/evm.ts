@@ -6,7 +6,7 @@ import { AbiItem } from "web3-utils"
 import abi from "../abi/ERC20ABI.json";
 import { Transaction, TransactionState, Operation } from "../types/models";
 import { v4 as uuidV4 } from "uuid";
-import { TransferEvmFundsParams } from "../types/transfer";
+import { TransferEvmFundsParams } from "../types/requests/transfer";
 import Web3 from "web3";
 
 export const loadContract = (assetContractAddress: string): any => {

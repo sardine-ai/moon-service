@@ -10,17 +10,18 @@ import { ITransactionSubmissionClient, SelfCustodyClient, FireblocksClient, Test
 import { GenieClient } from "../clients/genie";
 import getCryptoConfig from "../config/crypto-config";
 import getFireblocksConfig from "../config/fireblocks-config";
-import { buildBuyNftBundleUninjected } from "./seaport";
+import { buildBuyNftBundleUninjected } from "./buy-nft";
 import { OpenSeaClient } from "../clients/openSea";
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from "web3";
 import logger from "../loaders/logger";
 import { 
+  getBundle,
   storeBundle, 
   updateTransaction,
   getBundleByTransactionExecutionId
 } from "../repositories/prisma-repository";
-import { commandUninjected, quoteCommandUninjected } from "./command";
+import { commandUninjected, quoteCommandUninjected, getBundleStatusUninjected } from "./command";
 import { notifySubscribers } from "../clients/notifications";
 
 const cryptoConfig = getCryptoConfig();
@@ -66,4 +67,6 @@ export const handleFireblocksWebhook = handleFireblocksWebhookUninjected(
   updateTransaction,
   notifySubscribers
 );
+
+export const getBundleStatus = getBundleStatusUninjected(getBundle);
 

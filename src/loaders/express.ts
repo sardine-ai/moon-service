@@ -41,22 +41,7 @@ export default async ({ app }: { app: express.Application }) => {
       .end();
   });
 
-  /// error handlers
-  const unauthorizedErrorHandler: ErrorRequestHandler = (err: any, _req: Request, res: Response, next: NextFunction) => {
-    /**
-     * Handle 401 thrown by express-jwt library
-     */
-    if (err.name === 'UnauthorizedError') {
-      return res
-        .status(err.status)
-        .send({ message: err.message })
-        .end();
-    }
-    return next(err);
-  }
-  app.use(unauthorizedErrorHandler);
-
-  const internalServerErrorHandler: ErrorRequestHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const errorHandler: ErrorRequestHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
     res.status(err.status || 500);
     res.json({
       errors: {
@@ -64,5 +49,5 @@ export default async ({ app }: { app: express.Application }) => {
       },
     });
   }
-  app.use(internalServerErrorHandler);
+  app.use(errorHandler);
 };
