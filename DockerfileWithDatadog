@@ -1,0 +1,16 @@
+FROM gcr.io/docker-sardine-ai/datadog-agent:7.38.2 as ddagent
+WORKDIR /app
+
+FROM node:16
+WORKDIR /src
+COPY --from=ddagent /usr/bin/agent /usr/bin/agent
+COPY --from=ddagent /usr/bin/trace-agent /usr/bin/trace-agent
+COPY --from=ddagent /etc/datadog-agent/datadog.yaml /etc/datadog-agent/datadog.yaml
+RUN apt-get update
+RUN apt-get install netcat ca-certificates -y
+COPY package*.json ./
+RUN npm install --no-color
+COPY . .
+RUN npx prisma generate
+EXPOSE 8000
+CMD ["./launch_datadogagent_with_start.sh"]

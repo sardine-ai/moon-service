@@ -18,7 +18,7 @@ steps:
         "-t",
         "gcr.io/$PROJECT_ID/moon-service:$SHORT_SHA",
         "-f",
-        "Dockerfile.dev",
+        "DockerfileWithDatadog",
         ".",
       ]
   - name: docker
