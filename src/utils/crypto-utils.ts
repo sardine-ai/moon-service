@@ -1,53 +1,6 @@
-import axios from 'axios';
 import {
   Erc20Token,
-  PolgyonGasDetails,
-  EthGasDetails,
-  GasDetails
 } from '../types/evm';
-
-const CHAIN_TO_GAS_URL: { [name: string]: string } = {
-  polygon_test: 'https://gasstation-mumbai.matic.today/v2',
-  polygon: 'https://gasstation-mainnet.matic.network/v2',
-  mainnet: 'https://ethgasstation.info/api/ethgasAPI.json?',
-  goerli: 'https://ethgasstation.info/api/ethgasAPI.json?'
-};
-
-const convertPolygonGasDetailsToGasDetails = async (
-  polygonGasDetails: PolgyonGasDetails
-): Promise<GasDetails> => {
-  return {
-    maxFee: polygonGasDetails.standard.maxFee.toString(),
-    maxPriorityFee: polygonGasDetails.standard.maxPriorityFee.toString()
-  };
-};
-
-const convertEthGasDetailsToGasDetails = async (
-  ethGasDetails: EthGasDetails
-): Promise<GasDetails> => {
-  return {
-    maxPriorityFee: ethGasDetails.average.toString()
-  };
-};
-
-const CHAIN_TO_CONVERT_GAS_METHOD: {
-  [name: string]:
-    | ((polygonGasDetails: PolgyonGasDetails) => Promise<GasDetails>)
-    | ((ethGasDetails: EthGasDetails) => Promise<GasDetails>);
-} = {
-  polygon_test: convertPolygonGasDetailsToGasDetails,
-  polygon: convertPolygonGasDetailsToGasDetails,
-  mainnet: convertEthGasDetailsToGasDetails,
-  goerli: convertEthGasDetailsToGasDetails
-};
-
-export const getGasDetailsFromGasStation = async (
-  chain: string
-): Promise<GasDetails> => {
-  const url = CHAIN_TO_GAS_URL[chain];
-  const result = await axios(url);
-  return CHAIN_TO_CONVERT_GAS_METHOD[chain](result.data);
-};
 
 interface AssetContractDetails {
   [key: string]: {
