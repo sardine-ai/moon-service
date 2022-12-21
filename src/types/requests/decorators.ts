@@ -5,16 +5,18 @@ import {
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-  ValidationArguments,
+  ValidationArguments
 } from 'class-validator';
-import { ethers } from "ethers";
-import { Transform } from "class-transformer"
-import { cloneDeep } from "lodash"
+import { ethers } from 'ethers';
+import { Transform } from 'class-transformer';
+import { cloneDeep } from 'lodash';
 
 @ValidatorConstraint()
-export class IsValidEvmAddressContraint implements ValidatorConstraintInterface {
+export class IsValidEvmAddressContraint
+  implements ValidatorConstraintInterface
+{
   validate(evmAddress: string, _: ValidationArguments) {
-    return ethers.utils.isAddress(evmAddress)
+    return ethers.utils.isAddress(evmAddress);
   }
 }
 
@@ -25,11 +27,11 @@ export function IsValidEvmAddress(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsValidEvmAddressContraint,
+      validator: IsValidEvmAddressContraint
     });
   };
 }
 
 export function Default(defaultValue: unknown): PropertyDecorator {
-  return Transform((value: unknown) => value ?? cloneDeep(defaultValue))
+  return Transform((value: unknown) => value ?? cloneDeep(defaultValue));
 }

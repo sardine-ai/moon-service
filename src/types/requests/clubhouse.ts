@@ -1,21 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { IsDefined, IsIn, Min } from "class-validator";
-import { Expose } from "class-transformer";
-import { IsValidEvmAddress } from "./decorators";
-import { BaseRequest } from "./base-request";
+import { IsDefined, IsIn, Min } from 'class-validator';
+import { Expose } from 'class-transformer';
+import { IsValidEvmAddress } from './decorators';
+import { BaseRequest } from './base-request';
 
-const VALID_ASSET_IDS = ["MATIC"]
+const VALID_ASSET_IDS = ['MATIC'];
 
 export class BuyClubHouseNFTParams extends BaseRequest {
   @IsDefined()
   @Expose()
-  @IsIn(VALID_ASSET_IDS, {message: `Asset Id must be one of ${VALID_ASSET_IDS.toString()}`})
+  @IsIn(VALID_ASSET_IDS, {
+    message: `Asset Id must be one of ${VALID_ASSET_IDS.toString()}`
+  })
   assetId: string;
 
   @IsDefined()
   @Expose()
-  @Min(0, {message: "NFT Id must be greater than 0"})
+  @Min(0, { message: 'NFT Id must be greater than 0' })
   nftId: string;
 
   @IsDefined()
@@ -24,11 +26,15 @@ export class BuyClubHouseNFTParams extends BaseRequest {
 
   @IsDefined()
   @Expose()
-  @IsValidEvmAddress({message: "Contract Address must be a valid EVM Address"})
+  @IsValidEvmAddress({
+    message: 'Contract Address must be a valid EVM Address'
+  })
   contractAddress: string;
 
   @IsDefined()
   @Expose()
-  @IsValidEvmAddress({message: "Recepient Address must be a valid EVM Address"})
+  @IsValidEvmAddress({
+    message: 'Recepient Address must be a valid EVM Address'
+  })
   recepientAddress: string;
 }

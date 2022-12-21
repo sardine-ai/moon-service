@@ -3,47 +3,56 @@ import axios from 'axios';
 import winston from 'winston';
 import { BuyGenieNFTParams, GenieCallDataResponse } from '../types/genie';
 
-const BASE_URL = "https://v2.api.genie.xyz/";
+const BASE_URL = 'https://v2.api.genie.xyz/';
 
 export interface IGenieClient {
-  getCallData(buyGenieNFTParams: BuyGenieNFTParams): Promise<GenieCallDataResponse>
+  getCallData(
+    buyGenieNFTParams: BuyGenieNFTParams
+  ): Promise<GenieCallDataResponse>;
 }
 
 export class GenieClient implements IGenieClient {
-  logger: winston.Logger
+  logger: winston.Logger;
 
   constructor(logger: winston.Logger) {
     this.logger = logger;
   }
 
-  async getCallData({ assetId, nftId, collectionName, marketplace, contractAddress, recepientAddress }: BuyGenieNFTParams): Promise<GenieCallDataResponse> {
+  async getCallData({
+    assetId,
+    nftId,
+    collectionName,
+    marketplace,
+    contractAddress,
+    recepientAddress
+  }: BuyGenieNFTParams): Promise<GenieCallDataResponse> {
     const data = JSON.stringify({
-      "buy": [
+      buy: [
         {
-            "address": contractAddress,
-            "amount": 1,
-            "collectionName": collectionName,
-            "id": `${contractAddress}-${nftId}`,
-            "marketplace": marketplace,
-            "name": `#${nftId}`,
-            "symbol": assetId,
-            "tokenId": nftId,
-            "tokenType": "ERC721"
+          address: contractAddress,
+          amount: 1,
+          collectionName: collectionName,
+          id: `${contractAddress}-${nftId}`,
+          marketplace: marketplace,
+          name: `#${nftId}`,
+          symbol: assetId,
+          tokenId: nftId,
+          tokenType: 'ERC721'
         }
       ],
-      "sender": recepientAddress
+      sender: recepientAddress
     });
-    
+
     const config = {
       method: 'post',
       url: BASE_URL + 'route',
-      headers: { 
-        'accept': 'application/json', 
+      headers: {
+        accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      data : data
+      data: data
     };
-    
+
     const response = await axios(config);
     return response.data;
   }

@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import express, { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
+import express, {
+  NextFunction,
+  Request,
+  Response,
+  ErrorRequestHandler
+} from 'express';
 import cors from 'cors';
 import router from '../api/routes/index';
 import getAppConfig from '../config/app-config';
 
 export default async ({ app }: { app: express.Application }) => {
   const appConfig = getAppConfig();
-  
+
   /**
    * Health Check endpoints
    */
@@ -29,25 +34,27 @@ export default async ({ app }: { app: express.Application }) => {
 
   // Transforms the raw string of req.body into json
   app.use(express.json());
-  
+
   // Load API routes
   app.use(appConfig.api.prefix, router);
 
   /// catch 404 and forward to error handler
   app.use((_req: Request, res: Response, _next: NextFunction) => {
-    return res
-      .status(404)
-      .send({ message: "Not Found" })
-      .end();
+    return res.status(404).send({ message: 'Not Found' }).end();
   });
 
-  const errorHandler: ErrorRequestHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const errorHandler: ErrorRequestHandler = (
+    err: any,
+    _req: Request,
+    res: Response,
+    _next: NextFunction
+  ) => {
     res.status(err.status || 500);
     res.json({
       errors: {
-        message: err.message,
-      },
+        message: err.message
+      }
     });
-  }
+  };
   app.use(errorHandler);
 };

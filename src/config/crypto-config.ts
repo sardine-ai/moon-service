@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
-import { Chain } from "fireblocks-defi-sdk";
+import { Chain } from 'fireblocks-defi-sdk';
 
 const envFound = dotenv.config();
 if (envFound.error) {
-  console.log("⚠️  Couldn't find .env file  ⚠️ (Using pure environment variables instead)");
+  console.log(
+    "⚠️  Couldn't find .env file  ⚠️ (Using pure environment variables instead)"
+  );
 }
 
 const CHAIN_TO_ASSET_ID: { [key: string]: string } = {
@@ -14,8 +16,8 @@ const CHAIN_TO_ASSET_ID: { [key: string]: string } = {
   [Chain.BSC]: 'BNB_BSC',
   [Chain.BSC_TEST]: 'BNB_TEST',
   [Chain.POLYGON]: 'MATIC_POLYGON',
-  [Chain.MUMBAI]: 'MATIC_POLYGON_MUMBAI',
-}
+  [Chain.MUMBAI]: 'MATIC_POLYGON_MUMBAI'
+};
 
 export const CHAIN_TO_CHAIN_ID: { [key: string]: number } = {
   [Chain.MAINNET]: 1,
@@ -25,40 +27,40 @@ export const CHAIN_TO_CHAIN_ID: { [key: string]: number } = {
   [Chain.BSC]: 56,
   [Chain.BSC_TEST]: 97,
   [Chain.POLYGON]: 137,
-  [Chain.MUMBAI]: 80001,
-}
+  [Chain.MUMBAI]: 80001
+};
 
 enum EthChain {
-  MAINNET = "mainnet",
-  ROPSTEN = "ropsten",
-  RINKEBY = "rinkeby",
-  GOERLI = "goerli",
+  MAINNET = 'mainnet',
+  ROPSTEN = 'ropsten',
+  RINKEBY = 'rinkeby',
+  GOERLI = 'goerli'
 }
 
 enum PolygonChain {
-  MUMBAI = "mumbai",
-  MAINNET = "polygon",
+  MUMBAI = 'mumbai',
+  MAINNET = 'polygon'
 }
 
 enum SolanaChain {
-  MAINNET = "mainnet-beta",
-  DEVNET = "devnet",
+  MAINNET = 'mainnet-beta',
+  DEVNET = 'devnet'
 }
 
 export interface CryptoConfig {
-  sardinePrivateKey: string,
-  sardinePublicKey: string,
-  ethRPC: string,
-  maticRPC: string,
-  ethChain: string,
-  ethChainId: number,
-  ethAssetId: string,
-  polygonChain: string,
-  polygonChainId: number,
-  polygonAssetId: string,
-  solanaChain: string,
-  openSeaNetwork: string,
-  openSeaAPIKey: string,
+  sardinePrivateKey: string;
+  sardinePublicKey: string;
+  ethRPC: string;
+  maticRPC: string;
+  ethChain: string;
+  ethChainId: number;
+  ethAssetId: string;
+  polygonChain: string;
+  polygonChainId: number;
+  polygonAssetId: string;
+  solanaChain: string;
+  openSeaNetwork: string;
+  openSeaAPIKey: string;
 }
 
 const getCryptoConfig = (): CryptoConfig => {
@@ -72,14 +74,14 @@ const getCryptoConfig = (): CryptoConfig => {
 
   const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
 
-  const openSeaNetwork = process.env.ETH_CHAIN || EthChain.GOERLI
-  const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || ""
+  const openSeaNetwork = process.env.ETH_CHAIN || EthChain.GOERLI;
+  const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || '';
 
   return {
-    sardinePrivateKey: process.env.SARDINE_PRIVATE || "",
-    sardinePublicKey: process.env.SARDINE_PUBLIC || "",
-    ethRPC: process.env.ROOT_RPC || "",
-    maticRPC: process.env.MATIC_RPC || "",
+    sardinePrivateKey: process.env.SARDINE_PRIVATE || '',
+    sardinePublicKey: process.env.SARDINE_PUBLIC || '',
+    ethRPC: process.env.ROOT_RPC || '',
+    maticRPC: process.env.MATIC_RPC || '',
     ethChain: ethChain,
     ethChainId: ethChainId,
     ethAssetId: ethAssetId,
@@ -88,8 +90,8 @@ const getCryptoConfig = (): CryptoConfig => {
     polygonAssetId: polygonAssetId,
     solanaChain: solanaChain,
     openSeaNetwork: openSeaNetwork,
-    openSeaAPIKey: openSeaAPIKey,
-  }
-}
+    openSeaAPIKey: openSeaAPIKey
+  };
+};
 
 export default getCryptoConfig;
