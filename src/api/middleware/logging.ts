@@ -2,6 +2,7 @@
 
 import { Response, Request, NextFunction } from 'express';
 import { v4 as uuid } from 'uuid';
+import Logger from "../../loaders/logger";
 
 export const requestEnrichmentMw = async (
   req: Request,
@@ -13,17 +14,21 @@ export const requestEnrichmentMw = async (
   next();
 };
 
-// const resDotSendInterceptor = (res: any, send: any) => (content: any) => {
-//   res.contentBody = content;
-//   res.send = send;
-//   res.send(content);
-// };
+const resDotSendInterceptor = (res: any, send: any) => (content: any) => {
+  res.contentBody = content;
+  res.send = send;
+  res.send(content);
+};
 
 export const requestLoggerMw = (req: any, res: any, next: any) => {
-  console.log('Request', req.method, req.url, req.hostname, req.body);
-  // res.send = resDotSendInterceptor(res, res.send);
-  // res.on("finish", () => {
-  //     console.log("Response", res.contentBody);
-  // });
+  Logger.info("Request", {"Body": req.body, "Method": req.method, "URL": req.url, "Hostname": req.hostname});
   next();
 };
+
+export const responseLoggerMw = (_req: any, res: any, next: any) => {
+  res.send = resDotSendInterceptor(res, res.send);
+  res.on("finish", () => {
+    Logger.info("Response", {"Body": res.contentBody});
+  });
+  next();
+}

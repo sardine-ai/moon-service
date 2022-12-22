@@ -1,39 +1,21 @@
-import { Bundle, Operation, TransactionState, BaseTransaction } from '.';
-
-export type TransactionReceipts = Array<
-  | QuoteTransactionReceiptResponse
-  | UpdatedTransactionReceiptResponse
-  | CompletedTransactionReceiptResponse
->;
-
-export type SubmittedTransactionReceipts = Array<
-  UpdatedTransactionReceiptResponse | CompletedTransactionReceiptResponse
->;
+import { Bundle, Operation, TransactionState, Transaction } from '.';
 
 export interface BundleReceiptResponse {
   bundleId?: string;
   totalCost?: number;
   currency?: string;
   isComplete?: boolean;
-  transactionReceipts: TransactionReceipts;
+  transactionReceipts: Array<TransactionReceipt>;
 }
 
-export interface BaseTransactionReceipt {
-  totalCost: number;
-  cost: string;
-  gasCost: string;
+export interface TransactionReceipt {
+  totalCost?: number;
+  cost?: string;
+  gasCost?: string;
   currency: string;
   operation: Operation;
+  state?: TransactionState;
 }
-
-export type QuoteTransactionReceiptResponse = BaseTransactionReceipt;
-export type UpdatedTransactionReceiptResponse = Omit<
-  BaseTransactionReceipt & { state: TransactionState },
-  'cost' | 'gasCost' | 'totalCost'
->;
-export type CompletedTransactionReceiptResponse = BaseTransactionReceipt & {
-  state: TransactionState;
-};
 
 export const buildBundleReceiptResponse = (
   bundle: Bundle
@@ -42,11 +24,8 @@ export const buildBundleReceiptResponse = (
     const transactionReceipt = buildTransactionReceiptResponse(transaction);
     return transactionReceipt;
   });
-  console.log('transactionReceipts', transactionReceipts);
   const isComplete = allTransactionsComplete(transactionReceipts);
   const totalCost = getBundleReceiptTotalCost(transactionReceipts);
-  console.log('isComplete', isComplete);
-  console.log('totalCost', totalCost);
   return {
     bundleId: bundle.id,
     totalCost: isComplete ? totalCost : undefined,
@@ -57,8 +36,8 @@ export const buildBundleReceiptResponse = (
 };
 
 export const buildTransactionReceiptResponse = (
-  transaction: BaseTransaction
-): UpdatedTransactionReceiptResponse | CompletedTransactionReceiptResponse => {
+  transaction: Transaction
+): TransactionReceipt => {
   switch (transaction.state) {
     case TransactionState.COMPLETED: {
       return {
@@ -82,7 +61,7 @@ export const buildTransactionReceiptResponse = (
 };
 
 export const allTransactionsComplete = (
-  transactionReceipts: SubmittedTransactionReceipts
+  transactionReceipts: Array<TransactionReceipt>
 ) => {
   return transactionReceipts.every(
     transactionReceipt => transactionReceipt.state == TransactionState.COMPLETED
@@ -90,15 +69,12 @@ export const allTransactionsComplete = (
 };
 
 export const getBundleReceiptTotalCost = (
-  transactionReceipts: TransactionReceipts
+  transactionReceipts: Array<TransactionReceipt>
 ) => {
   const totalCost = transactionReceipts.reduce(
     (accumulator, transactionReceipt) => {
-      let newAccumulator = accumulator;
-      if ('totalCost' in transactionReceipt) {
-        newAccumulator += transactionReceipt.totalCost;
-      }
-      return newAccumulator;
+      accumulator += transactionReceipt.totalCost ?? 0;
+      return accumulator;
     },
     0
   );

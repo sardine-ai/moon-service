@@ -4,6 +4,7 @@ import { BuildBundle, CommandParams } from '../types/command';
 import { Logger } from 'winston';
 import { GetBundleStatus } from 'src/types/requests';
 import { buildBundleReceiptResponse } from '../types/models/receipt';
+import { getBaseRequest } from '../types/requests/base-request';
 
 export const commandUninjected =
   (
@@ -13,8 +14,9 @@ export const commandUninjected =
     executeBundle: ExecuteBundle
   ) =>
   async (params: CommandParams) => {
-    logger.info(`Processing Order: ${JSON.stringify(params)}`);
+    logger.info(`Processing Order: ${JSON.stringify(params)}`, getBaseRequest(params));
     const bundle = await buildBundle(params);
+    logger.info(`Bundle: ${JSON.stringify(bundle)}`, getBaseRequest(params));
     storeBundle(bundle);
     return await executeBundle(bundle);
   };
@@ -22,8 +24,9 @@ export const commandUninjected =
 export const quoteCommandUninjected =
   (logger: Logger, buildBundle: BuildBundle, quoteBundle: QuoteBundle) =>
   async (params: CommandParams) => {
-    logger.info(`Processing Quote: ${JSON.stringify(params)}`);
+    logger.info(`Processing Quote: ${JSON.stringify(params)}`, getBaseRequest(params));
     const bundle = await buildBundle(params);
+    logger.info(`Bundle: ${JSON.stringify(bundle)}`, getBaseRequest(params));
     return await quoteBundle(bundle);
   };
 

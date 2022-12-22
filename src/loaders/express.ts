@@ -9,6 +9,7 @@ import express, {
 import cors from 'cors';
 import router from '../api/routes/index';
 import getAppConfig from '../config/app-config';
+import { dogstatsd } from '../utils/metrics';
 
 export default async ({ app }: { app: express.Application }) => {
   const appConfig = getAppConfig();
@@ -49,6 +50,7 @@ export default async ({ app }: { app: express.Application }) => {
     res: Response,
     _next: NextFunction
   ) => {
+    dogstatsd.increment(err.message);
     res.status(err.status || 500);
     res.json({
       errors: {

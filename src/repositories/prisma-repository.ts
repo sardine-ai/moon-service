@@ -4,15 +4,13 @@ import {
   PrismaClient,
   Bundle as BundleInPrisma,
   Transaction as TransactionInPrisma,
-  EvmTransaction as EvmTransactionInPrisma,
   TransactionState as TransactionStateInPrisma
 } from '@prisma/client';
 import {
   Bundle,
   Transaction,
   TransactionState,
-  Operation,
-  BaseTransaction
+  Operation
 } from '../types/models';
 import {
   StoreBundle,
@@ -69,12 +67,12 @@ export const transactionStateInPrismaToTransactionState = (
   );
 };
 
-export const transactionToPrismaBaseTransaction = (
-  transaction: BaseTransaction
+export const transactionToPrismaTransaction = (
+  transaction: Transaction
 ): TransactionInPrisma => ({
   id: transaction.id,
   bundleId: transaction.bundleId!, // TODO: Don't like this
-  isStarting: transaction.isStarting,
+  order: transaction.order,
   transactionHash: transaction.transactionHash ?? null,
   executionId: transaction.executionId ?? null,
   state: transactionStateToTransactionStateInPrisma(transaction.state),
@@ -82,26 +80,19 @@ export const transactionToPrismaBaseTransaction = (
   cost: transaction.cost ?? null,
   gasCost: transaction.gasCost ?? null,
   chain: transaction.chain,
-  assetSymbol: transaction.assetSymbol
-});
-
-export const transactionToPrismaEvmTransaction = (
-  transaction: Transaction
-): EvmTransactionInPrisma => ({
-  transactionId: transaction.id,
+  assetSymbol: transaction.assetSymbol,
   to: transaction.to,
   value: transaction.value ?? null,
-  callData: transaction.callData ?? null
+  callData: transaction.callData ?? null,
 });
 
 export const prismaTransactionToTransaction = async (
   prismaTransaction: TransactionInPrisma
 ): Promise<Transaction> => {
-  const evmTransaction = await getEvmTransaction(prismaTransaction.id);
   return {
     id: prismaTransaction.id,
     bundleId: prismaTransaction.bundleId,
-    isStarting: prismaTransaction.isStarting,
+    order: prismaTransaction.order,
     transactionHash: prismaTransaction.transactionHash ?? undefined,
     executionId: prismaTransaction.executionId ?? undefined,
     state: transactionStateInPrismaToTransactionState(prismaTransaction.state),
@@ -112,9 +103,9 @@ export const prismaTransactionToTransaction = async (
       Operation.UNKNOWN,
     cost: prismaTransaction.cost ?? undefined,
     gasCost: prismaTransaction.gasCost ?? undefined,
-    to: evmTransaction?.to ?? '',
-    value: evmTransaction?.value ?? '',
-    callData: evmTransaction?.callData ?? ''
+    to: prismaTransaction?.to ?? '',
+    value: prismaTransaction?.value ?? undefined,
+    callData: prismaTransaction?.callData ?? undefined
   };
 };
 
@@ -127,8 +118,11 @@ export const getBundle: GetBundle = async (bundleId: string) => {
       transactions: true
     }
   });
-  bundle?.transactions;
-  return bundle ? bundleInPrismaToBundle(bundle) : undefined;
+  if (bundle) {
+    bundle.transactions = bundle.transactions.sort((a, b) => a.order - b.order);
+    return bundleInPrismaToBundle(bundle);
+  }
+  return undefined;
 };
 
 export const storeBundle: StoreBundle = async (bundle: Bundle) => {
@@ -141,53 +135,29 @@ export const storeBundle: StoreBundle = async (bundle: Bundle) => {
 export const storeBundleTransactions: StoreTransactions = async (
   bundle: Bundle
 ) => {
-  await prismaClient.$transaction([
-    prismaClient.transaction.createMany({
-      data: bundle.transactions.map(transactionToPrismaBaseTransaction)
-    }),
-    prismaClient.evmTransaction.createMany({
-      data: bundle.transactions.map(transaction =>
-        transactionToPrismaEvmTransaction(transaction as Transaction)
-      )
-    })
-  ]);
+  await prismaClient.transaction.createMany({
+    data: bundle.transactions.map(transaction =>
+      transactionToPrismaTransaction(transaction)
+    )
+  })
 };
 
 export const updateTransaction: UpdateTransaction = async (
   transaction: Transaction
 ) => {
-  await prismaClient.$transaction([
-    prismaClient.transaction.update({
-      where: {
-        id: transaction.id
-      },
-      data: transactionToPrismaBaseTransaction(transaction)
-    }),
-    prismaClient.evmTransaction.update({
-      where: {
-        transactionId: transaction.id
-      },
-      data: transactionToPrismaEvmTransaction(transaction)
-    })
-  ]);
+  prismaClient.transaction.update({
+    where: {
+      id: transaction.id
+    },
+    data: transactionToPrismaTransaction(transaction)
+  });
 };
 
-export const getEvmTransaction = async (transactionId: string) => {
-  const evmTransaction = await prismaClient.evmTransaction.findFirst({
-    where: {
-      transactionId: transactionId
-    }
-  });
-  return evmTransaction;
-};
 
 export const getTransactionByExecutionId: GetTransactionByExecutionId = async (
   executionId: string
 ) => {
   const transaction = await prismaClient.transaction.findFirst({
-    include: {
-      evmTransaction: true
-    },
     where: {
       executionId: executionId
     }

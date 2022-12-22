@@ -1,7 +1,7 @@
 import { IOpenSeaClient } from '../clients/openSea';
 import { BuyNftParams } from '../types/requests/nft';
 import { createBundle, Bundle, Operation } from '../types/models';
-import { setStartingTransaction, updateTransactionWithBundleId } from './utils';
+import { configureBundleTransactions } from './utils';
 
 export const buildBuyNftBundleUninjected =
   (opensea: IOpenSeaClient) =>
@@ -9,12 +9,11 @@ export const buildBuyNftBundleUninjected =
     let bundle = createBundle(Operation.BUY_NFT);
     switch (params.platform) {
       case 'opensea': {
-        let transaction = await opensea.buildTransaction(params);
-        transaction = updateTransactionWithBundleId(transaction, bundle.id);
+        const transaction = await opensea.buildTransaction(params);
         bundle.transactions.push(transaction);
         break;
       }
     }
-    bundle = setStartingTransaction(bundle);
+    bundle = configureBundleTransactions(bundle);
     return bundle;
   };

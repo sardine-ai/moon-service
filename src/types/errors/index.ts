@@ -23,3 +23,16 @@ export class NftNotFoundError extends Error {
     this.status = 410; // error code for responding to client
   }
 }
+
+export class TransactionSubmittionError extends Error {
+  // parent error
+  status: number;
+
+  constructor() {
+    super();
+    this.name = this.constructor.name; // good practice
+
+    this.message = 'There was an error submitting the transaction';
+    this.status = 500; // error code for responding to client
+  }
+}

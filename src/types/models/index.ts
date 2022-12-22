@@ -39,10 +39,10 @@ export const getTransactionState = (state: string): TransactionState => {
   );
 };
 
-export interface BaseTransaction {
+export interface Transaction {
   id: string;
   bundleId?: string;
-  isStarting: boolean;
+  order: number;
   transactionHash?: string;
   executionId?: string;
   state: TransactionState;
@@ -51,10 +51,7 @@ export interface BaseTransaction {
   gasCost?: string;
   chain: string;
   assetSymbol: string;
-}
-
-export type Transaction = BaseTransaction & {
   to: string;
   value?: string;
   callData?: string;
-};
+}

@@ -1,20 +1,15 @@
 import { update } from 'lodash';
 import { Bundle, Transaction } from '../types/models';
 
-export const setStartingTransaction = (bundle: Bundle): Bundle => {
+export const configureBundleTransactions = (bundle: Bundle): Bundle => {
   const newBundle = Object.assign({}, bundle);
-  const firstTransaction = newBundle.transactions[0];
-  firstTransaction.isStarting = true;
+  newBundle.transactions = bundle.transactions.map((transaction, index) => {
+    transaction.bundleId = bundle.id;
+    transaction.order = index;
+    return transaction;
+  })
   return newBundle;
-};
-
-export const updateTransactionWithBundleId = (
-  transaction: Transaction,
-  bundleId: string
-): Transaction => {
-  const newTransaction = update(transaction, 'bundleId', _b => bundleId);
-  return newTransaction;
-};
+}
 
 export const updateTransactionWithCosts = (
   transaction: Transaction,

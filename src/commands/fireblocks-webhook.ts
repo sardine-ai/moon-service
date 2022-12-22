@@ -12,6 +12,7 @@ import { buildBundleReceiptResponse } from '../types/models/receipt';
 import { updateTransactionWithCosts } from './utils';
 import { NotifySubscribers } from '../clients/notifications';
 import { FireblocksWebhookResponse } from '../types/fireblocks';
+import { dogstatsd } from '../utils/metrics';
 
 // TODO: Abstarct this uninjected function, we will probably switch to DFNS
 // split into:
@@ -56,6 +57,7 @@ export const handleFireblocksWebhookUninjected =
           ) as Transaction;
           switch (newState) {
             case TransactionState.COMPLETED: {
+              dogstatsd.increment("transaction.completed");
               transaction = updateTransactionWithCosts(
                 transaction,
                 fireblocksWebhookResponse.data.amountInfo.netAmount,
@@ -65,14 +67,17 @@ export const handleFireblocksWebhookUninjected =
             }
             case TransactionState.FAILED: {
               // Need to figure out what to do here: retry or rollback?
+              dogstatsd.increment("transaction.failed");
               break;
             }
             case TransactionState.CANCELLED || TransactionState.REJECTED: {
               // Rejected by sardine
+              dogstatsd.increment("transaction.cancelled");
               break;
             }
             case TransactionState.BLOCKED: {
               // Rejected by policy
+              dogstatsd.increment("transaction.blocked");
               break;
             }
           }

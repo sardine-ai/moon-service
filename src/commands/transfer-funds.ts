@@ -1,7 +1,7 @@
 import { TransferEvmFundsParams } from '../types/requests/transfer';
 import { buildEvmTransferTransaction } from '../clients/evm';
 import { createBundle, Bundle, Operation } from '../types/models';
-import { setStartingTransaction, updateTransactionWithBundleId } from './utils';
+import { configureBundleTransactions } from './utils';
 
 export const buildTransferFundsBundle = async (
   params: TransferEvmFundsParams
@@ -9,9 +9,8 @@ export const buildTransferFundsBundle = async (
   let bundle = createBundle(Operation.TRANSFER_FUNDS);
   // TODO: Logic to check if we have the funds?
   // ??
-  let transaction = buildEvmTransferTransaction(params);
-  transaction = updateTransactionWithBundleId(transaction, bundle.id);
+  const transaction = buildEvmTransferTransaction(params);
   bundle.transactions.push(transaction);
-  bundle = setStartingTransaction(bundle);
+  bundle = configureBundleTransactions(bundle);
   return bundle;
 };

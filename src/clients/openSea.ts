@@ -72,7 +72,7 @@ export class OpenSeaClient implements IOpenSeaClient {
     );
     return {
       id: uuidV4(),
-      isStarting: false,
+      order: -1,
       state: TransactionState.CREATED,
       to: callData.to!,
       value: callData.value?.toString(),
@@ -90,7 +90,7 @@ export class TestOpenSeaClient implements IOpenSeaClient {
   async buildTransaction(buyNftParams: BuyNftParams): Promise<Transaction> {
     return {
       id: '0',
-      isStarting: false,
+      order: -1,
       state: TransactionState.CREATED,
       to: buyNftParams.contractAddress,
       value: '1',

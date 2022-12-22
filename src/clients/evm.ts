@@ -37,11 +37,11 @@ export const buildEvmTransferTransaction = ({
   toAddress,
   amountInAsset,
   chain,
-  assetSymbol
+  assetSymbol,
 }: TransferEvmFundsParams): Transaction => {
   const transaction: Transaction = {
     id: uuidV4(),
-    isStarting: false,
+    order: -1,
     state: TransactionState.CREATED,
     to: toAddress,
     chain: chain,
