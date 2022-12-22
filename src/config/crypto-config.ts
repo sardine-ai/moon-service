@@ -47,6 +47,13 @@ enum SolanaChain {
   DEVNET = 'devnet'
 }
 
+const CHAIN_TO_0X_ENDPOINT: { [key: string]: string } = {
+  [Chain.MAINNET]: "https://api.0x.org/",
+  [Chain.GOERLI]: "https://goerli.api.0x.org/",
+  [Chain.POLYGON]: "https://polygon.api.0x.org/",
+  [Chain.MUMBAI]: "https://mumbai.api.0x.org/",
+};
+
 export interface CryptoConfig {
   sardinePrivateKey: string;
   sardinePublicKey: string;
@@ -61,6 +68,8 @@ export interface CryptoConfig {
   solanaChain: string;
   openSeaNetwork: string;
   openSeaAPIKey: string;
+  eth0xSwapEndpoint: string;
+  polygon0xSwapEndpoint: string;
 }
 
 const getCryptoConfig = (): CryptoConfig => {
@@ -90,7 +99,9 @@ const getCryptoConfig = (): CryptoConfig => {
     polygonAssetId: polygonAssetId,
     solanaChain: solanaChain,
     openSeaNetwork: openSeaNetwork,
-    openSeaAPIKey: openSeaAPIKey
+    openSeaAPIKey: openSeaAPIKey,
+    eth0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[ethChain],
+    polygon0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[polygonChain]
   };
 };
 
