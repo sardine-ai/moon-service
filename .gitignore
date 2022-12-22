@@ -6,3 +6,4 @@ build
 server.cert
 server.key
 .vscode
+logs
