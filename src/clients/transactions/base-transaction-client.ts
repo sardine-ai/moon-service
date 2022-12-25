@@ -52,7 +52,7 @@ export abstract class TransactionSubmissionClient
     );
     return {
       totalCost: Number(cost) + Number(gasCost),
-      cost: cost,
+      assetCost: cost,
       gasCost: gasCost,
       currency: transaction.chain,
       operation: transaction.operation
