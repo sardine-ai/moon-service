@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Transaction" ALTER COLUMN "cost" SET DATA TYPE TEXT,
+ALTER COLUMN "gasCost" SET DATA TYPE TEXT;
