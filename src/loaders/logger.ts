@@ -1,20 +1,27 @@
 import winston from 'winston';
 import getAppConfig from '../config/app-config';
 
+const logFormat = winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+
 const transports = [];
-if(process.env.NODE_ENV !== 'development') {
-  transports.push(
-    new winston.transports.Console()
-  )
+transports.push(
+  new winston.transports.File({ 
+    filename: `logs/moon-service.log`
+  }),
+)
+if (process.env.NODE_ENV !== 'development') {
+  transports.push(new winston.transports.Console());
 } else {
   transports.push(
     new winston.transports.Console({
       format: winston.format.combine(
+        winston.format.colorize(),
         winston.format.cli(),
         winston.format.splat(),
+        logFormat
       )
     })
-  )
+  );
 }
 
 const appConfig = getAppConfig();
