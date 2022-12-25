@@ -10,7 +10,7 @@ export interface BundleReceiptResponse {
 
 export interface TransactionReceipt {
   totalCost?: number;
-  cost?: string;
+  assetCost?: string;
   gasCost?: string;
   currency: string;
   operation: Operation;
@@ -43,7 +43,7 @@ export const buildTransactionReceiptResponse = (
       return {
         totalCost:
           Number(transaction.cost || 0) + Number(transaction.gasCost || 0),
-        cost: transaction.cost || '0',
+        assetCost: transaction.cost || '0',
         gasCost: transaction.gasCost || '0',
         currency: transaction.chain,
         operation: transaction.operation,
