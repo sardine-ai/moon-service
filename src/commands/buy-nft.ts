@@ -1,13 +1,11 @@
-import { IOpenSeaClient } from '../clients/openSea';
+import { IOpenSeaClient } from '../clients/opensea';
 import { BuyNftParams } from '../types/requests/nft';
 import { createBundle, Bundle, Operation } from '../types/models';
-import { ITransactionSubmissionClient } from 'src/clients/transactions';
 
 export const buildBuyNftBundleUninjected = (
-  opensea: IOpenSeaClient, 
-  transactionSubmissionClient: ITransactionSubmissionClient,
+  opensea: IOpenSeaClient
 ) => async (params: BuyNftParams): Promise<Bundle> => {
-    let bundle = createBundle(Operation.BUY_NFT);
+    const bundle = createBundle(Operation.BUY_NFT);
     switch (params.platform) {
       case 'opensea': {
         const transaction = await opensea.buildTransaction(params);
