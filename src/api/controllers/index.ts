@@ -13,7 +13,7 @@ import {
   handleFireblocksWebhook,
   getBundleStatus
 } from '../../commands';
-import { functionCounterWrapper }  from '../../utils/metrics';
+import { functionCounterWrapper } from '../../utils/metrics';
 
 const commandTryCatchWrapper =
   (command: (command: CommandParams) => Promise<any>) =>
@@ -32,9 +32,15 @@ export const buyClubHouseNftController =
 export const transferEvmFundsController = commandTryCatchWrapper(transferFunds);
 export const transferEvmFundsQuoteController =
   commandTryCatchWrapper(quoteTransferFunds);
-export const buyNftController = commandTryCatchWrapper(functionCounterWrapper(buyNft, "buyNft.calls"));
-export const buyNftQuoteController = commandTryCatchWrapper(functionCounterWrapper(quoteBuyNft,"quoteBuyNft.calls"));
+export const buyNftController = commandTryCatchWrapper(
+  functionCounterWrapper(buyNft, 'buyNft.calls')
+);
+export const buyNftQuoteController = commandTryCatchWrapper(
+  functionCounterWrapper(quoteBuyNft, 'quoteBuyNft.calls')
+);
 export const fireblocksWebhookController = commandTryCatchWrapper(
   handleFireblocksWebhook
 );
-export const getBundleStatusController = commandTryCatchWrapper(functionCounterWrapper(getBundleStatus,  "getBundleStatus.call"));
+export const getBundleStatusController = commandTryCatchWrapper(
+  functionCounterWrapper(getBundleStatus, 'getBundleStatus.call')
+);

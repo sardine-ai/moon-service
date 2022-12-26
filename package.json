@@ -7,7 +7,7 @@
     "build": "echo buildlol",
     "dev": "nodemon",
     "start": "ts-node src/app.ts",
-    "lint": "gts lint",
+    "lint": "prettier --config .prettierrc.json 'src/**/*.ts' --write",
     "clean": "gts clean",
     "compile": "echo lol",
     "fix": "gts fix",

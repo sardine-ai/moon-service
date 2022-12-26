@@ -48,10 +48,10 @@ enum SolanaChain {
 }
 
 const CHAIN_TO_0X_ENDPOINT: { [key: string]: string } = {
-  [Chain.MAINNET]: "https://api.0x.org/",
-  [Chain.GOERLI]: "https://goerli.api.0x.org/",
-  [Chain.POLYGON]: "https://polygon.api.0x.org/",
-  [Chain.MUMBAI]: "https://mumbai.api.0x.org/",
+  [Chain.MAINNET]: 'https://api.0x.org/',
+  [Chain.GOERLI]: 'https://api.0x.org/',
+  [Chain.POLYGON]: 'https://polygon.api.0x.org/',
+  [Chain.MUMBAI]: 'https://mumbai.api.0x.org/'
 };
 
 export interface CryptoConfig {
@@ -66,10 +66,11 @@ export interface CryptoConfig {
   polygonChainId: number;
   polygonAssetId: string;
   solanaChain: string;
-  openSeaNetwork: string;
   openSeaAPIKey: string;
   eth0xSwapEndpoint: string;
   polygon0xSwapEndpoint: string;
+  stableCoin: string;
+  zeroXApiKey: string;
 }
 
 const getCryptoConfig = (): CryptoConfig => {
@@ -82,9 +83,9 @@ const getCryptoConfig = (): CryptoConfig => {
   const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
 
   const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
-
-  const openSeaNetwork = process.env.ETH_CHAIN || EthChain.GOERLI;
   const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || '';
+
+  const stableCoin = process.env.STABLE_COIN || 'WETH';
 
   return {
     sardinePrivateKey: process.env.SARDINE_PRIVATE || '',
@@ -98,10 +99,11 @@ const getCryptoConfig = (): CryptoConfig => {
     polygonChainId: polygonChainId,
     polygonAssetId: polygonAssetId,
     solanaChain: solanaChain,
-    openSeaNetwork: openSeaNetwork,
     openSeaAPIKey: openSeaAPIKey,
     eth0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[ethChain],
-    polygon0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[polygonChain]
+    polygon0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[polygonChain],
+    stableCoin: stableCoin,
+    zeroXApiKey: process.env.ZERO_X_API_KEY || ''
   };
 };
 

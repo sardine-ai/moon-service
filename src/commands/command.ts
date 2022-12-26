@@ -14,7 +14,10 @@ export const commandUninjected =
     executeBundle: ExecuteBundle
   ) =>
   async (params: CommandParams) => {
-    logger.info(`Processing Order: ${JSON.stringify(params)}`, getBaseRequest(params));
+    logger.info(
+      `Processing Order: ${JSON.stringify(params)}`,
+      getBaseRequest(params)
+    );
     const bundle = await buildBundle(params);
     logger.info(`Bundle: ${JSON.stringify(bundle)}`, getBaseRequest(params));
     storeBundle(bundle);
@@ -24,7 +27,10 @@ export const commandUninjected =
 export const quoteCommandUninjected =
   (logger: Logger, buildBundle: BuildBundle, quoteBundle: QuoteBundle) =>
   async (params: CommandParams) => {
-    logger.info(`Processing Quote: ${JSON.stringify(params)}`, getBaseRequest(params));
+    logger.info(
+      `Processing Quote: ${JSON.stringify(params)}`,
+      getBaseRequest(params)
+    );
     const bundle = await buildBundle(params);
     logger.info(`Bundle: ${JSON.stringify(bundle)}`, getBaseRequest(params));
     return await quoteBundle(bundle);

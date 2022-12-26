@@ -1,13 +1,7 @@
 import express from 'express';
-import {
-  validateFireblocksSignatureMw
-} from '../middleware/validation';
-import {
-  requestLoggerMw
-} from '../middleware/logging';
-import {
-  fireblocksWebhookController,
-} from '../controllers';
+import { validateFireblocksSignatureMw } from '../middleware/validation';
+import { requestLoggerMw } from '../middleware/logging';
+import { fireblocksWebhookController } from '../controllers';
 
 export const router = express.Router();
 

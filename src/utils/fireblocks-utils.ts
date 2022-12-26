@@ -17,6 +17,7 @@ const ASSET_TO_FIREBLOCKS_ASSET_ID: AssetToFireblocksAssetId = {
     WETH: ''
   },
   mainnet: {
+    mainnet: 'ETH_TEST3', // CHANGE THIS IS JUST FOR 0X TESTING
     NATIVE: '',
     USDC: '',
     WETH: ''
@@ -44,6 +45,6 @@ export const getFireblocksAssetId = ({
     return assetId;
   }
   throw new Error(
-    `No Fireblocks Asset Id for Chain: ${chain} and Assey Symbol ${assetSymbol}`
+    `No Fireblocks Asset Id for Chain: ${chain} and Asset Symbol ${assetSymbol}`
   );
 };

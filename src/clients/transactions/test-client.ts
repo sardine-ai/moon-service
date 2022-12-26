@@ -15,9 +15,7 @@ export class TestTransactionSubmissionClient
     this.logger = logger;
   }
 
-  quoteTransaction(
-    _transaction: Transaction
-  ): Promise<TransactionReceipt> {
+  quoteTransaction(_transaction: Transaction): Promise<TransactionReceipt> {
     throw new Error('Method not implemented.');
   }
 

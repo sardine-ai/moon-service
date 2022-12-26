@@ -5,16 +5,18 @@ import { Transaction } from '../../types/models';
 import { TransactionReceipt } from '../../types/models/receipt';
 import { AlchemyWeb3, createAlchemyWeb3 } from '@alch/alchemy-web3';
 import { CHAIN_TO_CHAIN_ID, CryptoConfig } from '../../config/crypto-config';
-import { formatEther } from 'ethers/lib/utils';
 import { getGasDetails } from './helpers';
 import { EvmTransaction, GasDetails } from '../../types/evm';
+import {
+  getAssetDetails,
+  isNativeToken,
+  getNativeToken
+} from '../../utils/crypto-utils';
 
 export interface ITransactionSubmissionClient {
   sendTransaction(transaction: Transaction): Promise<any>;
   getFromAddress(chain: string, assetSymbol: string): Promise<string> | string;
-  quoteTransaction(
-    transaction: Transaction
-  ): Promise<TransactionReceipt>;
+  quoteTransaction(transaction: Transaction): Promise<TransactionReceipt>;
 }
 
 export abstract class TransactionSubmissionClient
@@ -33,28 +35,45 @@ export abstract class TransactionSubmissionClient
   async quoteTransaction(
     transaction: Transaction
   ): Promise<TransactionReceipt> {
-    const cost = formatEther(transaction.value || '0');
+    const value = transaction.value || '0';
 
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
     const fromAddress = await this.getFromAddress(
       transaction.chain,
-      transaction.assetSymbol
+      transaction.chain
     );
     const gasDetails = await getGasDetails(
       fromAddress,
       transaction,
       alchemyWeb3
     );
-    const gasCost = formatEther(
+    const gasCost =
       Number(gasDetails.gasLimit || 0) *
-        (Number(gasDetails.maxPriorityFee) +
-          Number(gasDetails.baseFeePerGas || 0))
+      (Number(gasDetails.maxPriorityFee) +
+        Number(gasDetails.baseFeePerGas || 0));
+
+    const assetCosts = transaction.assetCosts ?? [];
+    const nativeCostIndex = assetCosts.findIndex(cost =>
+      isNativeToken(cost.assetSymbol)
     );
+    if (nativeCostIndex == -1) {
+      assetCosts.push({
+        assetSymbol: getNativeToken(transaction.chain),
+        amount: (Number(value) + Number(gasCost)).toString(),
+        decimals: getAssetDetails(
+          transaction.chain,
+          getNativeToken(transaction.chain)
+        ).decimals
+      });
+    } else {
+      assetCosts[nativeCostIndex].amount = (
+        Number(assetCosts[nativeCostIndex].amount) + Number(gasCost)
+      ).toString();
+    }
     return {
-      totalCost: Number(cost) + Number(gasCost),
-      cost: cost,
-      gasCost: gasCost,
-      currency: transaction.chain,
+      assetCosts: assetCosts,
+      gasCost: gasCost.toString(),
+      chain: transaction.chain,
       operation: transaction.operation
     };
   }
@@ -100,7 +119,6 @@ export abstract class TransactionSubmissionClient
       value: transaction.value,
       chainId: CHAIN_TO_CHAIN_ID[transaction.chain],
       chain: transaction.chain,
-      assetSymbol: transaction.assetSymbol,
       nonce: nonce
     };
   }
@@ -111,7 +129,7 @@ export abstract class TransactionSubmissionClient
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
     const fromAddress = await this.getFromAddress(
       transaction.chain,
-      transaction.assetSymbol
+      transaction.chain
     );
     const nonce = await alchemyWeb3.eth.getTransactionCount(
       fromAddress,

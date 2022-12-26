@@ -77,20 +77,22 @@ export class FireblocksClient extends TransactionSubmissionClient {
       note: transaction.txNote || '',
       amount: formatEther(transaction?.value || '0')
     };
+
     if (transaction.data) {
       txArguments.extraParameters = {
         contractCallData: transaction.data
       };
       txArguments.operation = TransactionOperation.CONTRACT_CALL;
     }
+    console.log('txArguments', txArguments);
     return txArguments;
   }
 
   // TODO: Implement logic to determine which vault to use, probably want to look at balances
   choseVaultAccount(
     potentialVaults: Array<VaultAccountResponse>
-  ): VaultAccountResponse {
-    return potentialVaults[0];
+  ): VaultAccountResponse | undefined {
+    return potentialVaults.find(v => v.name == 'Testing Vault');
   }
 
   async getVaultAccount(
@@ -102,9 +104,10 @@ export class FireblocksClient extends TransactionSubmissionClient {
     const potentialVaults = await fireblocks.getVaultAccountsWithPageInfo({
       assetId: fireblocksAssetId
     });
-    if (potentialVaults.accounts && potentialVaults.accounts.length > 0) {
+    const vault = this.choseVaultAccount(potentialVaults.accounts);
+    if (vault) {
       return {
-        id: this.choseVaultAccount(potentialVaults.accounts).id,
+        id: vault.id,
         assetId: fireblocksAssetId
       };
     }
@@ -130,7 +133,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
     // need a getVaultFromAddress method
     const vaultAccount = await this.getVaultAccount(
       transaction.chain,
-      transaction.assetSymbol
+      transaction.chain
     );
     if (vaultAccount) {
       const evmTransaction = await this.convertTransactionToEvmTransaction(
@@ -140,13 +143,13 @@ export class FireblocksClient extends TransactionSubmissionClient {
         evmTransaction,
         vaultAccount
       );
-      this.logger.info(`Fireblocks Arguments: ${JSON.stringify(txArguments)}`)
+      this.logger.info(`Fireblocks Arguments: ${JSON.stringify(txArguments)}`);
       const fireblocks = await this.getOrSetFireblocksSdk();
       try {
         const response = await fireblocks.createTransaction(txArguments);
         return response;
       } catch (error) {
-        new TransactionSubmittionError()
+        new TransactionSubmittionError();
       }
     }
     this.logger.error('No vault acccount found');

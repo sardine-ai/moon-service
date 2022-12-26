@@ -77,13 +77,12 @@ export const transactionToPrismaTransaction = (
   executionId: transaction.executionId ?? null,
   state: transactionStateToTransactionStateInPrisma(transaction.state),
   operation: transaction.operation,
-  cost: transaction.cost ?? null,
+  assetCosts: transaction.assetCosts ?? [],
   gasCost: transaction.gasCost ?? null,
   chain: transaction.chain,
-  assetSymbol: transaction.assetSymbol,
   to: transaction.to,
   value: transaction.value ?? null,
-  callData: transaction.callData ?? null,
+  callData: transaction.callData ?? null
 });
 
 export const prismaTransactionToTransaction = async (
@@ -97,11 +96,14 @@ export const prismaTransactionToTransaction = async (
     executionId: prismaTransaction.executionId ?? undefined,
     state: transactionStateInPrismaToTransactionState(prismaTransaction.state),
     chain: prismaTransaction.chain ?? '',
-    assetSymbol: prismaTransaction.assetSymbol ?? '',
     operation:
       Operation[prismaTransaction.operation as keyof typeof Operation] ??
       Operation.UNKNOWN,
-    cost: prismaTransaction.cost ?? undefined,
+    assetCosts: prismaTransaction.assetCosts as {
+      assetSymbol: string;
+      amount: string;
+      decimals: number;
+    }[],
     gasCost: prismaTransaction.gasCost ?? undefined,
     to: prismaTransaction?.to ?? '',
     value: prismaTransaction?.value ?? undefined,
@@ -139,7 +141,7 @@ export const storeBundleTransactions: StoreTransactions = async (
     data: bundle.transactions.map(transaction =>
       transactionToPrismaTransaction(transaction)
     )
-  })
+  });
 };
 
 export const updateTransaction: UpdateTransaction = async (
@@ -152,7 +154,6 @@ export const updateTransaction: UpdateTransaction = async (
     data: transactionToPrismaTransaction(transaction)
   });
 };
-
 
 export const getTransactionByExecutionId: GetTransactionByExecutionId = async (
   executionId: string

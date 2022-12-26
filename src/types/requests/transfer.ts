@@ -6,7 +6,7 @@ import { Expose } from 'class-transformer';
 import { IsValidEvmAddress } from './decorators';
 
 const VALID_CHAINS = ['mainnet', 'goerli', 'polygon', 'polygon_test'];
-const VALID_ASSET_SYMBOLS = ['NATIVE', 'USDC', 'WETH'];
+const VALID_ASSET_SYMBOLS = ['ETH', 'USDC', 'WETH', 'MATIC'];
 
 export class TransferEvmFundsParams extends BaseRequest {
   @IsDefined()

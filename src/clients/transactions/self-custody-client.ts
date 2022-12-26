@@ -7,7 +7,7 @@ import { AlchemyWeb3 } from '@alch/alchemy-web3';
 import { SignedTransaction } from 'web3-core';
 import winston from 'winston';
 import { Transaction } from '../../types/models';
-import { TransactionSubmissionClient } from './base-transaction-client'
+import { TransactionSubmissionClient } from './base-transaction-client';
 import { TransactionSubmittionError } from '../../types/errors';
 
 export class SelfCustodyClient extends TransactionSubmissionClient {
@@ -48,7 +48,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
         if (err === null) {
           this.logger.info(`Transacion Hash: ${hash}`);
         } else {
-          new TransactionSubmittionError()
+          new TransactionSubmittionError();
         }
       }
     );

@@ -10,7 +10,6 @@ export interface EvmTransaction {
   txNote?: string;
   chainId?: number;
   chain: string;
-  assetSymbol: string;
   nonce: number;
 }
 

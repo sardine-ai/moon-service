@@ -78,7 +78,6 @@ export class OpenSeaClient implements IOpenSeaClient {
       value: callData.value?.toString(),
       callData: callData.data,
       chain: buyNftParams.chain,
-      assetSymbol: buyNftParams.chain,
       operation: Operation.BUY_NFT
     };
   }
@@ -96,7 +95,6 @@ export class TestOpenSeaClient implements IOpenSeaClient {
       value: '1',
       callData: '0xcallData',
       chain: buyNftParams.chain,
-      assetSymbol: buyNftParams.chain,
       operation: Operation.BUY_NFT
     };
   }

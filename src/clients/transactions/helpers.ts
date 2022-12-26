@@ -68,11 +68,10 @@ export const quoteBundleUninjected =
       })
     );
     logger.info(`Transaction Quotes: ${JSON.stringify(transactionQuotes)}`);
-    const totalCost = getBundleReceiptTotalCost(transactionQuotes);
-    logger.info(`Total cost: ${totalCost}`);
+    const totalCosts = getBundleReceiptTotalCost(transactionQuotes);
+    logger.info(`Total cost: ${totalCosts}`);
     return {
-      totalCost: totalCost,
-      currency: transactionQuotes[0].currency,
+      totalCosts: totalCosts,
       transactionReceipts: transactionQuotes
     };
   };

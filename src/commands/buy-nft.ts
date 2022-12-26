@@ -1,14 +1,17 @@
-import { IOpenSeaClient } from '../clients/openSea';
+import { IOpenSeaClient } from '../clients/opensea';
 import { BuyNftParams } from '../types/requests/nft';
 import { createBundle, Bundle, Operation } from '../types/models';
 import { configureBundleTransactions } from './utils';
-import { ITransactionSubmissionClient } from 'src/clients/transactions';
+import { BuildSwapTransaction } from '../clients/swaps';
+import { QuoteBundle } from '../clients/transactions/helpers';
 
-export const buildBuyNftBundleUninjected = (
-  opensea: IOpenSeaClient, 
-  transactionSubmissionClient: ITransactionSubmissionClient,
-  liquiditySwapClient: ILiquiditySwapClient
-) => async (params: BuyNftParams): Promise<Bundle> => {
+export const buildBuyNftBundleUninjected =
+  (
+    opensea: IOpenSeaClient,
+    quotebundle: QuoteBundle,
+    buildSwapTransaction: BuildSwapTransaction
+  ) =>
+  async (params: BuyNftParams): Promise<Bundle> => {
     let bundle = createBundle(Operation.BUY_NFT);
     switch (params.platform) {
       case 'opensea': {
@@ -17,9 +20,9 @@ export const buildBuyNftBundleUninjected = (
         break;
       }
     }
-    const bundleQuote = await transactionSubmissionClient.quoteTransaction(bundle.transactions[0]);
-    const transaction = liquiditySwapClient.buildTransaction(bundleQuote);
-    bundle.transactions = [transaction].concat(bundle.transactions);
+    // const bundleQuote = await quotebundle(bundle);
+    // const transactions = await buildSwapTransaction(bundleQuote);
+    // bundle.transactions = [...transactions].concat(bundle.transactions);
     bundle = configureBundleTransactions(bundle);
     return bundle;
   };

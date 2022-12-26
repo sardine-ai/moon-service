@@ -58,7 +58,6 @@ export const validateFireblocksSignatureMw = async (
       signature,
       'base64'
     );
-    console.log('is verified?', isVerified);
     if (isVerified) {
       next();
     }

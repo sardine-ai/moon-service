@@ -39,10 +39,9 @@ model Transaction {
   executionId String?
   state TransactionState
   operation String @default("UNKNOWN")
-  cost String?
+  assetCosts Json[]
   gasCost String?
   chain String
-  assetSymbol String
   to String
   value String?
   callData String?

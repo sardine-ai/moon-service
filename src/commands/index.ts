@@ -21,7 +21,7 @@ import { GenieClient } from '../clients/genie';
 import getCryptoConfig from '../config/crypto-config';
 import getFireblocksConfig from '../config/fireblocks-config';
 import { buildBuyNftBundleUninjected } from './buy-nft';
-import { OpenSeaClient } from '../clients/openSea';
+import { OpenSeaClient } from '../clients/opensea';
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from 'web3';
 import logger from '../loaders/logger';
@@ -37,6 +37,7 @@ import {
   getBundleStatusUninjected
 } from './command';
 import { notifySubscribers } from '../clients/notifications';
+import { buildSwapTransaction0xUninjected } from '../clients/swaps';
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig();
@@ -60,7 +61,7 @@ const genieClient: GenieClient = new GenieClient(logger);
 
 const ethProvider: any = new Web3.providers.HttpProvider(cryptoConfig.ethRPC);
 const ethOpenSea = new OpenSeaSDK(ethProvider, {
-  networkName: cryptoConfig.openSeaNetwork as Network,
+  networkName: cryptoConfig.ethChain as Network,
   apiKey: cryptoConfig.openSeaAPIKey
 });
 
@@ -108,7 +109,15 @@ export const quoteTransferFunds = quoteCommandUninjected(
   quoteBundle
 );
 
-const buildBuyNftBundle = buildBuyNftBundleUninjected(openSeaClient);
+const buildSwapTransaction0x = buildSwapTransaction0xUninjected(
+  cryptoConfig,
+  false
+);
+const buildBuyNftBundle = buildBuyNftBundleUninjected(
+  openSeaClient,
+  quoteBundle,
+  buildSwapTransaction0x
+);
 export const buyNft = commandUninjected(
   logger,
   buildBuyNftBundle,
@@ -124,7 +133,8 @@ export const quoteBuyNft = quoteCommandUninjected(
 export const handleFireblocksWebhook = handleFireblocksWebhookUninjected(
   getBundleByTransactionExecutionId,
   updateTransaction,
-  notifySubscribers
+  notifySubscribers,
+  executeBundle
 );
 
 export const getBundleStatus = getBundleStatusUninjected(getBundle);

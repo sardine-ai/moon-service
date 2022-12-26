@@ -13,6 +13,7 @@ import { updateTransactionWithCosts } from './utils';
 import { NotifySubscribers } from '../clients/notifications';
 import { FireblocksWebhookResponse } from '../types/fireblocks';
 import { dogstatsd } from '../utils/metrics';
+import { ExecuteBundle } from '../clients/transactions/helpers';
 
 // TODO: Abstarct this uninjected function, we will probably switch to DFNS
 // split into:
@@ -24,7 +25,8 @@ export const handleFireblocksWebhookUninjected =
   (
     getBundleByTransactionExecutionId: GetBundleByTransactionExecutionId,
     updateTransaction: UpdateTransaction,
-    notifySubscribers: NotifySubscribers
+    notifySubscribers: NotifySubscribers,
+    executeBundle: ExecuteBundle
   ) =>
   async (fireblocksWebhookResponse: FireblocksWebhookResponse) => {
     console.log(fireblocksWebhookResponse);
@@ -57,27 +59,28 @@ export const handleFireblocksWebhookUninjected =
           ) as Transaction;
           switch (newState) {
             case TransactionState.COMPLETED: {
-              dogstatsd.increment("transaction.completed");
+              dogstatsd.increment('transaction.completed');
               transaction = updateTransactionWithCosts(
                 transaction,
                 fireblocksWebhookResponse.data.amountInfo.netAmount,
                 fireblocksWebhookResponse.data.feeInfo.networkFee
               );
+              executeBundle(bundle);
               break;
             }
             case TransactionState.FAILED: {
               // Need to figure out what to do here: retry or rollback?
-              dogstatsd.increment("transaction.failed");
+              dogstatsd.increment('transaction.failed');
               break;
             }
             case TransactionState.CANCELLED || TransactionState.REJECTED: {
               // Rejected by sardine
-              dogstatsd.increment("transaction.cancelled");
+              dogstatsd.increment('transaction.cancelled');
               break;
             }
             case TransactionState.BLOCKED: {
               // Rejected by policy
-              dogstatsd.increment("transaction.blocked");
+              dogstatsd.increment('transaction.blocked');
               break;
             }
           }
