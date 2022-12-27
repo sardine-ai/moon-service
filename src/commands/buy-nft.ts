@@ -20,9 +20,9 @@ export const buildBuyNftBundleUninjected =
         break;
       }
     }
-    // const bundleQuote = await quotebundle(bundle);
-    // const transactions = await buildSwapTransaction(bundleQuote);
-    // bundle.transactions = [...transactions].concat(bundle.transactions);
+    const bundleQuote = await quotebundle(bundle);
+    const transactions = await buildSwapTransaction(bundleQuote);
+    bundle.transactions = [...transactions].concat(bundle.transactions);
     bundle = configureBundleTransactions(bundle);
     return bundle;
   };

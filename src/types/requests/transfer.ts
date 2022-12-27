@@ -14,6 +14,7 @@ export class TransferEvmFundsParams extends BaseRequest {
   @IsPositive({ message: 'Please submit an amoount greater than 0' })
   amountInAsset: number;
 
+  @IsDefined()
   @Expose()
   @IsIn(VALID_ASSET_SYMBOLS, {
     message: `Asset Symbol must be one of ${VALID_ASSET_SYMBOLS.toString()}`

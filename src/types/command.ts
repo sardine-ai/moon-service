@@ -1,16 +1,20 @@
 import { BuyGenieNFTParams } from './genie';
-import { BuyClubHouseNFTParams } from './requests/clubhouse';
-import { TransferEvmFundsParams } from './requests/transfer';
-import { BuyNftParams } from './requests/nft';
 import { Bundle } from './models';
 import { FireblocksWebhookResponse } from './fireblocks';
-import { GetBundleStatus } from './requests';
+import {
+  GetBundleStatusParams,
+  SwapTokensParams,
+  BuyClubHouseNFTParams,
+  TransferEvmFundsParams,
+  BuyNftParams
+} from './requests';
 
 export type CommandParams = TransferEvmFundsParams &
   BuyClubHouseNFTParams &
   BuyGenieNFTParams &
   BuyNftParams &
+  SwapTokensParams &
   FireblocksWebhookResponse &
-  GetBundleStatus;
+  GetBundleStatusParams;
 
 export type BuildBundle = (params: CommandParams) => Promise<Bundle>;

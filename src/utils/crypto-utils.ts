@@ -9,11 +9,11 @@ interface AssetDetails {
 const ASSET_DETAILS: AssetDetails = {
   goerli: {
     ETH: {
-      assetContractAddress: '',
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
       decimals: 18
     },
     USDC: {
-      assetContractAddress: '0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557',
+      assetContractAddress: '0x5FfbaC75EFc9547FBc822166feD19B05Cd5890bb',
       decimals: 6
     },
     WETH: {
@@ -23,7 +23,7 @@ const ASSET_DETAILS: AssetDetails = {
   },
   mainnet: {
     ETH: {
-      assetContractAddress: '',
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
       decimals: 18
     },
     USDC: {
@@ -37,7 +37,7 @@ const ASSET_DETAILS: AssetDetails = {
   },
   polygon_test: {
     MATIC: {
-      assetContractAddress: '',
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
       decimals: 18
     },
     USDC: {
@@ -51,7 +51,7 @@ const ASSET_DETAILS: AssetDetails = {
   },
   polygon: {
     MATIC: {
-      assetContractAddress: '',
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
       decimals: 18
     },
     USDC: {

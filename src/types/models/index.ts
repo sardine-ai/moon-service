@@ -4,7 +4,7 @@ export enum Operation {
   UNKNOWN = 'UNKNOWN',
   TRANSFER_FUNDS = 'TRANSFER_FUNDS',
   BUY_NFT = 'BUY_NFT',
-  SWAP = 'SWAP'
+  SWAP_TOKENS = 'SWAP_TOKENS'
 }
 
 export interface Bundle {

@@ -2,7 +2,7 @@ import { ExecuteBundle, QuoteBundle } from '../clients/transactions/helpers';
 import { GetBundle, StoreBundle } from '../repositories/base-repository';
 import { BuildBundle, CommandParams } from '../types/command';
 import { Logger } from 'winston';
-import { GetBundleStatus } from 'src/types/requests';
+import { GetBundleStatusParams } from 'src/types/requests';
 import { buildBundleReceiptResponse } from '../types/models/receipt';
 import { getBaseRequest } from '../types/requests/base-request';
 
@@ -37,7 +37,7 @@ export const quoteCommandUninjected =
   };
 
 export const getBundleStatusUninjected =
-  (getBundle: GetBundle) => async (getBundleStatus: GetBundleStatus) => {
+  (getBundle: GetBundle) => async (getBundleStatus: GetBundleStatusParams) => {
     const bundle = await getBundle(getBundleStatus.bundleId);
     if (bundle) {
       const bundleReceipt = buildBundleReceiptResponse(bundle);

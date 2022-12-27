@@ -11,7 +11,9 @@ import {
   buyNft,
   quoteBuyNft,
   handleFireblocksWebhook,
-  getBundleStatus
+  getBundleStatus,
+  swapTokens,
+  quoteSwapTokens
 } from '../../commands';
 import { functionCounterWrapper } from '../../utils/metrics';
 
@@ -37,6 +39,12 @@ export const buyNftController = commandTryCatchWrapper(
 );
 export const buyNftQuoteController = commandTryCatchWrapper(
   functionCounterWrapper(quoteBuyNft, 'quoteBuyNft.calls')
+);
+export const swapTokensController = commandTryCatchWrapper(
+  functionCounterWrapper(swapTokens, 'swapTokens.calls')
+);
+export const swapTokensQuoteController = commandTryCatchWrapper(
+  functionCounterWrapper(quoteSwapTokens, 'quoteSwapTokens.calls')
 );
 export const fireblocksWebhookController = commandTryCatchWrapper(
   handleFireblocksWebhook

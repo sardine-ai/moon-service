@@ -38,6 +38,7 @@ export abstract class TransactionSubmissionClient
     const value = transaction.value || '0';
 
     const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
+
     const fromAddress = await this.getFromAddress(
       transaction.chain,
       transaction.chain

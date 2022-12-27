@@ -7,13 +7,16 @@ import {
   transferEvmFundsController,
   buyNftController,
   buyNftQuoteController,
+  swapTokensController,
+  swapTokensQuoteController,
   getBundleStatusController
 } from '../controllers';
 import {
   BuyClubHouseNFTParams,
   TransferEvmFundsParams,
   BuyNftParams,
-  GetBundleStatus
+  GetBundleStatusParams,
+  SwapTokensParams
 } from '../../types/requests';
 import {
   requestEnrichmentMw,
@@ -48,10 +51,19 @@ router.get(
   validationMw(BuyNftParams),
   buyNftQuoteController
 );
-
+router.post(
+  '/v1/swap-tokens',
+  validationMw(SwapTokensParams),
+  swapTokensController
+);
+router.get(
+  '/v1/quote-swap-tokens',
+  validationMw(SwapTokensParams),
+  swapTokensQuoteController
+);
 // Get
 router.get(
   '/v1/get-bundle-status',
-  validationMw(GetBundleStatus),
+  validationMw(GetBundleStatusParams),
   getBundleStatusController
 );

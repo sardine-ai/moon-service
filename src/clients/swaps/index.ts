@@ -3,14 +3,20 @@ import { Operation, Transaction, TransactionState } from '../../types/models';
 import { BundleReceiptResponse } from '../../types/models/receipt';
 import { v4 as uuidV4 } from 'uuid';
 import { getAssetDetails } from '../../utils/crypto-utils';
+import { SwapTokensParams } from '../../types/requests';
 
 export type BuildSwapTransaction = (
   bundle: BundleReceiptResponse
 ) => Promise<Array<Transaction>>;
 
-const get0xSwapData = async (
+export type GetZeroXSwapData = (
   baseUrl: string,
-  { sellToken, buyToken, buyAmount, intentOnFilling }: Swap0xRequestParams
+  zeroXSwapParams: ZeroXSwapParams
+) => Promise<any>;
+
+export const getZeroXSwapData = async (
+  baseUrl: string,
+  { sellToken, buyToken, buyAmount, intentOnFilling }: ZeroXSwapParams
 ) => {
   const url = `${baseUrl}swap/v1/quote?sellToken=${sellToken}&buyToken=${buyToken}&buyAmount=${buyAmount}&intentOnFilling=${intentOnFilling}`;
   return await fetch(url, {
@@ -24,14 +30,14 @@ const get0xSwapData = async (
 
 const buildTransactionWithSwapData = (
   chain: string,
-  swapData: Swap0xResponse,
-  swapRequest: Swap0xRequestParams
+  swapData: ZeroXSwapResponse,
+  swapRequest: ZeroXSwapParams
 ): Transaction => {
   return {
     id: uuidV4(),
     order: -1,
     state: TransactionState.CREATED,
-    operation: Operation.SWAP,
+    operation: Operation.SWAP_TOKENS,
     assetCosts: [
       {
         assetSymbol: swapRequest.sellToken,
@@ -44,9 +50,6 @@ const buildTransactionWithSwapData = (
         decimals: getAssetDetails(chain, swapRequest.buyToken).decimals
       }
     ],
-    gasCost: (Number(swapData.gas) * Number(swapData.gasPrice)).toString(),
-    gas: swapData.gas,
-    gasPrice: swapData.gasPrice,
     chain: chain,
     to: swapData.to,
     value: swapData.value,
@@ -54,9 +57,48 @@ const buildTransactionWithSwapData = (
   };
 };
 
+export type BuildZeroXSwapTransaction = (
+  zeroXSwapParams: ZeroXSwapParams
+) => Promise<Transaction | null>;
+
+export const buildZeroXSwapTransactionUninjected =
+  (cryptoConfig: CryptoConfig, getZeroXSwapData: GetZeroXSwapData) =>
+  async (zeroXSwapParams: ZeroXSwapParams) => {
+    // On devnet 0X uses contract addresses instead of token symbols
+    // if (cryptoConfig.ethChain === "goerli") {
+    //   zeroXSwapParams.buyToken = getAssetDetails(
+    //     cryptoConfig.ethChain,
+    //     zeroXSwapParams.buyToken
+    //   ).assetContractAddress;
+    //   zeroXSwapParams.sellToken = getAssetDetails(
+    //     cryptoConfig.ethChain,
+    //     zeroXSwapParams.sellToken
+    //   ).assetContractAddress;
+    // }
+
+    const swapDataResponse = await getZeroXSwapData(
+      cryptoConfig.eth0xSwapEndpoint,
+      zeroXSwapParams
+    );
+    if (!swapDataResponse.ok) {
+      return null;
+    }
+    const swapData = await swapDataResponse.json();
+    const transaction = buildTransactionWithSwapData(
+      cryptoConfig.ethChain,
+      swapData,
+      zeroXSwapParams
+    );
+    return transaction;
+  };
+
 // For now only works on ethereum mainnet
-export const buildSwapTransaction0xUninjected =
-  (cryptoConfig: CryptoConfig, intentOnFilling: boolean) =>
+export const buildSwapTransactionFromReceiptUninjected =
+  (
+    intentOnFilling: boolean,
+    cryptoConfig: CryptoConfig,
+    buildTransaction: BuildZeroXSwapTransaction
+  ) =>
   async (bundleReceipt: BundleReceiptResponse): Promise<Array<Transaction>> => {
     const transactions =
       (await bundleReceipt.totalCosts
@@ -64,41 +106,44 @@ export const buildSwapTransaction0xUninjected =
         .reduce(async (previousPromise, cost) => {
           const acc = await previousPromise;
 
-          const swap0xRequestParams: Swap0xRequestParams = {
+          const zeroXSwapParams: ZeroXSwapParams = {
             sellToken: cryptoConfig.stableCoin,
             buyToken: 'ETH',
             buyAmount: cost.amount,
             intentOnFilling: intentOnFilling
           };
-          const swapDataResponse = await get0xSwapData(
-            cryptoConfig.eth0xSwapEndpoint,
-            swap0xRequestParams
-          );
-          if (!swapDataResponse.ok) {
-            return acc;
+
+          const transaction = await buildTransaction(zeroXSwapParams);
+          if (transaction) {
+            acc.push(transaction);
           }
-          const swapData = await swapDataResponse.json();
-          acc.push(
-            buildTransactionWithSwapData(
-              cryptoConfig.ethChain,
-              swapData,
-              swap0xRequestParams
-            )
-          );
           return acc;
         }, Promise.resolve([]) as Promise<Array<Transaction>>)) ?? [];
 
     return transactions;
   };
 
-interface Swap0xRequestParams {
+export const buildSwapTokensTransactionUninjected =
+  (intentOnFilling: boolean, buildTransaction: BuildZeroXSwapTransaction) =>
+  async (params: SwapTokensParams): Promise<Transaction | null> => {
+    const zeroXSwapParams: ZeroXSwapParams = {
+      sellToken: params.sellToken,
+      buyToken: params.buyToken,
+      buyAmount: params.buyAmount.toString(),
+      intentOnFilling: intentOnFilling
+    };
+    const transaction = await buildTransaction(zeroXSwapParams);
+    return transaction;
+  };
+
+interface ZeroXSwapParams {
   sellToken: string;
   buyToken: string;
   buyAmount: string;
   intentOnFilling: boolean;
 }
 
-interface Swap0xResponse {
+interface ZeroXSwapResponse {
   chainId: number;
   price: string;
   guaranteedPrice: string;

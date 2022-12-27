@@ -5,6 +5,7 @@ import { buyClubHouseNFTUninjected } from './clubhouse';
 import { buyGenieNFTUninjected } from './genie';
 import { buildTransferFundsBundle } from './transfer-funds';
 import { handleFireblocksWebhookUninjected } from './fireblocks-webhook';
+import { buildSwapTokensBundleUninjected } from './swap-tokens';
 import {
   executeBundleUninjected,
   quoteBundleUninjected,
@@ -37,7 +38,12 @@ import {
   getBundleStatusUninjected
 } from './command';
 import { notifySubscribers } from '../clients/notifications';
-import { buildSwapTransaction0xUninjected } from '../clients/swaps';
+import {
+  buildZeroXSwapTransactionUninjected,
+  buildSwapTokensTransactionUninjected,
+  buildSwapTransactionFromReceiptUninjected,
+  getZeroXSwapData
+} from '../clients/swaps';
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig();
@@ -102,21 +108,39 @@ export const transferFunds = commandUninjected(
   buildTransferFundsBundle,
   storeBundle,
   executeBundle
-); // <----- Every command should look like this
+);
 export const quoteTransferFunds = quoteCommandUninjected(
   logger,
   buildTransferFundsBundle,
   quoteBundle
 );
 
-const buildSwapTransaction0x = buildSwapTransaction0xUninjected(
+const buildSwapTransaction = buildZeroXSwapTransactionUninjected(
   cryptoConfig,
-  false
+  getZeroXSwapData
 );
+
+const buildSwapTransactionFromReceipt =
+  buildSwapTransactionFromReceiptUninjected(
+    false,
+    cryptoConfig,
+    buildSwapTransaction
+  );
+
+const buildSwapTokensTransaction = buildSwapTokensTransactionUninjected(
+  true,
+  buildSwapTransaction
+);
+
+const buildQuoteSwapTokensTransaction = buildSwapTokensTransactionUninjected(
+  false,
+  buildSwapTransaction
+);
+
 const buildBuyNftBundle = buildBuyNftBundleUninjected(
   openSeaClient,
   quoteBundle,
-  buildSwapTransaction0x
+  buildSwapTransactionFromReceipt
 );
 export const buyNft = commandUninjected(
   logger,
@@ -127,6 +151,26 @@ export const buyNft = commandUninjected(
 export const quoteBuyNft = quoteCommandUninjected(
   logger,
   buildBuyNftBundle,
+  quoteBundle
+);
+
+const buildSwapTokensBundle = buildSwapTokensBundleUninjected(
+  buildSwapTokensTransaction
+);
+
+const buildQuoteSwapTokensBundle = buildSwapTokensBundleUninjected(
+  buildQuoteSwapTokensTransaction
+);
+
+export const swapTokens = commandUninjected(
+  logger,
+  buildSwapTokensBundle,
+  storeBundle,
+  executeBundle
+);
+export const quoteSwapTokens = quoteCommandUninjected(
+  logger,
+  buildQuoteSwapTokensBundle,
   quoteBundle
 );
 
