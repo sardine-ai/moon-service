@@ -1,7 +1,7 @@
 {
-  "name": "fireblocks",
-  "version": "1.0.0",
-  "description": "",
+  "name": "moon-service",
+  "private": true,
+  "description": "A service for building & fulfilling on chain transactions",
   "main": "src/app.ts",
   "scripts": {
     "build": "echo buildlol",
@@ -24,8 +24,6 @@
     "ext": "ts",
     "exec": "npm run lint && npm run start"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@jest/globals": "^29.3.1",
     "@types/bn.js": "^5.1.1",
