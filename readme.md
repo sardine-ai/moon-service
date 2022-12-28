@@ -24,7 +24,7 @@
 ### Start Server
 9. To receive webhooks from fireblocks 
 9. Run `yarn install` to install dependencies (compiling will not work)
-10. Run `yarn dev` to start the server. Uses your public/private key pair by default
+10. Run `yarn dev -- self` to start the server with public/private key pair. Moon services fakes transaction submissions by default
   - `yarn dev -- fireblocks` to use fireblocks instead
 
 Docker setup coming soon...
@@ -38,7 +38,7 @@ Docker setup coming soon...
 - Function: camelCase
 
 ## Features
-to use a feature make sure your server is running
+to use a feature make sure your server is running and make sure `TEMP_API_KEY` is set in the headers under the `X-API-Key` key.
 
 ### Transfer Funds
 _This feature allows crypto backend to send api requests to wallet service to transfer funds to different addresses in different currencies_
@@ -46,7 +46,7 @@ Steps for Transfering WETH on Polygon Mumbai using your Public Private Key Pair:
 1. Go to the mumbai faucer and request test polygon at: `https://faucet.polygon.technology/` 
 2. Go to`https://uniswap.org/`, launch the app and switch to `polygon-mumbai`
 3. Swap your matic for WETH
-4. Call `localhost:8000/api/evm/transfer-funds` with the following body:
+4. Call `localhost:8000/api/v1/transfer-funds` with the following body:
 ```
 {
     "amountInAsset": 0.00001,
@@ -56,10 +56,51 @@ Steps for Transfering WETH on Polygon Mumbai using your Public Private Key Pair:
 }
 ```
 
-### Buy Seaport NFT (in progress)
-_This feature allows you to buy a given NFT on a seaport marketplace through an API request._
+### Buy NFT
+_This feature allows you to buy a given NFT on a given platform through an API request. Only available now for seaport_
 Steps:
-1. Go to `https://testnets.opensea.io/` and click on an NFT you would "like" to purcahse. The url should look something like thid: `https://testnets.opensea.io/assets/goerli/0xb00492a72557b778cb31270e78d27716d6340bbf/1` Note the contractAddress and nftId. In this case that would be `0xb00492a72557b778cb31270e78d27716d6340bbf` and `1` respectively.
+1. Go to `https://testnets.opensea.io/` and click on an NFT you would "like" to purcahse. The url should look something like thid: `https://testnets.opensea.io/assets/goerli/0xf4910c763ed4e47a585e2d34baa9a4b611ae448c/67022434631017884391824511567400835126939038864993395292924042664566883090433` Note the contractAddress and nftId. In this case that would be `0xf4910c763ed4e47a585e2d34baa9a4b611ae448c` and `67022434631017884391824511567400835126939038864993395292924042664566883090433` respectively.
+2. Request a quote to purchase the NFT by sending a GET request to `localhost:8000/api/v1/quote-buy-nft` with the following body:
+```
+{
+    "nftId": "67022434631017884391824511567400835126939038864993395292924042664566883090433",
+    "collectionName": "a dog collection",
+    "contractAddress": "0xf4910c763ed4e47a585e2d34baa9a4b611ae448c",
+    "chain": "goerli",
+    "recipientAddress": "0x4cc1756281D7203A172C63E9df9307dABA5523A8",
+    "platform": "opensea"
+}
+```
+3. You can then purchase the NFT by send a POST request to `localhost:8000/api/v1/quote-buy-nft` with the same body as above.
+
+### Swap Tokens
+_This feature allows you to swap tokens using the 0x api. Right now only avaible on mainnets since devnets to not have enough liquidity_
+1. Request a quote by calling a GET request to `localhost:8000/api/v1/quote-swap-tokens` with the following body (Calling this on devnet will request the 0x mainnet endpoint):
+```
+{
+    "sellToken": "ETH",
+    "buyToken": "WETH",
+    "buyAmount": 100000,
+    "chain": "goerli"
+}
+```
+2. You can then swap the tokens by calling a POST request to `localhost:8000/api/v1/swap-tokens` with the same body as above.
+
+### Get Bundle Status
+_This endpoint is for getting the status of a bundle after submitting it to the blockchain_
+For a full setup: 
+1. Start the server with fireblocks as your transaction submission client `yarn run dev -- fireblocks`.
+2. Install ngrok here `https://ngrok.com/download`
+3. Open another terminal and start ngrok with `ngrok http 8000`
+4. Note the ngrok url and in the fireblocks console under settings > Configure Webhook URLS add the ngrok url followed by the fireblocks webhook extension: `https://94b5-174-140-97-44.ngrok.io/api/v1/fireblocks-webhook`
+5. Go to `webhook.site` and note the webhook url.
+6. In the .env file add the webhook.site url to the `CRYPTO_BACKEND_URL` variable.
+7. Now submit any transaction. As the the fireblocks states change you will start to see the webhooks being sent out to your webhook url. You can also make a GET request to `localhost:8000/api/v1/get-bundle-status` with the following body to get the status of the bundle:
+```
+{
+    "bundleId": "0a06d0a4-66da-444f-8f8d-28639856ca83"
+}
+```
 
 ## Adding New Features
 1. In `api/routes` add the endpoint to your new feature

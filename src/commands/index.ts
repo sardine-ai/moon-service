@@ -11,7 +11,7 @@ import {
   quoteBundleUninjected,
   ExecuteBundle,
   QuoteBundle
-} from '../clients/transactions/helpers';
+} from '../orchestrators';
 import {
   ITransactionSubmissionClient,
   SelfCustodyClient,
@@ -44,6 +44,7 @@ import {
   buildSwapTransactionFromReceiptUninjected,
   getZeroXSwapData
 } from '../clients/swaps';
+import { getAlchemyGasDetails } from '../clients/transactions/gas';
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig();
@@ -54,11 +55,12 @@ if (process.argv.length > 2 && process.argv[2] == 'fireblocks') {
   transactionSubmissionClient = new FireblocksClient(
     logger,
     fireblocksConfig,
-    cryptoConfig
+    cryptoConfig,
+    getAlchemyGasDetails
   );
 } else if (process.argv.length > 2 && process.argv[2] == 'self') {
   logger.info('Configured to use your personal keys to submit transactions');
-  transactionSubmissionClient = new SelfCustodyClient(logger, cryptoConfig);
+  transactionSubmissionClient = new SelfCustodyClient(logger, cryptoConfig, getAlchemyGasDetails);
 } else {
   logger.info('Configured to send fake transactions');
   transactionSubmissionClient = new TestTransactionSubmissionClient(logger);
@@ -84,6 +86,7 @@ const executeBundle: ExecuteBundle = executeBundleUninjected(
 );
 const quoteBundle: QuoteBundle = quoteBundleUninjected(
   transactionSubmissionClient,
+  cryptoConfig,
   logger
 );
 
@@ -142,6 +145,7 @@ const buildBuyNftBundle = buildBuyNftBundleUninjected(
   quoteBundle,
   buildSwapTransactionFromReceipt
 );
+
 export const buyNft = commandUninjected(
   logger,
   buildBuyNftBundle,
