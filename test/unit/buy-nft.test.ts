@@ -1,10 +1,11 @@
 import { Operation, TransactionState } from "../../src/types/models";
-import { TestOpenSeaClient } from "../../src/clients/openSea";
+import { TestOpenSeaClient } from "../../src/clients/opensea";
 import { buildBuyNftBundleUninjected } from "../../src/commands/buy-nft";
 
 describe('Testing Build Buy NFT Bundle', () => {
   const openSea = new TestOpenSeaClient();
-  const buildBuyNftBundle = buildBuyNftBundleUninjected(openSea);
+  // TODO(fix)
+  const buildBuyNftBundle = buildBuyNftBundleUninjected(openSea, undefined as any, undefined as any);
 
   test('it builds buy nft bundle', async () => {
     const bundle = await buildBuyNftBundle({
