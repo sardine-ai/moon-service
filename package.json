@@ -7,7 +7,8 @@
     "build": "echo buildlol",
     "dev": "nodemon",
     "start": "ts-node src/app.ts",
-    "lint": "prettier --config .prettierrc.json 'src/**/*.ts' --write",
+    "lint": "prettier --config .prettierrc.json 'src/**/*.ts'",
+    "lint:fix": "prettier --config .prettierrc.json 'src/**/*.ts' --write",
     "clean": "gts clean",
     "compile": "echo lol",
     "fix": "gts fix",
@@ -53,6 +54,7 @@
   },
   "dependencies": {
     "@0x/types": "^3.3.7",
+    "@0x/utils": "https://github.com/ProjectOpensea/0x-tools/raw/provider-patch/utils/0x-utils-6.5.0.tgz",
     "@alch/alchemy-web3": "^1.4.6",
     "@ethersproject/bignumber": "^5.7.0",
     "@google-cloud/secret-manager": "^4.1.3",
@@ -86,7 +88,8 @@
     "web3": "^1.8.1",
     "web3-core": "^1.8.0",
     "web3-eth": "^1.8.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "wyvern-schemas": "github:ProjectOpenSea/wyvern-schemas#b829f3e93b0332f280f547875b31a9a3c7ae092a"
   },
   "resolutions": {
     "@0x/utils": "https://github.com/ProjectOpensea/0x-tools/raw/provider-patch/utils/0x-utils-6.5.0.tgz",

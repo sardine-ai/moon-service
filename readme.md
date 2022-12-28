@@ -23,9 +23,9 @@
 
 ### Start Server
 9. To receive webhooks from fireblocks 
-9. Run `npm install` to install dependencies (compiling will not work)
-10. Run `npm run dev` to start the server. Uses your public/private key pair by default
-  - `npm run dev -- fireblocks` to use fireblocks instead
+9. Run `yarn install` to install dependencies (compiling will not work)
+10. Run `yarn dev` to start the server. Uses your public/private key pair by default
+  - `yarn dev -- fireblocks` to use fireblocks instead
 
 Docker setup coming soon...
 
