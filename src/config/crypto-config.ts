@@ -72,8 +72,8 @@ export interface CryptoConfig {
   polygon0xSwapEndpoint: string;
   stableCoin: string;
   zeroXApiKey: string;
-  ethWeb3: AlchemyWeb3;
-  polygonWeb3: AlchemyWeb3;
+  ethWeb3?: AlchemyWeb3;
+  polygonWeb3?: AlchemyWeb3;
 }
 
 const getCryptoConfig = (): CryptoConfig => {
@@ -108,7 +108,30 @@ const getCryptoConfig = (): CryptoConfig => {
     stableCoin: stableCoin,
     zeroXApiKey: process.env.ZERO_X_API_KEY || '',
     ethWeb3: createAlchemyWeb3(process.env.ROOT_RPC || ''),
-    polygonWeb3: createAlchemyWeb3(process.env.MATIC_RPC || ''),
+    polygonWeb3: createAlchemyWeb3(process.env.MATIC_RPC || '')
+  };
+};
+
+export const getTestCryptoConfig = (): CryptoConfig => {
+  return {
+    sardinePrivateKey: '',
+    sardinePublicKey: '',
+    ethRPC: '',
+    maticRPC: '',
+    ethChain: 'goerli',
+    ethChainId: 5,
+    ethAssetId: 'ETH_TEST3"',
+    polygonChain: 'mumbai',
+    polygonChainId: 80001,
+    polygonAssetId: 'MATIC_POLYGON_MUMBAI',
+    solanaChain: 'devnet',
+    openSeaAPIKey: '',
+    eth0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT['goerli'],
+    polygon0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT['mumbai'],
+    stableCoin: 'WETH',
+    zeroXApiKey: '',
+    ethWeb3: undefined,
+    polygonWeb3: undefined
   };
 };
 

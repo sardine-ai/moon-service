@@ -15,7 +15,11 @@ import { GetGasDetails } from './gas';
 export class SelfCustodyClient extends TransactionSubmissionClient {
   logger: winston.Logger;
 
-  constructor(logger: winston.Logger, cryptoConfig: CryptoConfig, getGasDetails: GetGasDetails) {
+  constructor(
+    logger: winston.Logger,
+    cryptoConfig: CryptoConfig,
+    getGasDetails: GetGasDetails
+  ) {
     super(cryptoConfig, getGasDetails);
     this.logger = logger;
   }
@@ -29,8 +33,8 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
         from: transaction.from,
         to: transaction.to,
         value: transaction?.value || 0,
-        gas: transaction?.gas,
-        maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
+        gas: transaction.gas,
+        maxPriorityFeePerGas: transaction.maxPriorityFeePerGas,
         data: transaction.data,
         nonce: transaction.nonce,
         chainId: transaction.chainId

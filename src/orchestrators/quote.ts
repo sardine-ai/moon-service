@@ -6,18 +6,31 @@ import {
   BundleReceiptResponse,
   getBundleReceiptTotalCost
 } from '../types/models/receipt';
-import { getAlchemyGasDetails, getGasCost } from '../clients/transactions/gas';
+import { calculateGasCost, GetGasDetails } from '../clients/transactions/gas';
 import { CryptoConfig } from '../config/crypto-config';
-import { getAssetDetails, getNativeToken, isNativeToken } from '../utils/crypto-utils';
+import {
+  getAssetDetails,
+  getNativeToken,
+  isNativeToken
+} from '../utils/crypto-utils';
 
 export const quoteBundleUninjected =
-  (transactionSubmissionClient: ITransactionSubmissionClient, cryptoConfig: CryptoConfig, logger: Logger) =>
+  (
+    transactionSubmissionClient: ITransactionSubmissionClient,
+    quoteTransaction: QuoteTransaction,
+    logger: Logger
+  ) =>
   async (bundle: Bundle): Promise<BundleReceiptResponse> => {
     const transactionQuotes = await Promise.all(
       bundle.transactions.map(async (transaction: Transaction) => {
         logger.info(`Quoting transaction: ${JSON.stringify(transaction)}`);
-        const fromAddress = await transactionSubmissionClient.getFromAddress(transaction.chain);
-        const transactionQuote = await quoteTransaction(fromAddress, transaction, cryptoConfig)
+        const fromAddress = await transactionSubmissionClient.getFromAddress(
+          transaction.chain
+        );
+        const transactionQuote = await quoteTransaction(
+          fromAddress,
+          transaction
+        );
         return transactionQuote;
       })
     );
@@ -30,37 +43,47 @@ export const quoteBundleUninjected =
     };
   };
 
-export const quoteTransaction = async (fromAddress: string, transaction: Transaction, cryptoConfig: CryptoConfig): Promise<TransactionReceipt> => {
-  const gasDetails = await getAlchemyGasDetails(
-    fromAddress,
-    transaction,
-    cryptoConfig
-  );
-  
-  const gasCost = getGasCost(gasDetails);
-  const assetCosts = transaction.assetCosts ?? [];
-  const value = transaction.value || '0';
-  const nativeCostIndex = assetCosts.findIndex(cost =>
-    isNativeToken(cost.assetSymbol)
-  );
-  if (nativeCostIndex == -1) {
-    assetCosts.push({
-      assetSymbol: getNativeToken(transaction.chain),
-      amount: (Number(value) + Number(gasCost)).toString(),
-      decimals: getAssetDetails(
-        transaction.chain,
-        getNativeToken(transaction.chain)
-      ).decimals
-    });
-  } else {
-    assetCosts[nativeCostIndex].amount = (
-      Number(assetCosts[nativeCostIndex].amount) + Number(gasCost)
-    ).toString();
-  }
-  return {
-    assetCosts: assetCosts,
-    gasCost: gasCost.toString(),
-    chain: transaction.chain,
-    operation: transaction.operation
+export type QuoteTransaction = (
+  fromAddress: string,
+  transaction: Transaction
+) => Promise<TransactionReceipt>;
+
+export const quoteTransactionUninjected =
+  (cryptoConfig: CryptoConfig, getGasDetails: GetGasDetails) =>
+  async (
+    fromAddress: string,
+    transaction: Transaction
+  ): Promise<TransactionReceipt> => {
+    const gasDetails = await getGasDetails(
+      fromAddress,
+      transaction,
+      cryptoConfig
+    );
+
+    const gasCost = calculateGasCost(gasDetails);
+    const assetCosts = transaction.assetCosts ?? [];
+    const value = transaction.value || '0';
+    const nativeCostIndex = assetCosts.findIndex(cost =>
+      isNativeToken(cost.assetSymbol)
+    );
+    if (nativeCostIndex == -1) {
+      assetCosts.push({
+        assetSymbol: getNativeToken(transaction.chain),
+        amount: (Number(value) + Number(gasCost)).toString(),
+        decimals: getAssetDetails(
+          transaction.chain,
+          getNativeToken(transaction.chain)
+        ).decimals
+      });
+    } else {
+      assetCosts[nativeCostIndex].amount = (
+        Number(assetCosts[nativeCostIndex].amount) + Number(gasCost)
+      ).toString();
+    }
+    return {
+      assetCosts: assetCosts,
+      gasCost: gasCost.toString(),
+      chain: transaction.chain,
+      operation: transaction.operation
+    };
   };
-}

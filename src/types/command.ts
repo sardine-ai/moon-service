@@ -8,6 +8,7 @@ import {
   TransferEvmFundsParams,
   BuyNftParams
 } from './requests';
+import { BundleReceiptResponse } from './models/receipt';
 
 export type CommandParams = TransferEvmFundsParams &
   BuyClubHouseNFTParams &
@@ -18,3 +19,5 @@ export type CommandParams = TransferEvmFundsParams &
   GetBundleStatusParams;
 
 export type BuildBundle = (params: CommandParams) => Promise<Bundle>;
+
+export type Command = (params: CommandParams) => Promise<BundleReceiptResponse>;

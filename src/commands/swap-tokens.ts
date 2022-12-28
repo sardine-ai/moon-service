@@ -6,7 +6,7 @@ export const buildSwapTokensBundleUninjected =
   (
     buildSwapTokenTransaction: (
       params: SwapTokensParams
-    ) => Promise<Transaction | null>
+    ) => Promise<Transaction | undefined>
   ) =>
   async (params: SwapTokensParams): Promise<Bundle> => {
     let bundle = createBundle(Operation.SWAP_TOKENS);

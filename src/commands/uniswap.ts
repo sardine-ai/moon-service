@@ -37,7 +37,7 @@ const swap = async (
   );
 
   const recipient = await transactionSubmissionClient.getFromAddress(
-    cryptoConfig.ethChain,
+    cryptoConfig.ethChain
   );
   const tradeOptions: TradeOptions = {
     allowedSlippage: new Percent('50', '10000'),

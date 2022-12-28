@@ -119,7 +119,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
   async getFromAddress(chain: string): Promise<string> {
     const fireblocks = await this.getOrSetFireblocksSdk();
     // We will be using one vault for each chain/asset symbol combo
-    const vaultAccount = await this.getVaultAccount(chain, chain); 
+    const vaultAccount = await this.getVaultAccount(chain, chain);
     if (vaultAccount) {
       const depositAddresses = await fireblocks.getDepositAddresses(
         vaultAccount.id,
