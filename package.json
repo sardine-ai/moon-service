@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start": "ts-node src/app.ts",
+    "start": "node build/src/app.js",
     "lint": "prettier --config .prettierrc.json 'src/**/*.ts'",
     "lint:fix": "prettier --config .prettierrc.json 'src/**/*.ts' --write",
     "clean": "gts clean",
@@ -14,7 +14,7 @@
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
-    "posttest": "npm run lint",
+    "posttest": "echo done",
     "test": "jest",
     "prettier-format": "prettier --config .prettierrc.json 'src/**/*.ts' --write"
   },
@@ -23,7 +23,7 @@
       "src"
     ],
     "ext": "ts",
-    "exec": "npm run lint && npm run start"
+    "exec": "ts-node src/app.ts"
   },
   "devDependencies": {
     "@jest/globals": "^29.3.1",

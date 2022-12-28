@@ -10,7 +10,8 @@ import {
   executeBundleUninjected,
   quoteBundleUninjected,
   ExecuteBundle,
-  QuoteBundle
+  QuoteBundle,
+  quoteTransactionUninjected
 } from '../orchestrators';
 import {
   ITransactionSubmissionClient,
@@ -60,10 +61,14 @@ if (process.argv.length > 2 && process.argv[2] == 'fireblocks') {
   );
 } else if (process.argv.length > 2 && process.argv[2] == 'self') {
   logger.info('Configured to use your personal keys to submit transactions');
-  transactionSubmissionClient = new SelfCustodyClient(logger, cryptoConfig, getAlchemyGasDetails);
+  transactionSubmissionClient = new SelfCustodyClient(
+    logger,
+    cryptoConfig,
+    getAlchemyGasDetails
+  );
 } else {
   logger.info('Configured to send fake transactions');
-  transactionSubmissionClient = new TestTransactionSubmissionClient(logger);
+  transactionSubmissionClient = new TestTransactionSubmissionClient();
 }
 const genieClient: GenieClient = new GenieClient(logger);
 
@@ -84,9 +89,15 @@ const executeBundle: ExecuteBundle = executeBundleUninjected(
   updateTransaction,
   logger
 );
+
+const quoteTransaction = quoteTransactionUninjected(
+  cryptoConfig,
+  getAlchemyGasDetails
+);
+
 const quoteBundle: QuoteBundle = quoteBundleUninjected(
   transactionSubmissionClient,
-  cryptoConfig,
+  quoteTransaction,
   logger
 );
 

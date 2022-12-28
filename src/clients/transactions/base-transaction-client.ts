@@ -4,12 +4,12 @@
 import { Transaction } from '../../types/models';
 import { CHAIN_TO_CHAIN_ID, CryptoConfig } from '../../config/crypto-config';
 import { EvmTransaction, GasDetails } from '../../types/evm';
-import { GetGasDetails } from './gas';
+import { calculateMaxFeePerGas, GetGasDetails } from './gas';
 import { getChainAlchemy } from './helpers';
 
 export interface ITransactionSubmissionClient {
-  cryptoConfig: CryptoConfig
-  getGasDetails: GetGasDetails
+  cryptoConfig: CryptoConfig;
+  getGasDetails: GetGasDetails;
 
   sendTransaction(transaction: Transaction): Promise<any>;
   getFromAddress(chain: string): Promise<string>;
@@ -30,9 +30,7 @@ export abstract class TransactionSubmissionClient
     throw new Error('Method not implemented.');
   }
 
-  getFromAddress(
-    _chain: string,
-  ): Promise<string> {
+  getFromAddress(_chain: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
@@ -47,10 +45,7 @@ export abstract class TransactionSubmissionClient
       to: transaction.to,
       gas: gasDetails.gasLimit,
       maxPriorityFeePerGas: gasDetails.maxPriorityFee,
-      maxFeePerGas: (
-        2 * Number(gasDetails?.baseFeePerGas || '0') +
-        Number(gasDetails?.maxPriorityFee || '0')
-      ).toString(),
+      maxFeePerGas: calculateMaxFeePerGas(gasDetails),
       data: transaction.callData,
       value: transaction.value,
       chainId: CHAIN_TO_CHAIN_ID[transaction.chain],
@@ -62,10 +57,8 @@ export abstract class TransactionSubmissionClient
   async convertTransactionToEvmTransaction(
     transaction: Transaction
   ): Promise<EvmTransaction> {
-    const fromAddress = await this.getFromAddress(
-      transaction.chain,
-    );
-    const alchemyWeb3 = getChainAlchemy(transaction.chain, this.cryptoConfig)
+    const fromAddress = await this.getFromAddress(transaction.chain);
+    const alchemyWeb3 = getChainAlchemy(transaction.chain, this.cryptoConfig);
     const nonce = await alchemyWeb3.eth.getTransactionCount(
       fromAddress,
       'latest'
