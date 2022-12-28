@@ -2,7 +2,7 @@ name: TS Checks
 
 on:
   push:
-    branches: [kazuki/actions]
+    branches: [master]
   pull_request:
     branches: [master]
   # For Dependabot. Dependabot cannot access ENV varibles in steps triggered by pull_request events.
