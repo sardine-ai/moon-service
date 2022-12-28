@@ -4,6 +4,9 @@ import { BundleReceiptResponse } from '../../types/models/receipt';
 import { v4 as uuidV4 } from 'uuid';
 import { getAssetDetails } from '../../utils/crypto-utils';
 import { SwapTokensParams } from '../../types/requests';
+import { AxiosResponse, AxiosError } from 'axios'; 
+import axios from '../../api/axios'; 
+import logger from '../../loaders/logger';
 
 export type BuildSwapTransaction = (
   bundle: BundleReceiptResponse
@@ -19,17 +22,25 @@ export const getZeroXSwapData: GetZeroXSwapData = async (
   { sellToken, buyToken, buyAmount, intentOnFilling }: ZeroXSwapParams
 ) => {
   const url = `${baseUrl}swap/v1/quote?sellToken=${sellToken}&buyToken=${buyToken}&buyAmount=${buyAmount}&intentOnFilling=${intentOnFilling}`;
-  const data =  await fetch(url, {
-    method: 'GET',
+  const data = await axios.get(url, {
     headers: {
       '0x-api-key': process.env.ZERO_X_API_KEY || '',
       'Content-Type': 'application/json'
     }
-  });
-  if (!data.ok) {
-    return null;
-  }
-  return await data.json();
+  })
+  .then((response: AxiosResponse<ZeroXSwapResponse>) => {
+    return response.data
+  })
+  .catch((reason: AxiosError<any>) => {
+    if (reason.response!.status === 400) {
+      logger.error(`400 Error calling 0x API: ${reason.message}`)
+    } else {  
+      logger.error(`500 Error calling 0x API: ${reason.message}`)
+    }
+    return undefined
+  })
+
+  return data;
 };
 
 const buildTransactionWithSwapData = (
