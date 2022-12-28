@@ -25,30 +25,12 @@ jobs:
     if: |
       (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]') ||
       (github.event_name != 'pull_request_target' && github.actor != 'dependabot[bot]')
-    name: check-and-build
-    # Redis service is for testing server after building.
-    services:
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+    name: test-and-build
     steps:
       - name: Checkout pull_request (Dependabot should not run this step)
         uses: sardine-ai/checkout@v2
+        with:
+          persist-credentials: false
         if: ${{ github.event_name != 'pull_request_target' }}
       - name: Checkout pull_request_target (Dependabot can run this step. Other actors including humans should not run this)
         uses: sardine-ai/checkout@v2
@@ -56,6 +38,12 @@ jobs:
         with:
           # Need to specify the SHA of the head to identify the target.
           ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      # workaround for npm issue https://github.com/actions/setup-node/issues/214
+      - name: Reconfigure git to use HTTP authentication
+        run: >
+          git config --global url."https://github.com/".insteadOf
+          ssh://git@github.com/
       - uses: sardine-ai/cache@v2
         with:
           path: .yarn
