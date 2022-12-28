@@ -56,30 +56,29 @@ jobs:
         with:
           # Need to specify the SHA of the head to identify the target.
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Restore cache for root deps
-        uses: sardine-ai/cache@v2
+      - uses: sardine-ai/cache@v2
         with:
-          path: .npm
-          key: ${{ runner.os }}-root-${{ hashFiles('package-lock.json') }}
+          path: .yarn
+          key: ${{ runner.os }}-v1-checkout-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-root-
-      - name: npm ci
+            ${{ runner.os }}-v1-checkout-
+      - name: Install modules
         run: |
-          npm ci --cache .npm --prefer-offline
+          yarn install --frozen-lockfile --cache .yarn --prefer-offline
       - name: Make sure files are prettified using prettier
         run: |
-          echo "TODO"
+          yarn lint:fix
           echo $(git status -s)
           if [[ $(git status -s) ]]; then
-            echo "Looks like you forgot to run 'npm run format'. Have you format the code before pushing?"
+            echo "Looks like you forgot to run 'yarn lint:fix'. Have you format the code before pushing?"
             echo "You might have forgotten to run prettier. please make sure you setup husky hook"
             git diff
             exit 1
           fi
       - name: Run tests
         run: |
-          npm run test
+          yarn test
       - name: build
         run: |
-          npm run build
+          yarn build
      
