@@ -13,7 +13,7 @@ import { updateTransactionWithCosts } from './utils';
 import { NotifySubscribers } from '../clients/notifications';
 import { FireblocksWebhookResponse } from '../types/fireblocks';
 import { dogstatsd } from '../utils/metrics';
-import { ExecuteBundle } from '../clients/transactions/helpers';
+import { ExecuteBundle } from '../orchestrators';
 
 // TODO: Abstarct this uninjected function, we will probably switch to DFNS
 // split into:

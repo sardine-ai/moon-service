@@ -17,6 +17,7 @@ import { getFireblocksAssetId } from '../../utils/fireblocks-utils';
 import { formatEther, formatUnits } from 'ethers/lib/utils';
 import { Transaction } from '../../types/models';
 import { TransactionSubmittionError } from '../../types/errors';
+import { GetGasDetails } from './gas';
 
 interface FireblocksVaultAccount {
   id: string;
@@ -31,9 +32,10 @@ export class FireblocksClient extends TransactionSubmissionClient {
   constructor(
     logger: winston.Logger,
     config: FireblocksConfig,
-    cryptoConfig: CryptoConfig
+    cryptoConfig: CryptoConfig,
+    getGasDetails: GetGasDetails
   ) {
-    super(cryptoConfig);
+    super(cryptoConfig, getGasDetails);
     this.logger = logger;
     this.config = config;
   }
@@ -114,9 +116,10 @@ export class FireblocksClient extends TransactionSubmissionClient {
     return undefined;
   }
 
-  async getFromAddress(chain: string, assetSymbol: string): Promise<string> {
+  async getFromAddress(chain: string): Promise<string> {
     const fireblocks = await this.getOrSetFireblocksSdk();
-    const vaultAccount = await this.getVaultAccount(chain, assetSymbol);
+    // We will be using one vault for each chain/asset symbol combo
+    const vaultAccount = await this.getVaultAccount(chain, chain); 
     if (vaultAccount) {
       const depositAddresses = await fireblocks.getDepositAddresses(
         vaultAccount.id,

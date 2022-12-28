@@ -3,7 +3,7 @@ import { BuyNftParams } from '../types/requests/nft';
 import { createBundle, Bundle, Operation } from '../types/models';
 import { configureBundleTransactions } from './utils';
 import { BuildSwapTransaction } from '../clients/swaps';
-import { QuoteBundle } from '../clients/transactions/helpers';
+import { QuoteBundle } from '../orchestrators';
 
 export const buildBuyNftBundleUninjected =
   (

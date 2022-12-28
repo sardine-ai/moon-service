@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { Chain } from 'fireblocks-defi-sdk';
+import { AlchemyWeb3, createAlchemyWeb3 } from '@alch/alchemy-web3';
 
 const envFound = dotenv.config();
 if (envFound.error) {
@@ -71,6 +72,8 @@ export interface CryptoConfig {
   polygon0xSwapEndpoint: string;
   stableCoin: string;
   zeroXApiKey: string;
+  ethWeb3: AlchemyWeb3;
+  polygonWeb3: AlchemyWeb3;
 }
 
 const getCryptoConfig = (): CryptoConfig => {
@@ -103,7 +106,9 @@ const getCryptoConfig = (): CryptoConfig => {
     eth0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[ethChain],
     polygon0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[polygonChain],
     stableCoin: stableCoin,
-    zeroXApiKey: process.env.ZERO_X_API_KEY || ''
+    zeroXApiKey: process.env.ZERO_X_API_KEY || '',
+    ethWeb3: createAlchemyWeb3(process.env.ROOT_RPC || ''),
+    polygonWeb3: createAlchemyWeb3(process.env.MATIC_RPC || ''),
   };
 };
 

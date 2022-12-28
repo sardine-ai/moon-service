@@ -9,12 +9,14 @@ import winston from 'winston';
 import { Transaction } from '../../types/models';
 import { TransactionSubmissionClient } from './base-transaction-client';
 import { TransactionSubmittionError } from '../../types/errors';
+import { getChainAlchemy } from './helpers';
+import { GetGasDetails } from './gas';
 
 export class SelfCustodyClient extends TransactionSubmissionClient {
   logger: winston.Logger;
 
-  constructor(logger: winston.Logger, cryptoConfig: CryptoConfig) {
-    super(cryptoConfig);
+  constructor(logger: winston.Logger, cryptoConfig: CryptoConfig, getGasDetails: GetGasDetails) {
+    super(cryptoConfig, getGasDetails);
     this.logger = logger;
   }
 
@@ -56,7 +58,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
   }
 
   async sendTransaction(transaction: Transaction): Promise<any> {
-    const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
+    const alchemyWeb3 = getChainAlchemy(transaction.chain, this.cryptoConfig);
     const evmTransaction = await this.convertTransactionToEvmTransaction(
       transaction
     );
@@ -67,7 +69,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
     return this.sendSignedTransaction(alchemyWeb3, signedTransaction);
   }
 
-  getFromAddress(_chain: string, _assetSymbol: string): string {
+  async getFromAddress(_chain: string): Promise<string> {
     return this.cryptoConfig.sardinePublicKey;
   }
 }
