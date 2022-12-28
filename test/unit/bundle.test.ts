@@ -22,7 +22,8 @@ describe('Testing Bundle Logic', () => {
       toAddress: "0x4cc1756281D7203A172C63E9df9307dABA5523A8"
     })
     expect(bundle.transactions.length).toEqual(1);
-    expect(bundle.transactions[0].isStarting).toEqual(true);
+    // TODO: fix
+    expect((bundle.transactions[0] as any).isStarting).toEqual(true);
   })
 
   test('it should store the bundle', async () => {

@@ -66,7 +66,3 @@ jobs:
       - name: Run tests
         run: |
           yarn test
-      - name: build
-        run: |
-          yarn build
-     
