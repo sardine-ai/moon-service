@@ -1,0 +1,85 @@
+name: TS Checks
+
+on:
+  push:
+    branches: [kazuki/actions]
+  pull_request:
+    branches: [master]
+  # For Dependabot. Dependabot cannot access ENV varibles in steps triggered by pull_request events.
+  # To run check for Dependabot, we use pull_request_target events.
+  # pull_request_target is very similar to pull_request but ENV variables are accessible.
+  # Also, it runs against the forked repo, not against the original, if forked.
+  # pull_request_target was introduced to solve the security problem problem https://github.blog/2020-08-03-github-actions-improvements-for-fork-and-pull-request-workflows/
+  # Article: https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+  # Official document: https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#pull_request_target
+  pull_request_target:
+    branches: [master]
+
+jobs:
+  check-and-build:
+    env:
+      SENTRY_AUTH_TOKEN: DUMMY
+    runs-on: ubuntu-latest
+    # Only Dependabot can run pull_request_target steps. Dependabot cannot run pull_request steps
+    # Non-dependabot can pull_request but cannot run pull_request_target
+    if: |
+      (github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]') ||
+      (github.event_name != 'pull_request_target' && github.actor != 'dependabot[bot]')
+    name: check-and-build
+    # Redis service is for testing server after building.
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout pull_request (Dependabot should not run this step)
+        uses: sardine-ai/checkout@v2
+        if: ${{ github.event_name != 'pull_request_target' }}
+      - name: Checkout pull_request_target (Dependabot can run this step. Other actors including humans should not run this)
+        uses: sardine-ai/checkout@v2
+        if: ${{ github.event_name == 'pull_request_target' }}
+        with:
+          # Need to specify the SHA of the head to identify the target.
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Restore cache for root deps
+        uses: sardine-ai/cache@v2
+        with:
+          path: .npm
+          key: ${{ runner.os }}-root-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-root-
+      - name: npm ci
+        run: |
+          npm ci --cache .npm --prefer-offline
+      - name: Make sure files are prettified using prettier
+        run: |
+          echo "TODO"
+          echo $(git status -s)
+          if [[ $(git status -s) ]]; then
+            echo "Looks like you forgot to run 'npm run format'. Have you format the code before pushing?"
+            echo "You might have forgotten to run prettier. please make sure you setup husky hook"
+            git diff
+            exit 1
+          fi
+      - name: Run tests
+        run: |
+          npm run test
+      - name: build
+        run: |
+          npm run build
+     
