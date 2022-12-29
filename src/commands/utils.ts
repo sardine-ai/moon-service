@@ -7,9 +7,9 @@ export const configureBundleTransactions = (bundle: Bundle): Bundle => {
     transaction.bundleId = bundle.id;
     transaction.order = index;
     return transaction;
-  })
+  });
   return newBundle;
-}
+};
 
 export const updateTransactionWithCosts = (
   transaction: Transaction,

@@ -25,5 +25,5 @@ export const getBaseRequest = (commandParams: CommandParams): BaseRequest => {
     sessionKey: commandParams.sessionKey,
     requestId: commandParams.requestId,
     timestamp: commandParams.timestamp
-  }
-}
+  };
+};

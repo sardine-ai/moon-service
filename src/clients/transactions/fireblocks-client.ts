@@ -8,7 +8,6 @@ import {
   TransactionArguments,
   VaultAccountResponse
 } from 'fireblocks-sdk';
-import winston from 'winston';
 import { TransactionSubmissionClient } from './base-transaction-client';
 import { FireblocksConfig } from '../../config/fireblocks-config';
 import { CryptoConfig } from '../../config/crypto-config';
@@ -17,6 +16,8 @@ import { getFireblocksAssetId } from '../../utils/fireblocks-utils';
 import { formatEther, formatUnits } from 'ethers/lib/utils';
 import { Transaction } from '../../types/models';
 import { TransactionSubmittionError } from '../../types/errors';
+import { GetGasDetails } from './gas';
+import logger from '../../loaders/logger';
 
 interface FireblocksVaultAccount {
   id: string;
@@ -24,17 +25,15 @@ interface FireblocksVaultAccount {
 }
 
 export class FireblocksClient extends TransactionSubmissionClient {
-  logger: winston.Logger;
   fireblocks_dontCallDirectly: FireblocksSDK;
   config: FireblocksConfig;
 
   constructor(
-    logger: winston.Logger,
     config: FireblocksConfig,
-    cryptoConfig: CryptoConfig
+    cryptoConfig: CryptoConfig,
+    getGasDetails: GetGasDetails
   ) {
-    super(cryptoConfig);
-    this.logger = logger;
+    super(cryptoConfig, getGasDetails);
     this.config = config;
   }
 
@@ -77,20 +76,22 @@ export class FireblocksClient extends TransactionSubmissionClient {
       note: transaction.txNote || '',
       amount: formatEther(transaction?.value || '0')
     };
+
     if (transaction.data) {
       txArguments.extraParameters = {
         contractCallData: transaction.data
       };
       txArguments.operation = TransactionOperation.CONTRACT_CALL;
     }
+    console.log('txArguments', txArguments);
     return txArguments;
   }
 
   // TODO: Implement logic to determine which vault to use, probably want to look at balances
   choseVaultAccount(
     potentialVaults: Array<VaultAccountResponse>
-  ): VaultAccountResponse {
-    return potentialVaults[0];
+  ): VaultAccountResponse | undefined {
+    return potentialVaults.find(v => v.name == 'Testing Vault');
   }
 
   async getVaultAccount(
@@ -102,18 +103,20 @@ export class FireblocksClient extends TransactionSubmissionClient {
     const potentialVaults = await fireblocks.getVaultAccountsWithPageInfo({
       assetId: fireblocksAssetId
     });
-    if (potentialVaults.accounts && potentialVaults.accounts.length > 0) {
+    const vault = this.choseVaultAccount(potentialVaults.accounts);
+    if (vault) {
       return {
-        id: this.choseVaultAccount(potentialVaults.accounts).id,
+        id: vault.id,
         assetId: fireblocksAssetId
       };
     }
     return undefined;
   }
 
-  async getFromAddress(chain: string, assetSymbol: string): Promise<string> {
+  async getFromAddress(chain: string): Promise<string> {
     const fireblocks = await this.getOrSetFireblocksSdk();
-    const vaultAccount = await this.getVaultAccount(chain, assetSymbol);
+    // We will be using one vault for each chain/asset symbol combo
+    const vaultAccount = await this.getVaultAccount(chain, chain);
     if (vaultAccount) {
       const depositAddresses = await fireblocks.getDepositAddresses(
         vaultAccount.id,
@@ -121,7 +124,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
       );
       return depositAddresses[0].address;
     }
-    this.logger.error('No address found');
+    logger.error('No address found');
     return '';
   }
 
@@ -130,7 +133,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
     // need a getVaultFromAddress method
     const vaultAccount = await this.getVaultAccount(
       transaction.chain,
-      transaction.assetSymbol
+      transaction.chain
     );
     if (vaultAccount) {
       const evmTransaction = await this.convertTransactionToEvmTransaction(
@@ -140,16 +143,16 @@ export class FireblocksClient extends TransactionSubmissionClient {
         evmTransaction,
         vaultAccount
       );
-      this.logger.info(`Fireblocks Arguments: ${JSON.stringify(txArguments)}`)
+      logger.info(`Fireblocks Arguments: ${JSON.stringify(txArguments)}`);
       const fireblocks = await this.getOrSetFireblocksSdk();
       try {
         const response = await fireblocks.createTransaction(txArguments);
         return response;
       } catch (error) {
-        new TransactionSubmittionError()
+        throw TransactionSubmittionError(error);
       }
     }
-    this.logger.error('No vault acccount found');
+    logger.error('No vault acccount found');
     return;
   }
 }

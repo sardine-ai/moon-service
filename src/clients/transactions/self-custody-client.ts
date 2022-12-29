@@ -5,17 +5,19 @@ import { EvmTransaction } from '../../types/evm';
 import { CryptoConfig } from '../../config/crypto-config';
 import { AlchemyWeb3 } from '@alch/alchemy-web3';
 import { SignedTransaction } from 'web3-core';
-import winston from 'winston';
 import { Transaction } from '../../types/models';
-import { TransactionSubmissionClient } from './base-transaction-client'
+import { TransactionSubmissionClient } from './base-transaction-client';
 import { TransactionSubmittionError } from '../../types/errors';
+import { getChainAlchemy } from './helpers';
+import { GetGasDetails } from './gas';
+import logger from '../../loaders/logger';
 
 export class SelfCustodyClient extends TransactionSubmissionClient {
-  logger: winston.Logger;
-
-  constructor(logger: winston.Logger, cryptoConfig: CryptoConfig) {
-    super(cryptoConfig);
-    this.logger = logger;
+  constructor(
+    cryptoConfig: CryptoConfig,
+    getGasDetails: GetGasDetails
+  ) {
+    super(cryptoConfig, getGasDetails);
   }
 
   async signTransaction(
@@ -27,8 +29,8 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
         from: transaction.from,
         to: transaction.to,
         value: transaction?.value || 0,
-        gas: transaction?.gas,
-        maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
+        gas: transaction.gas,
+        maxPriorityFeePerGas: transaction.maxPriorityFeePerGas,
         data: transaction.data,
         nonce: transaction.nonce,
         chainId: transaction.chainId
@@ -46,9 +48,9 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
       signedTransaction.rawTransaction!,
       (err, hash) => {
         if (err === null) {
-          this.logger.info(`Transacion Hash: ${hash}`);
+          logger.info(`Transacion Hash: ${hash}`);
         } else {
-          new TransactionSubmittionError()
+          throw TransactionSubmittionError(err);
         }
       }
     );
@@ -56,7 +58,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
   }
 
   async sendTransaction(transaction: Transaction): Promise<any> {
-    const alchemyWeb3 = this.getChainAlchemy(transaction.chain);
+    const alchemyWeb3 = getChainAlchemy(transaction.chain, this.cryptoConfig);
     const evmTransaction = await this.convertTransactionToEvmTransaction(
       transaction
     );
@@ -67,7 +69,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
     return this.sendSignedTransaction(alchemyWeb3, signedTransaction);
   }
 
-  getFromAddress(_chain: string, _assetSymbol: string): string {
+  async getFromAddress(_chain: string): Promise<string> {
     return this.cryptoConfig.sardinePublicKey;
   }
 }
