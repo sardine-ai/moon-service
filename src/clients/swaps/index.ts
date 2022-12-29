@@ -1,12 +1,12 @@
-import { CryptoConfig } from '../../config/crypto-config';
-import { Operation, Transaction, TransactionState } from '../../types/models';
-import { BundleReceiptResponse } from '../../types/models/receipt';
+import { CryptoConfig } from '@/config/crypto-config';
+import { Operation, Transaction, TransactionState } from '@/types/models';
+import { BundleReceiptResponse } from '@/types/models/receipt';
 import { v4 as uuidV4 } from 'uuid';
-import { getAssetDetails } from '../../utils/crypto-utils';
-import { SwapTokensParams } from '../../types/requests';
+import { getAssetDetails } from '@/utils/crypto-utils';
+import { SwapTokensParams } from '@/types/requests';
 import { AxiosResponse, AxiosError } from 'axios';
-import axios from '../../api/axios';
-import logger from '../../loaders/logger';
+import axios from '@/api/axios';
+import logger from '@/loaders/logger';
 
 export type BuildSwapTransaction = (
   bundle: BundleReceiptResponse

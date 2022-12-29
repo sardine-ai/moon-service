@@ -2,7 +2,7 @@
 
 import { Response, Request, NextFunction } from 'express';
 import { v4 as uuid } from 'uuid';
-import Logger from '../../loaders/logger';
+import Logger from '@/loaders/logger';
 
 export const requestEnrichmentMw = async (
   req: Request,

@@ -1,4 +1,4 @@
-import { Bundle, Transaction } from '../types/models';
+import { Bundle, Transaction } from '@/types/models';
 import { GetBundle, StoreBundle, UpdateTransaction } from './base-repository';
 
 const BUNDLE_DATABASE: Array<Bundle> = [];

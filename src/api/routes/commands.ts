@@ -17,7 +17,7 @@ import {
   BuyNftParams,
   GetBundleStatusParams,
   SwapTokensParams
-} from '../../types/requests';
+} from '@/types/requests';
 import {
   requestEnrichmentMw,
   requestLoggerMw,

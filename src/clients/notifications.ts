@@ -1,5 +1,5 @@
-import getAppConfig from '../config/app-config';
-import { BundleReceiptResponse } from '../types/models/receipt';
+import getAppConfig from '@/config/app-config';
+import { BundleReceiptResponse } from '@/types/models/receipt';
 
 export type NotifySubscribers = (
   bundleReceiptResponse: BundleReceiptResponse

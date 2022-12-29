@@ -1,5 +1,5 @@
 import { update } from 'lodash';
-import { Bundle, Transaction } from '../types/models';
+import { Bundle, Transaction } from '@/types/models';
 
 export const configureBundleTransactions = (bundle: Bundle): Bundle => {
   const newBundle = Object.assign({}, bundle);

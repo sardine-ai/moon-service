@@ -12,40 +12,40 @@ import {
   ExecuteBundle,
   QuoteBundle,
   quoteTransactionUninjected
-} from '../orchestrators';
+} from '@/orchestrators';
 import {
   ITransactionSubmissionClient,
   SelfCustodyClient,
   FireblocksClient,
   TestTransactionSubmissionClient
-} from '../clients/transactions';
-import { GenieClient } from '../clients/genie';
-import getCryptoConfig from '../config/crypto-config';
-import getFireblocksConfig from '../config/fireblocks-config';
+} from '@/clients/transactions';
+import { GenieClient } from '@/clients/genie';
+import getCryptoConfig from '@/config/crypto-config';
+import getFireblocksConfig from '@/config/fireblocks-config';
 import { buildBuyNftBundleUninjected } from './buy-nft';
-import { OpenSeaClient } from '../clients/opensea';
+import { OpenSeaClient } from '@/clients/opensea';
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from 'web3';
-import logger from '../loaders/logger';
+import logger from '@/loaders/logger';
 import {
   getBundle,
   storeBundle,
   updateTransaction,
   getBundleByTransactionExecutionId
-} from '../repositories/prisma-repository';
+} from '@/repositories/prisma-repository';
 import {
   commandUninjected,
   quoteCommandUninjected,
   getBundleStatusUninjected
 } from './command';
-import { notifySubscribers } from '../clients/notifications';
+import { notifySubscribers } from '@/clients/notifications';
 import {
   buildZeroXSwapTransactionUninjected,
   buildSwapTokensTransactionUninjected,
   buildSwapTransactionFromReceiptUninjected,
   getZeroXSwapData
-} from '../clients/swaps';
-import { getAlchemyGasDetails } from '../clients/transactions/gas';
+} from '@/clients/swaps';
+import { getAlchemyGasDetails } from '@/clients/transactions/gas';
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig();
@@ -54,7 +54,6 @@ let transactionSubmissionClient: ITransactionSubmissionClient;
 if (process.argv.length > 2 && process.argv[2] == 'fireblocks') {
   logger.warn('Configured to use Fireblocks to submit transactions');
   transactionSubmissionClient = new FireblocksClient(
-    logger,
     fireblocksConfig,
     cryptoConfig,
     getAlchemyGasDetails
@@ -62,7 +61,6 @@ if (process.argv.length > 2 && process.argv[2] == 'fireblocks') {
 } else if (process.argv.length > 2 && process.argv[2] == 'self') {
   logger.info('Configured to use your personal keys to submit transactions');
   transactionSubmissionClient = new SelfCustodyClient(
-    logger,
     cryptoConfig,
     getAlchemyGasDetails
   );
@@ -79,7 +77,6 @@ const ethOpenSea = new OpenSeaSDK(ethProvider, {
 });
 
 const openSeaClient: OpenSeaClient = new OpenSeaClient(
-  logger,
   cryptoConfig,
   ethOpenSea
 );
@@ -102,29 +99,24 @@ const quoteBundle: QuoteBundle = quoteBundleUninjected(
 );
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(
-  logger,
   cryptoConfig,
   transactionSubmissionClient
 );
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(
-  logger,
   transactionSubmissionClient
 );
 export const buyGenieNFT = buyGenieNFTUninjected(
-  logger,
   genieClient,
   transactionSubmissionClient,
   cryptoConfig
 );
 
 export const transferFunds = commandUninjected(
-  logger,
   buildTransferFundsBundle,
   storeBundle,
   executeBundle
 );
 export const quoteTransferFunds = quoteCommandUninjected(
-  logger,
   buildTransferFundsBundle,
   quoteBundle
 );
@@ -158,13 +150,11 @@ const buildBuyNftBundle = buildBuyNftBundleUninjected(
 );
 
 export const buyNft = commandUninjected(
-  logger,
   buildBuyNftBundle,
   storeBundle,
   executeBundle
 );
 export const quoteBuyNft = quoteCommandUninjected(
-  logger,
   buildBuyNftBundle,
   quoteBundle
 );
@@ -178,13 +168,11 @@ const buildQuoteSwapTokensBundle = buildSwapTokensBundleUninjected(
 );
 
 export const swapTokens = commandUninjected(
-  logger,
   buildSwapTokensBundle,
   storeBundle,
   executeBundle
 );
 export const quoteSwapTokens = quoteCommandUninjected(
-  logger,
   buildQuoteSwapTokensBundle,
   quoteBundle
 );

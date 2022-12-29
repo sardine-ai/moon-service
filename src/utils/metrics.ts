@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { StatsD } from 'hot-shots';
-import Logger from '../loaders/logger';
+import Logger from '@/loaders/logger';
 
 export const dogstatsd = new StatsD({
   port: 8125

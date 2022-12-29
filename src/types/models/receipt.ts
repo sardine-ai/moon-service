@@ -1,5 +1,5 @@
 import { Bundle, Operation, TransactionState, Transaction } from '.';
-import { getAssetDetails } from '../../utils/crypto-utils';
+import { getAssetDetails } from '@/utils/crypto-utils';
 
 export interface BundleReceiptResponse {
   bundleId?: string;

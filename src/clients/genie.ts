@@ -1,7 +1,7 @@
 // Client built for the following api: https://v2.api.genie.xyz/docs/#/Assets/get_walletAssets
 import axios from 'axios';
 import winston from 'winston';
-import { BuyGenieNFTParams, GenieCallDataResponse } from '../types/genie';
+import { BuyGenieNFTParams, GenieCallDataResponse } from '@/types/genie';
 
 const BASE_URL = 'https://v2.api.genie.xyz/';
 

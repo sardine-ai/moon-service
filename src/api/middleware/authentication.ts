@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
-import { UnauthorizedError } from '../../types/errors';
+import { UnauthorizedError } from '@/types/errors';
 
 export const authenticationMw = async (
   req: Request,

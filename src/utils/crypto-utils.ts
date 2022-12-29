@@ -1,4 +1,4 @@
-import { Erc20Token } from '../types/evm';
+import { Erc20Token } from '@/types/evm';
 
 interface AssetDetails {
   [key: string]: {

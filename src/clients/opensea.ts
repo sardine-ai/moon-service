@@ -3,11 +3,10 @@
 
 import { v4 as uuidV4 } from 'uuid';
 import { OpenSeaSDK } from 'opensea-js';
-import { BuyNftParams } from '../types/requests/nft';
-import winston from 'winston';
-import { CryptoConfig } from '../config/crypto-config';
-import { Operation, Transaction, TransactionState } from '../types/models';
-import { NftNotFoundError } from '../types/errors';
+import { BuyNftParams } from '@/types/requests/nft';
+import { CryptoConfig } from '@/config/crypto-config';
+import { Operation, Transaction, TransactionState } from '@/types/models';
+import { NftNotFoundError } from '@/types/errors';
 
 export interface IOpenSeaClient {
   ethOpenSea: OpenSeaSDK;
@@ -15,16 +14,13 @@ export interface IOpenSeaClient {
 }
 
 export class OpenSeaClient implements IOpenSeaClient {
-  logger: winston.Logger;
   cryptoConfig: CryptoConfig;
   ethOpenSea: OpenSeaSDK;
 
   constructor(
-    logger: winston.Logger,
     cryptoConfig: CryptoConfig,
     ethOpenSea: OpenSeaSDK
   ) {
-    this.logger = logger;
     this.cryptoConfig = cryptoConfig;
     this.ethOpenSea = ethOpenSea;
   }

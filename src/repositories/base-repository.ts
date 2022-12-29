@@ -1,4 +1,4 @@
-import { Bundle, Transaction } from '../types/models';
+import { Bundle, Transaction } from '@/types/models';
 
 export type StoreBundle = (bundle: Bundle) => Promise<void>;
 export type GetBundle = (bundleId: string) => Promise<Bundle | undefined>;

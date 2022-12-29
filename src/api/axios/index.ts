@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { PubSub } from '@google-cloud/pubsub';
-import { MoonOutboundRequestResponse } from '../../generated/moon_outbound_request_response';
+import { MoonOutboundRequestResponse } from '@/generated/moon_outbound_request_response';
 
 const pubsub = new PubSub();
 

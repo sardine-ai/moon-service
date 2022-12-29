@@ -1,18 +1,18 @@
-import { Bundle, Transaction } from '../types/models';
-import { ITransactionSubmissionClient } from '../clients/transactions';
+import { Bundle, Transaction } from '@/types/models';
+import { ITransactionSubmissionClient } from '@/clients/transactions';
 import { Logger } from 'winston';
 import {
   TransactionReceipt,
   BundleReceiptResponse,
   getBundleReceiptTotalCost
-} from '../types/models/receipt';
-import { calculateGasCost, GetGasDetails } from '../clients/transactions/gas';
-import { CryptoConfig } from '../config/crypto-config';
+} from '@/types/models/receipt';
+import { calculateGasCost, GetGasDetails } from '@/clients/transactions/gas';
+import { CryptoConfig } from '@/config/crypto-config';
 import {
   getAssetDetails,
   getNativeToken,
   isNativeToken
-} from '../utils/crypto-utils';
+} from '@/utils/crypto-utils';
 
 export const quoteBundleUninjected =
   (

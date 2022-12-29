@@ -2,18 +2,18 @@ import { update } from 'lodash';
 import {
   GetBundleByTransactionExecutionId,
   UpdateTransaction
-} from '../repositories/base-repository';
+} from '@/repositories/base-repository';
 import {
   getTransactionState,
   Transaction,
   TransactionState
-} from '../types/models';
-import { buildBundleReceiptResponse } from '../types/models/receipt';
+} from '@/types/models';
+import { buildBundleReceiptResponse } from '@/types/models/receipt';
 import { updateTransactionWithCosts } from './utils';
-import { NotifySubscribers } from '../clients/notifications';
-import { FireblocksWebhookResponse } from '../types/fireblocks';
-import { dogstatsd } from '../utils/metrics';
-import { ExecuteBundle } from '../orchestrators';
+import { NotifySubscribers } from '@/clients/notifications';
+import { FireblocksWebhookResponse } from '@/types/fireblocks';
+import { dogstatsd } from '@/utils/metrics';
+import { ExecuteBundle } from '@/orchestrators';
 
 // TODO: Abstarct this uninjected function, we will probably switch to DFNS
 // split into:

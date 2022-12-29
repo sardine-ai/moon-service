@@ -1,6 +1,6 @@
-import { TransferEvmFundsParams } from '../types/requests';
-import { buildEvmTransferTransaction } from '../clients/evm';
-import { createBundle, Bundle, Operation } from '../types/models';
+import { TransferEvmFundsParams } from '@/types/requests';
+import { buildEvmTransferTransaction } from '@/clients/evm';
+import { createBundle, Bundle, Operation } from '@/types/models';
 import { configureBundleTransactions } from './utils';
 
 export const buildTransferFundsBundle = async (
