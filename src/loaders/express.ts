@@ -3,7 +3,7 @@
 import * as Sentry from '@sentry/node';
 // we want to init Sentry here so we can catch issue from other import
 Sentry.init({
-  dsn: "https://edec36bd8c4e41fda354a6b3cc146d38@o1035526.ingest.sentry.io/4504409369411584",
+  dsn: 'https://edec36bd8c4e41fda354a6b3cc146d38@o1035526.ingest.sentry.io/4504409369411584'
 });
 
 import express, {
