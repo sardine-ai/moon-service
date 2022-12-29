@@ -68,7 +68,7 @@
     "@uniswap/sdk": "^3.0.3",
     "@uniswap/smart-order-router": "^2.9.2",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
-    "axios": "^0.27.2",
+    "axios": "^1.2.1",
     "bn.js": "^5.2.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
