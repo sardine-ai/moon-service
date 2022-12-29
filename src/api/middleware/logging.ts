@@ -7,7 +7,7 @@ const applicationNamespace = createNamespace('MOON_SERVICE_NAMESPACE');
 
 export const attachContext: RequestHandler = (_req, _res, next) => {
   applicationNamespace.run(() => next());
-}
+};
 
 export const requestEnrichmentMw: RequestHandler = async (req, _res, next) => {
   const requestId = uuid();

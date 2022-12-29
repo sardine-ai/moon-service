@@ -13,10 +13,7 @@ import { GetGasDetails } from './gas';
 import logger from '../../loaders/logger';
 
 export class SelfCustodyClient extends TransactionSubmissionClient {
-  constructor(
-    cryptoConfig: CryptoConfig,
-    getGasDetails: GetGasDetails
-  ) {
+  constructor(cryptoConfig: CryptoConfig, getGasDetails: GetGasDetails) {
     super(cryptoConfig, getGasDetails);
   }
 

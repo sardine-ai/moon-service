@@ -58,7 +58,11 @@ export default async ({ app }: { app: express.Application }) => {
     _next: NextFunction
   ) => {
     dogstatsd.increment(err.message);
-    logger.error(`Error: ${err.message} \nStack Trace: ${err?.cause?.stack.split("\n") ?? ''}`)
+    logger.error(
+      `Error: ${err.message} \nStack Trace: ${
+        err?.cause?.stack.split('\n') ?? ''
+      }`
+    );
     res.status(err.status || 500);
     res.json({
       errors: {

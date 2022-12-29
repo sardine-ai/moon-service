@@ -23,10 +23,8 @@ export const commandUninjected =
     return await executeBundle(bundle);
   };
 
-export const quoteCommandUninjected = (
-  buildBundle: BuildBundle, 
-  quoteBundle: QuoteBundle
-) =>
+export const quoteCommandUninjected =
+  (buildBundle: BuildBundle, quoteBundle: QuoteBundle) =>
   async (params: CommandParams) => {
     logger.info(
       `Processing Quote: ${JSON.stringify(params)}`,

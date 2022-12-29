@@ -7,7 +7,7 @@ import { BuyNftParams } from '../types/requests/nft';
 import { CryptoConfig } from '../config/crypto-config';
 import { Operation, Transaction, TransactionState } from '../types/models';
 import { NftNotFoundError } from '../types/errors';
-import { PopulatedTransaction } from "ethers"
+import { PopulatedTransaction } from 'ethers';
 
 export interface IOpenSeaClient {
   ethOpenSea: OpenSeaSDK;
@@ -18,10 +18,7 @@ export class OpenSeaClient implements IOpenSeaClient {
   cryptoConfig: CryptoConfig;
   ethOpenSea: OpenSeaSDK;
 
-  constructor(
-    cryptoConfig: CryptoConfig,
-    ethOpenSea: OpenSeaSDK
-  ) {
+  constructor(cryptoConfig: CryptoConfig, ethOpenSea: OpenSeaSDK) {
     this.cryptoConfig = cryptoConfig;
     this.ethOpenSea = ethOpenSea;
   }
