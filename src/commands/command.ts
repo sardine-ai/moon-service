@@ -1,10 +1,10 @@
-import { ExecuteBundle, QuoteBundle } from '@/orchestrators';
-import { GetBundle, StoreBundle } from '@/repositories/base-repository';
-import { BuildBundle, CommandParams } from '@/types/command';
-import { GetBundleStatusParams } from '@/types/requests';
-import { buildBundleReceiptResponse } from '@/types/models/receipt';
-import { getBaseRequest } from '@/types/requests/base-request';
-import logger from '@/loaders/logger';
+import { ExecuteBundle, QuoteBundle } from '../orchestrators';
+import { GetBundle, StoreBundle } from '../repositories/base-repository';
+import { BuildBundle, CommandParams } from '../types/command';
+import { GetBundleStatusParams } from '../types/requests';
+import { buildBundleReceiptResponse } from '../types/models/receipt';
+import { getBaseRequest } from '../types/requests/base-request';
+import logger from '../loaders/logger';
 
 export const commandUninjected =
   (

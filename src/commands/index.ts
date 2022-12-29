@@ -12,40 +12,40 @@ import {
   ExecuteBundle,
   QuoteBundle,
   quoteTransactionUninjected
-} from '@/orchestrators';
+} from '../orchestrators';
 import {
   ITransactionSubmissionClient,
   SelfCustodyClient,
   FireblocksClient,
   TestTransactionSubmissionClient
-} from '@/clients/transactions';
-import { GenieClient } from '@/clients/genie';
-import getCryptoConfig from '@/config/crypto-config';
-import getFireblocksConfig from '@/config/fireblocks-config';
+} from '../clients/transactions';
+import { GenieClient } from '../clients/genie';
+import getCryptoConfig from '../config/crypto-config';
+import getFireblocksConfig from '../config/fireblocks-config';
 import { buildBuyNftBundleUninjected } from './buy-nft';
-import { OpenSeaClient } from '@/clients/opensea';
+import { OpenSeaClient } from '../clients/opensea';
 import { Network, OpenSeaSDK } from 'opensea-js';
 import Web3 from 'web3';
-import logger from '@/loaders/logger';
+import logger from '../loaders/logger';
 import {
   getBundle,
   storeBundle,
   updateTransaction,
   getBundleByTransactionExecutionId
-} from '@/repositories/prisma-repository';
+} from '../repositories/prisma-repository';
 import {
   commandUninjected,
   quoteCommandUninjected,
   getBundleStatusUninjected
 } from './command';
-import { notifySubscribers } from '@/clients/notifications';
+import { notifySubscribers } from '../clients/notifications';
 import {
   buildZeroXSwapTransactionUninjected,
   buildSwapTokensTransactionUninjected,
   buildSwapTransactionFromReceiptUninjected,
   getZeroXSwapData
-} from '@/clients/swaps';
-import { getAlchemyGasDetails } from '@/clients/transactions/gas';
+} from '../clients/swaps';
+import { getAlchemyGasDetails } from '../clients/transactions/gas';
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig();

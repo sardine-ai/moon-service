@@ -11,7 +11,7 @@ import {
   Transaction,
   TransactionState,
   Operation
-} from '@/types/models';
+} from '../types/models';
 import {
   StoreBundle,
   StoreTransactions,

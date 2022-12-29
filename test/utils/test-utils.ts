@@ -1,4 +1,4 @@
-import { Bundle } from "@/types/models";
+import { Bundle } from "../../src/types/models";
 
 export const updateBundleWithFakeId = (bundle: Bundle, newId: string) => {
   bundle.id = newId;

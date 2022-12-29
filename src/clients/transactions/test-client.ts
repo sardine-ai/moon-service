@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { CryptoConfig } from '@/config/crypto-config';
-import { Transaction } from '@/types/models';
+import { CryptoConfig } from '../../config/crypto-config';
+import { Transaction } from '../../types/models';
 import { ITransactionSubmissionClient } from './base-transaction-client';
 import { GetGasDetails } from './gas';
-import logger from '@/loaders/logger';
+import logger from '../../loaders/logger';
 
 export class TestTransactionSubmissionClient
   implements ITransactionSubmissionClient

@@ -1,5 +1,5 @@
-import { SwapTokensParams } from '@/types/requests';
-import { createBundle, Bundle, Operation, Transaction } from '@/types/models';
+import { SwapTokensParams } from '../types/requests';
+import { createBundle, Bundle, Operation, Transaction } from '../types/models';
 import { configureBundleTransactions } from './utils';
 
 export const buildSwapTokensBundleUninjected =

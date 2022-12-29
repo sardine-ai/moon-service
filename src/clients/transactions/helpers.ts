@@ -1,4 +1,4 @@
-import { CryptoConfig } from '@/config/crypto-config';
+import { CryptoConfig } from '../../config/crypto-config';
 
 export const getChainAlchemy = (chain: string, cryptoConfig: CryptoConfig) => {
   switch (chain) {

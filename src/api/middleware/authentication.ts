@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
-import { UnauthorizedError } from '@/types/errors';
+import { UnauthorizedError } from '../../types/errors';
 
 export const authenticationMw = async (
   req: Request,
@@ -11,7 +11,7 @@ export const authenticationMw = async (
   if (apiKey == expectedSecret) {
     next();
   } else {
-    const e = new UnauthorizedError();
+    const e = UnauthorizedError(undefined);
     next(e);
   }
 };

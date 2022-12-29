@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { EvmTransaction } from '@/types/evm';
-import { CryptoConfig } from '@/config/crypto-config';
+import { EvmTransaction } from '../../types/evm';
+import { CryptoConfig } from '../../config/crypto-config';
 import { AlchemyWeb3 } from '@alch/alchemy-web3';
 import { SignedTransaction } from 'web3-core';
-import { Transaction } from '@/types/models';
+import { Transaction } from '../../types/models';
 import { TransactionSubmissionClient } from './base-transaction-client';
-import { TransactionSubmittionError } from '@/types/errors';
+import { TransactionSubmittionError } from '../../types/errors';
 import { getChainAlchemy } from './helpers';
 import { GetGasDetails } from './gas';
-import logger from '@/loaders/logger';
+import logger from '../../loaders/logger';
 
 export class SelfCustodyClient extends TransactionSubmissionClient {
   constructor(
@@ -50,7 +50,7 @@ export class SelfCustodyClient extends TransactionSubmissionClient {
         if (err === null) {
           logger.info(`Transacion Hash: ${hash}`);
         } else {
-          new TransactionSubmittionError();
+          throw TransactionSubmittionError(err);
         }
       }
     );

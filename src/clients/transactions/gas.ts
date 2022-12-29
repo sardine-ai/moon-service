@@ -1,6 +1,6 @@
-import { GasDetails } from '@/types/evm';
-import { Transaction } from '@/types/models';
-import { CryptoConfig } from '@/config/crypto-config';
+import { GasDetails } from '../../types/evm';
+import { Transaction } from '../../types/models';
+import { CryptoConfig } from '../../config/crypto-config';
 import { getChainAlchemy } from './helpers';
 
 export type GetGasDetails = (

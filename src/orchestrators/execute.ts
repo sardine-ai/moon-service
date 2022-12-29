@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Bundle, Transaction, TransactionState } from '@/types/models';
-import { UpdateTransaction } from '@/repositories/base-repository';
-import { ITransactionSubmissionClient } from '@/clients/transactions';
+import { Bundle, Transaction, TransactionState } from '../types/models';
+import { UpdateTransaction } from '../repositories/base-repository';
+import { ITransactionSubmissionClient } from '../clients/transactions';
 import { Logger } from 'winston';
-import { BundleReceiptResponse } from '@/types/models/receipt';
-import { buildBundleReceiptResponse } from '@/types/models/receipt';
+import { BundleReceiptResponse } from '../types/models/receipt';
+import { buildBundleReceiptResponse } from '../types/models/receipt';
 
 export type ExecuteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>;
 export type QuoteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>;

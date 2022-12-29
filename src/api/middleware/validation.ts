@@ -3,7 +3,7 @@
 import { Response, Request, NextFunction } from 'express';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import Logger from '@/loaders/logger';
+import Logger from '../../loaders/logger';
 import crypto from 'crypto';
 
 const FIREBLOCKS_WEBHOOK_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----

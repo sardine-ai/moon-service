@@ -1,9 +1,9 @@
-import { executeBundleUninjected } from "@/orchestrators";
-import { buildTransferFundsBundle } from "@/commands/transfer-funds";
-import { getBundle, storeBundle, updateTransaction } from "@/repositories/test-repository";
-import { Bundle, Operation, createBundle, TransactionState } from "@/types/models";
-import logger from "@/loaders/logger";
-import { TestTransactionSubmissionClient } from "@/clients/transactions";
+import { executeBundleUninjected } from "../../src/orchestrators";
+import { buildTransferFundsBundle } from "../../src/commands/transfer-funds";
+import { getBundle, storeBundle, updateTransaction } from "../../src/repositories/test-repository";
+import { Bundle, Operation, createBundle, TransactionState } from "../../src/types/models";
+import logger from "../../src/loaders/logger";
+import { TestTransactionSubmissionClient } from "../../src/clients/transactions";
 
 describe('Testing Bundle Logic', () => {
   test('it should create a Bundle', () => {

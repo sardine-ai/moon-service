@@ -9,15 +9,15 @@ import {
   VaultAccountResponse
 } from 'fireblocks-sdk';
 import { TransactionSubmissionClient } from './base-transaction-client';
-import { FireblocksConfig } from '@/config/fireblocks-config';
-import { CryptoConfig } from '@/config/crypto-config';
-import { EvmTransaction } from '@/types/evm';
-import { getFireblocksAssetId } from '@/utils/fireblocks-utils';
+import { FireblocksConfig } from '../../config/fireblocks-config';
+import { CryptoConfig } from '../../config/crypto-config';
+import { EvmTransaction } from '../../types/evm';
+import { getFireblocksAssetId } from '../../utils/fireblocks-utils';
 import { formatEther, formatUnits } from 'ethers/lib/utils';
-import { Transaction } from '@/types/models';
-import { TransactionSubmittionError } from '@/types/errors';
+import { Transaction } from '../../types/models';
+import { TransactionSubmittionError } from '../../types/errors';
 import { GetGasDetails } from './gas';
-import logger from '@/loaders/logger';
+import logger from '../../loaders/logger';
 
 interface FireblocksVaultAccount {
   id: string;
@@ -149,7 +149,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
         const response = await fireblocks.createTransaction(txArguments);
         return response;
       } catch (error) {
-        new TransactionSubmittionError();
+        throw TransactionSubmittionError(error);
       }
     }
     logger.error('No vault acccount found');

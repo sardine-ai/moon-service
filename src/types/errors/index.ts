@@ -1,38 +1,32 @@
-export class UnauthorizedError extends Error {
-  // parent error
+export class ApplicationError extends Error {
+  cause: unknown;
+  name: string;
+  message: string;
   status: number;
-
-  constructor() {
+  constructor(
+    cause: unknown,
+    name: string, 
+    message: string,
+    status: number
+  ) {
     super();
-    this.name = this.constructor.name; // good practice
-
-    this.message = 'Unauthorized';
-    this.status = 404; // error code for responding to client
+    this.cause = cause;
+    this.name = name;
+    this.message = message;
+    this.status = status;
   }
 }
 
-export class NftNotFoundError extends Error {
-  // parent error
-  status: number;
+export type ErrorBuilder = (cause: unknown) => ApplicationError
 
-  constructor() {
-    super();
-    this.name = this.constructor.name; // good practice
-
-    this.message = 'Sorry, this NFT is no longer available';
-    this.status = 410; // error code for responding to client
-  }
+export const UnauthorizedError: ErrorBuilder = (cause) => {
+  return new ApplicationError(cause, 'UnauthorizedError', 'Unauthorized', 404);
 }
 
-export class TransactionSubmittionError extends Error {
-  // parent error
-  status: number;
+export const NftNotFoundError: ErrorBuilder = (cause) => {
+  return new ApplicationError(cause, 'NftNotFoundError', 'Sorry, this NFT is no longer available', 410);
+}
 
-  constructor() {
-    super();
-    this.name = this.constructor.name; // good practice
-
-    this.message = 'There was an error submitting the transaction';
-    this.status = 500; // error code for responding to client
-  }
+export const TransactionSubmittionError: ErrorBuilder = (cause) => {
+  return new ApplicationError(cause, 'TransactionSubmittionError', 'There was an error submitting the transaction', 500);
 }

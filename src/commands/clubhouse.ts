@@ -1,6 +1,6 @@
-import { BuyClubHouseNFTParams } from '@/types/requests/clubhouse';
-import { ITransactionSubmissionClient } from '@/clients/transactions';
-import logger from '@/loaders/logger';
+import { BuyClubHouseNFTParams } from '../types/requests/clubhouse';
+import { ITransactionSubmissionClient } from '../clients/transactions';
+import logger from '../loaders/logger';
 
 export const buyClubHouseNFTUninjected =
   (

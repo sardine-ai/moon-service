@@ -1,12 +1,12 @@
-import { Operation, TransactionState } from "@/types/models";
-import { TestOpenSeaClient } from "@/clients/opensea";
-import { buildBuyNftBundleUninjected } from "@/commands/buy-nft";
-import { buildSwapTransactionFromReceiptUninjected, buildZeroXSwapTransactionUninjected, getTestZeroXSwapData } from "@/clients/swaps";
-import { getTestCryptoConfig } from "@/config/crypto-config";
-import { QuoteBundle, quoteBundleUninjected, quoteTransactionUninjected } from "@/orchestrators";
-import { TestTransactionSubmissionClient } from "@/clients/transactions";
-import logger from "@/loaders/logger";
-import { getTestGasDetails } from "@/clients/transactions/gas";
+import { Operation, TransactionState } from "../../src/types/models";
+import { TestOpenSeaClient } from "../../src/clients/opensea";
+import { buildBuyNftBundleUninjected } from "../../src/commands/buy-nft";
+import { buildSwapTransactionFromReceiptUninjected, buildZeroXSwapTransactionUninjected, getTestZeroXSwapData } from "../../src/clients/swaps";
+import { getTestCryptoConfig } from "../../src/config/crypto-config";
+import { QuoteBundle, quoteBundleUninjected, quoteTransactionUninjected } from "../../src/orchestrators";
+import { TestTransactionSubmissionClient } from "../../src/clients/transactions";
+import logger from "../../src/loaders/logger";
+import { getTestGasDetails } from "../../src/clients/transactions/gas";
 
 describe('Testing Build Buy NFT Bundle', () => {
   const openSea = new TestOpenSeaClient();

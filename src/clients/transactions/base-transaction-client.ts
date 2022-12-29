@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { Transaction } from '@/types/models';
-import { CHAIN_TO_CHAIN_ID, CryptoConfig } from '@/config/crypto-config';
-import { EvmTransaction, GasDetails } from '@/types/evm';
+import { Transaction } from '../../types/models';
+import { CHAIN_TO_CHAIN_ID, CryptoConfig } from '../../config/crypto-config';
+import { EvmTransaction, GasDetails } from '../../types/evm';
 import { calculateMaxFeePerGas, GetGasDetails } from './gas';
 import { getChainAlchemy } from './helpers';
 

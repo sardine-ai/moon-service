@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Response, Request, NextFunction } from 'express';
-import Logger from '@/loaders/logger';
-import { CommandParams } from '@/types/command';
+import Logger from '../../loaders/logger';
+import { CommandParams } from '../../types/command';
 import {
   buyGenieNFT,
   buyClubHouseNFT,
@@ -14,8 +14,8 @@ import {
   getBundleStatus,
   swapTokens,
   quoteSwapTokens
-} from '@/commands';
-import { functionCounterWrapper } from '@/utils/metrics';
+} from '../../commands';
+import { functionCounterWrapper } from '../../utils/metrics';
 
 const commandTryCatchWrapper =
   (command: (command: CommandParams) => Promise<any>) =>
