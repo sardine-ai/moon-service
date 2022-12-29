@@ -57,6 +57,7 @@ export default async ({ app }: { app: express.Application }) => {
     res: Response,
     _next: NextFunction
   ) => {
+    Sentry.captureException(err);
     dogstatsd.increment(err.message);
     logger.error(
       `Error: ${err.message} \nStack Trace: ${
