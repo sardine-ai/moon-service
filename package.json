@@ -64,6 +64,7 @@
     "@maticnetwork/maticjs-ethers": "^1.0.2",
     "@maticnetwork/maticjs-web3": "^1.0.1",
     "@prisma/client": "^4.5.0",
+    "@sentry/node": "^7.28.1",
     "@types/cors": "^2.8.12",
     "@uniswap/sdk": "^3.0.3",
     "@uniswap/smart-order-router": "^2.9.2",
