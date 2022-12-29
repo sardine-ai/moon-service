@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import * as Sentry from '@sentry/node';
 import { Response, Request, NextFunction } from 'express';
 import Logger from '../../loaders/logger';
 import { CommandParams } from '../../types/command';
@@ -23,6 +24,7 @@ const commandTryCatchWrapper =
     try {
       res.json(await command(req.body)).status(200);
     } catch (err: unknown) {
+      Sentry.captureException(err);
       Logger.error('An Error Occured while processing request', err);
       next(err);
     }
