@@ -16,6 +16,7 @@ import cors from 'cors';
 import router from '../api/routes/index';
 import getAppConfig from '../config/app-config';
 import { dogstatsd } from '../utils/metrics';
+import logger from '../loaders/logger';
 
 export default async ({ app }: { app: express.Application }) => {
   const appConfig = getAppConfig();
@@ -57,6 +58,7 @@ export default async ({ app }: { app: express.Application }) => {
     _next: NextFunction
   ) => {
     dogstatsd.increment(err.message);
+    logger.error(`Error: ${err.message} \nStack Trace: ${err?.cause?.stack.split("\n") ?? ''}`)
     res.status(err.status || 500);
     res.json({
       errors: {

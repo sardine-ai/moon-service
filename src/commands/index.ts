@@ -54,7 +54,6 @@ let transactionSubmissionClient: ITransactionSubmissionClient;
 if (process.argv.length > 2 && process.argv[2] == 'fireblocks') {
   logger.warn('Configured to use Fireblocks to submit transactions');
   transactionSubmissionClient = new FireblocksClient(
-    logger,
     fireblocksConfig,
     cryptoConfig,
     getAlchemyGasDetails
@@ -62,7 +61,6 @@ if (process.argv.length > 2 && process.argv[2] == 'fireblocks') {
 } else if (process.argv.length > 2 && process.argv[2] == 'self') {
   logger.info('Configured to use your personal keys to submit transactions');
   transactionSubmissionClient = new SelfCustodyClient(
-    logger,
     cryptoConfig,
     getAlchemyGasDetails
   );
@@ -79,7 +77,6 @@ const ethOpenSea = new OpenSeaSDK(ethProvider, {
 });
 
 const openSeaClient: OpenSeaClient = new OpenSeaClient(
-  logger,
   cryptoConfig,
   ethOpenSea
 );
@@ -102,29 +99,24 @@ const quoteBundle: QuoteBundle = quoteBundleUninjected(
 );
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(
-  logger,
   cryptoConfig,
   transactionSubmissionClient
 );
 export const buyClubHouseNFT = buyClubHouseNFTUninjected(
-  logger,
   transactionSubmissionClient
 );
 export const buyGenieNFT = buyGenieNFTUninjected(
-  logger,
   genieClient,
   transactionSubmissionClient,
   cryptoConfig
 );
 
 export const transferFunds = commandUninjected(
-  logger,
   buildTransferFundsBundle,
   storeBundle,
   executeBundle
 );
 export const quoteTransferFunds = quoteCommandUninjected(
-  logger,
   buildTransferFundsBundle,
   quoteBundle
 );
@@ -158,13 +150,11 @@ const buildBuyNftBundle = buildBuyNftBundleUninjected(
 );
 
 export const buyNft = commandUninjected(
-  logger,
   buildBuyNftBundle,
   storeBundle,
   executeBundle
 );
 export const quoteBuyNft = quoteCommandUninjected(
-  logger,
   buildBuyNftBundle,
   quoteBundle
 );
@@ -178,13 +168,11 @@ const buildQuoteSwapTokensBundle = buildSwapTokensBundleUninjected(
 );
 
 export const swapTokens = commandUninjected(
-  logger,
   buildSwapTokensBundle,
   storeBundle,
   executeBundle
 );
 export const quoteSwapTokens = quoteCommandUninjected(
-  logger,
   buildQuoteSwapTokensBundle,
   quoteBundle
 );

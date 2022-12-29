@@ -4,10 +4,10 @@
 import { v4 as uuidV4 } from 'uuid';
 import { OpenSeaSDK } from 'opensea-js';
 import { BuyNftParams } from '../types/requests/nft';
-import winston from 'winston';
 import { CryptoConfig } from '../config/crypto-config';
 import { Operation, Transaction, TransactionState } from '../types/models';
 import { NftNotFoundError } from '../types/errors';
+import { PopulatedTransaction } from "ethers"
 
 export interface IOpenSeaClient {
   ethOpenSea: OpenSeaSDK;
@@ -15,16 +15,13 @@ export interface IOpenSeaClient {
 }
 
 export class OpenSeaClient implements IOpenSeaClient {
-  logger: winston.Logger;
   cryptoConfig: CryptoConfig;
   ethOpenSea: OpenSeaSDK;
 
   constructor(
-    logger: winston.Logger,
     cryptoConfig: CryptoConfig,
     ethOpenSea: OpenSeaSDK
   ) {
-    this.logger = logger;
     this.cryptoConfig = cryptoConfig;
     this.ethOpenSea = ethOpenSea;
   }
@@ -38,7 +35,7 @@ export class OpenSeaClient implements IOpenSeaClient {
       });
       return order;
     } catch (error) {
-      throw new NftNotFoundError();
+      throw NftNotFoundError(error);
     }
   }
 
@@ -46,7 +43,7 @@ export class OpenSeaClient implements IOpenSeaClient {
     protocalData: any,
     accountAddress: string,
     recipientAddress: string
-  ) {
+  ): Promise<PopulatedTransaction> {
     try {
       const { actions } = await this.ethOpenSea.seaport.fulfillOrder({
         order: protocalData,
@@ -56,7 +53,7 @@ export class OpenSeaClient implements IOpenSeaClient {
       const callData = await actions[0].transactionMethods.buildTransaction();
       return callData;
     } catch (error) {
-      throw new NftNotFoundError();
+      throw NftNotFoundError(error);
     }
   }
 

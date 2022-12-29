@@ -3,11 +3,9 @@ import { GenieClient } from '../clients/genie';
 import { BuyGenieNFTParams, GenieCallDataResponse } from '../types/genie';
 import { swapUsdcToEth } from './index';
 import { CryptoConfig } from '../config/crypto-config';
-import winston from 'winston';
 
 export const buyGenieNFTUninjected =
   (
-    _logger: winston.Logger,
     genieClient: GenieClient,
     _transactionSubmissionClient: ITransactionSubmissionClient,
     _cryptoConfig: CryptoConfig

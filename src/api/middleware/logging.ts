@@ -1,20 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { Response, Request, NextFunction } from 'express';
+import { RequestHandler } from 'express';
 import { v4 as uuid } from 'uuid';
 import Logger from '../../loaders/logger';
+import { createNamespace } from 'cls-hooked';
 
-export const requestEnrichmentMw = async (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-) => {
-  req.body['requestId'] = uuid();
+const applicationNamespace = createNamespace('MOON_SERVICE_NAMESPACE');
+
+export const attachContext: RequestHandler = (_req, _res, next) => {
+  applicationNamespace.run(() => next());
+}
+
+export const requestEnrichmentMw: RequestHandler = async (req, _res, next) => {
+  const requestId = uuid();
+  applicationNamespace.set('REQUEST_ID', requestId);
+  req.body['requestId'] = requestId;
   req.body['timestamp'] = Math.floor(Date.now() / 1000);
   next();
 };
 
-export const requestLoggerMw = (req: any, res: any, next: any) => {
+export const requestLoggerMw: RequestHandler = (req, _res, next) => {
   Logger.info('Request', {
     Body: req.body,
     Method: req.method,
@@ -24,9 +27,9 @@ export const requestLoggerMw = (req: any, res: any, next: any) => {
   next();
 };
 
-export const responseLoggerMw = (_req: any, res: any, next: any) => {
+export const responseLoggerMw: RequestHandler = (_req, res, next) => {
   const send = res.send;
-  res.send = (content: any) => {
+  res.send = (content: unknown) => {
     Logger.info('Response', { Body: content });
     res.send = send;
     return res.send(content);

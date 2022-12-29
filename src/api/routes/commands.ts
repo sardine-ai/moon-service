@@ -19,6 +19,7 @@ import {
   SwapTokensParams
 } from '../../types/requests';
 import {
+  attachContext,
   requestEnrichmentMw,
   requestLoggerMw,
   responseLoggerMw
@@ -27,6 +28,7 @@ import {
 export const router = express.Router();
 
 router.use(
+  attachContext,
   requestEnrichmentMw,
   requestLoggerMw,
   responseLoggerMw,

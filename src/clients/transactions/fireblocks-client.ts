@@ -8,7 +8,6 @@ import {
   TransactionArguments,
   VaultAccountResponse
 } from 'fireblocks-sdk';
-import winston from 'winston';
 import { TransactionSubmissionClient } from './base-transaction-client';
 import { FireblocksConfig } from '../../config/fireblocks-config';
 import { CryptoConfig } from '../../config/crypto-config';
@@ -18,6 +17,7 @@ import { formatEther, formatUnits } from 'ethers/lib/utils';
 import { Transaction } from '../../types/models';
 import { TransactionSubmittionError } from '../../types/errors';
 import { GetGasDetails } from './gas';
+import logger from '../../loaders/logger';
 
 interface FireblocksVaultAccount {
   id: string;
@@ -25,18 +25,15 @@ interface FireblocksVaultAccount {
 }
 
 export class FireblocksClient extends TransactionSubmissionClient {
-  logger: winston.Logger;
   fireblocks_dontCallDirectly: FireblocksSDK;
   config: FireblocksConfig;
 
   constructor(
-    logger: winston.Logger,
     config: FireblocksConfig,
     cryptoConfig: CryptoConfig,
     getGasDetails: GetGasDetails
   ) {
     super(cryptoConfig, getGasDetails);
-    this.logger = logger;
     this.config = config;
   }
 
@@ -127,7 +124,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
       );
       return depositAddresses[0].address;
     }
-    this.logger.error('No address found');
+    logger.error('No address found');
     return '';
   }
 
@@ -146,16 +143,16 @@ export class FireblocksClient extends TransactionSubmissionClient {
         evmTransaction,
         vaultAccount
       );
-      this.logger.info(`Fireblocks Arguments: ${JSON.stringify(txArguments)}`);
+      logger.info(`Fireblocks Arguments: ${JSON.stringify(txArguments)}`);
       const fireblocks = await this.getOrSetFireblocksSdk();
       try {
         const response = await fireblocks.createTransaction(txArguments);
         return response;
       } catch (error) {
-        new TransactionSubmittionError();
+        throw TransactionSubmittionError(error);
       }
     }
-    this.logger.error('No vault acccount found');
+    logger.error('No vault acccount found');
     return;
   }
 }

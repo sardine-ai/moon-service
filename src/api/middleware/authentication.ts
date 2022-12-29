@@ -11,7 +11,7 @@ export const authenticationMw = async (
   if (apiKey == expectedSecret) {
     next();
   } else {
-    const e = new UnauthorizedError();
+    const e = UnauthorizedError(undefined);
     next(e);
   }
 };

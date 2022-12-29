@@ -36,7 +36,7 @@ export const quoteBundleUninjected =
     );
     logger.info(`Transaction Quotes: ${JSON.stringify(transactionQuotes)}`);
     const totalCosts = getBundleReceiptTotalCost(transactionQuotes);
-    logger.info(`Total cost: ${totalCosts}`);
+    logger.info(`Total cost: ${JSON.stringify(totalCosts)}`);
     return {
       totalCosts: totalCosts,
       transactionReceipts: transactionQuotes

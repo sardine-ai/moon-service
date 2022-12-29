@@ -1,14 +1,13 @@
 import { ExecuteBundle, QuoteBundle } from '../orchestrators';
 import { GetBundle, StoreBundle } from '../repositories/base-repository';
 import { BuildBundle, CommandParams } from '../types/command';
-import { Logger } from 'winston';
-import { GetBundleStatusParams } from 'src/types/requests';
+import { GetBundleStatusParams } from '../types/requests';
 import { buildBundleReceiptResponse } from '../types/models/receipt';
 import { getBaseRequest } from '../types/requests/base-request';
+import logger from '../loaders/logger';
 
 export const commandUninjected =
   (
-    logger: Logger,
     buildBundle: BuildBundle,
     storeBundle: StoreBundle,
     executeBundle: ExecuteBundle
@@ -24,8 +23,10 @@ export const commandUninjected =
     return await executeBundle(bundle);
   };
 
-export const quoteCommandUninjected =
-  (logger: Logger, buildBundle: BuildBundle, quoteBundle: QuoteBundle) =>
+export const quoteCommandUninjected = (
+  buildBundle: BuildBundle, 
+  quoteBundle: QuoteBundle
+) =>
   async (params: CommandParams) => {
     logger.info(
       `Processing Quote: ${JSON.stringify(params)}`,
