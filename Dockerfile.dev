@@ -1,15 +1,10 @@
 FROM node:16
-
 WORKDIR /src
 
-COPY package*.json ./
-
-RUN npm install --no-color
-
+# TODO: Do proper docker-caching, where we push package.json up.
 COPY . .
 
+RUN npm install --no-color
 RUN npx prisma generate
-
 EXPOSE 8000
-
 CMD ["./start.sh"]
