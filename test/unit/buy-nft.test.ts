@@ -5,12 +5,13 @@ import { buildSwapTransactionFromReceiptUninjected, buildZeroXSwapTransactionUni
 import { getTestCryptoConfig } from "../../src/config/crypto-config";
 import { QuoteBundle, quoteBundleUninjected, quoteTransactionUninjected } from "../../src/orchestrators";
 import { TestTransactionSubmissionClient } from "../../src/clients/transactions";
-import logger from "../../src/loaders/logger";
 import { getTestGasDetails } from "../../src/clients/transactions/gas";
+import { updateBundleWithFakeId } from "../utils/test-utils";
 
 describe('Testing Build Buy NFT Bundle', () => {
   const openSea = new TestOpenSeaClient();
-  const transactionSubmissionClient = new TestTransactionSubmissionClient()
+  const testCryptoConfig = getTestCryptoConfig()
+  const transactionSubmissionClient = new TestTransactionSubmissionClient(testCryptoConfig, getTestGasDetails);
   const cryptoConfig = getTestCryptoConfig();
   const buildSwapTransaction = buildZeroXSwapTransactionUninjected(
     cryptoConfig,
@@ -32,16 +33,16 @@ describe('Testing Build Buy NFT Bundle', () => {
   const quoteBundle: QuoteBundle = quoteBundleUninjected(
     transactionSubmissionClient,
     quoteTransaction,
-    logger
   );
+  
   const buildBuyNftBundle = buildBuyNftBundleUninjected(
     openSea,
     quoteBundle,
     buildSwapTransactionFromReceipt
-  );;
+  );
 
   test('it builds buy nft bundle', async () => {
-    const bundle = await buildBuyNftBundle({
+    let bundle = await buildBuyNftBundle({
       nftId: "1",
       collectionName: "A fun collection",
       contractAddress: "0xcontractAddress",
@@ -49,12 +50,7 @@ describe('Testing Build Buy NFT Bundle', () => {
       recipientAddress: "0xrecipientAddress",
       platform: "opensea",
     })
-    bundle.id = "0";
-    bundle.transactions = bundle.transactions.map(t => {
-      t.id = "0"
-      t.bundleId = "0"
-      return t
-    });
+    bundle = updateBundleWithFakeId(bundle, "0");
     expect(bundle).toEqual({
       id: "0",
       operation: Operation.BUY_NFT,
@@ -95,5 +91,62 @@ describe('Testing Build Buy NFT Bundle', () => {
         }
       ]
     });
+  });
+  test('it builds quotes buy nft', async () => {
+    let bundle = await buildBuyNftBundle({
+      nftId: "1",
+      collectionName: "A fun collection",
+      contractAddress: "0xcontractAddress",
+      chain: "goerli",
+      recipientAddress: "0xrecipientAddress",
+      platform: "opensea",
+    })
+    bundle = updateBundleWithFakeId(bundle, "0");
+    const quote = await quoteBundle(bundle);
+    expect(quote).toEqual({
+      totalCosts: [
+        {
+          amount: "1",
+          assetSymbol: "WETH",
+          decimals: 18,
+        },
+        {
+          amount: "2.9646277825578994e+21",
+          assetSymbol: "ETH",
+          decimals: 18,
+        },
+      ],
+      transactionReceipts: [
+        {
+          assetCosts: [
+            {
+              amount: "1",
+              assetSymbol: "WETH",
+              decimals: 18,
+            },
+            {
+              amount: "1.4823138912789497e+21",
+              assetSymbol: "ETH",
+              decimals: 18,
+            },
+          ],
+          chain: "goerli",
+          gasCost: "1.4823138912789497e+21",
+          operation: Operation.SWAP_TOKENS,
+        },
+        {
+          assetCosts: [
+            {
+              amount: "1.4823138912789497e+21",
+              assetSymbol: "ETH",
+              decimals: 18,
+            },
+          ],
+          chain: "goerli",
+          gasCost: "1.4823138912789497e+21",
+          operation: Operation.BUY_NFT,
+        },
+      ],
+    })
   });
 });

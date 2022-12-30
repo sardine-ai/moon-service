@@ -5,6 +5,7 @@ import { GetBundleStatusParams } from '../types/requests';
 import { buildBundleReceiptResponse } from '../types/models/receipt';
 import { getBaseRequest } from '../types/requests/base-request';
 import logger from '../loaders/logger';
+import { BundleNotFoundError } from '../types/errors';
 
 export const commandUninjected =
   (
@@ -42,5 +43,5 @@ export const getBundleStatusUninjected =
       const bundleReceipt = buildBundleReceiptResponse(bundle);
       return bundleReceipt;
     }
-    throw new Error(`Bundle Id ${getBundleStatus.bundleId} Not Found`);
+    throw BundleNotFoundError(getBundleStatus.bundleId);
   };

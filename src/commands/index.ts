@@ -20,7 +20,7 @@ import {
   TestTransactionSubmissionClient
 } from '../clients/transactions';
 import { GenieClient } from '../clients/genie';
-import getCryptoConfig from '../config/crypto-config';
+import getCryptoConfig, { getTestCryptoConfig } from '../config/crypto-config';
 import getFireblocksConfig from '../config/fireblocks-config';
 import { buildBuyNftBundleUninjected } from './buy-nft';
 import { OpenSeaClient } from '../clients/opensea';
@@ -45,7 +45,7 @@ import {
   buildSwapTransactionFromReceiptUninjected,
   getZeroXSwapData
 } from '../clients/swaps';
-import { getAlchemyGasDetails } from '../clients/transactions/gas';
+import { getAlchemyGasDetails, getTestGasDetails } from '../clients/transactions/gas';
 
 const cryptoConfig = getCryptoConfig();
 const fireblocksConfig = getFireblocksConfig();
@@ -66,7 +66,8 @@ if (process.argv.length > 2 && process.argv[2] == 'fireblocks') {
   );
 } else {
   logger.info('Configured to send fake transactions');
-  transactionSubmissionClient = new TestTransactionSubmissionClient();
+  const testCryptoConfig = getTestCryptoConfig()
+  transactionSubmissionClient = new TestTransactionSubmissionClient(testCryptoConfig, getTestGasDetails);
 }
 const genieClient: GenieClient = new GenieClient(logger);
 
@@ -84,7 +85,6 @@ const openSeaClient: OpenSeaClient = new OpenSeaClient(
 const executeBundle: ExecuteBundle = executeBundleUninjected(
   transactionSubmissionClient,
   updateTransaction,
-  logger
 );
 
 const quoteTransaction = quoteTransactionUninjected(
@@ -95,7 +95,6 @@ const quoteTransaction = quoteTransactionUninjected(
 const quoteBundle: QuoteBundle = quoteBundleUninjected(
   transactionSubmissionClient,
   quoteTransaction,
-  logger
 );
 
 export const swapUsdcToEth = swapUsdcToEthUninjected(

@@ -44,7 +44,7 @@ export const getZeroXSwapData: GetZeroXSwapData = async (
   return data;
 };
 
-const buildTransactionWithSwapData = (
+export const buildTransactionWithSwapData = (
   chain: string,
   swapData: ZeroXSwapResponse,
   swapRequest: ZeroXSwapParams
@@ -151,14 +151,14 @@ export const buildSwapTokensTransactionUninjected =
     return transaction;
   };
 
-interface ZeroXSwapParams {
+export interface ZeroXSwapParams {
   sellToken: string;
   buyToken: string;
   buyAmount: string;
   intentOnFilling: boolean;
 }
 
-interface ZeroXSwapResponse {
+export interface ZeroXSwapResponse {
   chainId: number;
   price: string;
   guaranteedPrice: string;

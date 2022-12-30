@@ -1,3 +1,5 @@
+import { UnknownFireblocksAssetError } from "../types/errors";
+
 interface AssetToFireblocksAssetId {
   [key: string]: {
     [key: string]: string;
@@ -44,7 +46,5 @@ export const getFireblocksAssetId = ({
   if (assetId) {
     return assetId;
   }
-  throw new Error(
-    `No Fireblocks Asset Id for Chain: ${chain} and Asset Symbol ${assetSymbol}`
-  );
+  throw UnknownFireblocksAssetError(chain, assetSymbol ?? '')
 };
