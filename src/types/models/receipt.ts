@@ -1,18 +1,25 @@
 import { Bundle, Operation, TransactionState, Transaction } from '.';
+import { getAssetDetails } from '../../utils/crypto-utils';
 
 export interface BundleReceiptResponse {
   bundleId?: string;
-  totalCost?: number;
-  currency?: string;
+  totalCosts?: {
+    assetSymbol: string;
+    amount: string;
+    decimals: number;
+  }[];
   isComplete?: boolean;
   transactionReceipts: Array<TransactionReceipt>;
 }
 
 export interface TransactionReceipt {
-  totalCost?: number;
-  assetCost?: string;
+  assetCosts?: {
+    assetSymbol: string;
+    amount: string;
+    decimals: number;
+  }[];
   gasCost?: string;
-  currency: string;
+  chain: string;
   operation: Operation;
   state?: TransactionState;
 }
@@ -25,11 +32,10 @@ export const buildBundleReceiptResponse = (
     return transactionReceipt;
   });
   const isComplete = allTransactionsComplete(transactionReceipts);
-  const totalCost = getBundleReceiptTotalCost(transactionReceipts);
+  const totalCosts = getBundleReceiptTotalCost(transactionReceipts);
   return {
     bundleId: bundle.id,
-    totalCost: isComplete ? totalCost : undefined,
-    currency: transactionReceipts[0].currency,
+    totalCosts: isComplete ? totalCosts : undefined,
     isComplete: isComplete,
     transactionReceipts: transactionReceipts
   };
@@ -41,18 +47,16 @@ export const buildTransactionReceiptResponse = (
   switch (transaction.state) {
     case TransactionState.COMPLETED: {
       return {
-        totalCost:
-          Number(transaction.cost || 0) + Number(transaction.gasCost || 0),
-        assetCost: transaction.cost || '0',
+        assetCosts: transaction.assetCosts,
         gasCost: transaction.gasCost || '0',
-        currency: transaction.chain,
+        chain: transaction.chain,
         operation: transaction.operation,
         state: TransactionState.COMPLETED
       };
     }
     default: {
       return {
-        currency: transaction.chain,
+        chain: transaction.chain,
         operation: transaction.operation,
         state: transaction.state
       };
@@ -71,12 +75,27 @@ export const allTransactionsComplete = (
 export const getBundleReceiptTotalCost = (
   transactionReceipts: Array<TransactionReceipt>
 ) => {
-  const totalCost = transactionReceipts.reduce(
-    (accumulator, transactionReceipt) => {
-      accumulator += transactionReceipt.totalCost ?? 0;
+  const totalCostDict = transactionReceipts
+    .map(t => t.assetCosts)
+    .flat()
+    .reduce<Record<string, string>>((accumulator, cost) => {
+      if (cost) {
+        if (cost.assetSymbol in accumulator) {
+          accumulator[cost.assetSymbol] = (
+            Number(accumulator[cost.assetSymbol]) + Number(cost.amount)
+          ).toString();
+        } else {
+          accumulator[cost.assetSymbol] = cost.amount;
+        }
+      }
       return accumulator;
-    },
-    0
-  );
-  return totalCost;
+    }, {});
+  const totalCosts = Object.keys(totalCostDict).map(key => {
+    return {
+      assetSymbol: key,
+      amount: totalCostDict[key],
+      decimals: getAssetDetails('mainnet', key).decimals
+    };
+  });
+  return totalCosts;
 };

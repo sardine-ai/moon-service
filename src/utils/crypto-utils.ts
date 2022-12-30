@@ -1,17 +1,19 @@
-import {
-  Erc20Token,
-} from '../types/evm';
+import { Erc20Token } from '../types/evm';
 
-interface AssetContractDetails {
+interface AssetDetails {
   [key: string]: {
     [key: string]: Erc20Token;
   };
 }
 
-const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
+const ASSET_DETAILS: AssetDetails = {
   goerli: {
+    ETH: {
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      decimals: 18
+    },
     USDC: {
-      assetContractAddress: '0x2f3A40A3db8a7e3D09B0adfEfbCe4f6F81927557',
+      assetContractAddress: '0x5FfbaC75EFc9547FBc822166feD19B05Cd5890bb',
       decimals: 6
     },
     WETH: {
@@ -20,6 +22,10 @@ const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
     }
   },
   mainnet: {
+    ETH: {
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      decimals: 18
+    },
     USDC: {
       assetContractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
       decimals: 6
@@ -30,6 +36,10 @@ const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
     }
   },
   polygon_test: {
+    MATIC: {
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      decimals: 18
+    },
     USDC: {
       assetContractAddress: '0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747',
       decimals: 6
@@ -40,6 +50,10 @@ const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
     }
   },
   polygon: {
+    MATIC: {
+      assetContractAddress: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      decimals: 18
+    },
     USDC: {
       assetContractAddress: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
       decimals: 6
@@ -51,9 +65,40 @@ const ASSET_CONTRACT_DETAILS: AssetContractDetails = {
   }
 };
 
-export const getAssetContractDetails = (
+export const getAssetDetails = (
   chain: string,
   assetSymbol: string
 ): Erc20Token => {
-  return ASSET_CONTRACT_DETAILS[chain][assetSymbol];
+  return ASSET_DETAILS[chain][assetSymbol];
+};
+
+export const amountToSmallestDenomination = (
+  amount: number,
+  decimals: number
+) => {
+  return amount * 10 ** decimals;
+};
+
+export const isNativeToken = (assetSymbol: string) => {
+  return assetSymbol == 'ETH' || assetSymbol == 'MATIC';
+};
+
+export const getNativeToken = (chain: string): string => {
+  switch (chain) {
+    case 'goerli': {
+      return 'ETH';
+    }
+    case 'mainnet': {
+      return 'ETH';
+    }
+    case 'polygon_test': {
+      return 'MATIC';
+    }
+    case 'polygon': {
+      return 'MATIC';
+    }
+    default: {
+      return 'ETH';
+    }
+  }
 };

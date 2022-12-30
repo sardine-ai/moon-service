@@ -3,7 +3,8 @@ import { v4 as uuidV4 } from 'uuid';
 export enum Operation {
   UNKNOWN = 'UNKNOWN',
   TRANSFER_FUNDS = 'TRANSFER_FUNDS',
-  BUY_NFT = 'BUY_NFT'
+  BUY_NFT = 'BUY_NFT',
+  SWAP_TOKENS = 'SWAP_TOKENS'
 }
 
 export interface Bundle {
@@ -47,10 +48,15 @@ export interface Transaction {
   executionId?: string;
   state: TransactionState;
   operation: Operation;
-  cost?: string;
+  assetCosts?: {
+    assetSymbol: string;
+    amount: string;
+    decimals: number;
+  }[];
   gasCost?: string;
+  gas?: string;
+  gasPrice?: string;
   chain: string;
-  assetSymbol: string;
   to: string;
   value?: string;
   callData?: string;

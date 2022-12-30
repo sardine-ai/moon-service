@@ -1,9 +1,12 @@
 import dotenv from 'dotenv';
-import { Chain } from "fireblocks-defi-sdk";
+import { Chain } from 'fireblocks-defi-sdk';
+import { AlchemyWeb3, createAlchemyWeb3 } from '@alch/alchemy-web3';
 
 const envFound = dotenv.config();
 if (envFound.error) {
-  console.log("⚠️  Couldn't find .env file  ⚠️ (Using pure environment variables instead)");
+  console.log(
+    "⚠️  Couldn't find .env file  ⚠️ (Using pure environment variables instead)"
+  );
 }
 
 const CHAIN_TO_ASSET_ID: { [key: string]: string } = {
@@ -14,8 +17,8 @@ const CHAIN_TO_ASSET_ID: { [key: string]: string } = {
   [Chain.BSC]: 'BNB_BSC',
   [Chain.BSC_TEST]: 'BNB_TEST',
   [Chain.POLYGON]: 'MATIC_POLYGON',
-  [Chain.MUMBAI]: 'MATIC_POLYGON_MUMBAI',
-}
+  [Chain.MUMBAI]: 'MATIC_POLYGON_MUMBAI'
+};
 
 export const CHAIN_TO_CHAIN_ID: { [key: string]: number } = {
   [Chain.MAINNET]: 1,
@@ -25,40 +28,52 @@ export const CHAIN_TO_CHAIN_ID: { [key: string]: number } = {
   [Chain.BSC]: 56,
   [Chain.BSC_TEST]: 97,
   [Chain.POLYGON]: 137,
-  [Chain.MUMBAI]: 80001,
-}
+  [Chain.MUMBAI]: 80001
+};
 
 enum EthChain {
-  MAINNET = "mainnet",
-  ROPSTEN = "ropsten",
-  RINKEBY = "rinkeby",
-  GOERLI = "goerli",
+  MAINNET = 'mainnet',
+  ROPSTEN = 'ropsten',
+  RINKEBY = 'rinkeby',
+  GOERLI = 'goerli'
 }
 
 enum PolygonChain {
-  MUMBAI = "mumbai",
-  MAINNET = "polygon",
+  MUMBAI = 'mumbai',
+  MAINNET = 'polygon'
 }
 
 enum SolanaChain {
-  MAINNET = "mainnet-beta",
-  DEVNET = "devnet",
+  MAINNET = 'mainnet-beta',
+  DEVNET = 'devnet'
 }
 
+const CHAIN_TO_0X_ENDPOINT: { [key: string]: string } = {
+  [Chain.MAINNET]: 'https://api.0x.org/',
+  [Chain.GOERLI]: 'https://api.0x.org/',
+  [Chain.POLYGON]: 'https://polygon.api.0x.org/',
+  [Chain.MUMBAI]: 'https://mumbai.api.0x.org/'
+};
+
 export interface CryptoConfig {
-  sardinePrivateKey: string,
-  sardinePublicKey: string,
-  ethRPC: string,
-  maticRPC: string,
-  ethChain: string,
-  ethChainId: number,
-  ethAssetId: string,
-  polygonChain: string,
-  polygonChainId: number,
-  polygonAssetId: string,
-  solanaChain: string,
-  openSeaNetwork: string,
-  openSeaAPIKey: string,
+  sardinePrivateKey: string;
+  sardinePublicKey: string;
+  ethRPC: string;
+  maticRPC: string;
+  ethChain: string;
+  ethChainId: number;
+  ethAssetId: string;
+  polygonChain: string;
+  polygonChainId: number;
+  polygonAssetId: string;
+  solanaChain: string;
+  openSeaAPIKey: string;
+  eth0xSwapEndpoint: string;
+  polygon0xSwapEndpoint: string;
+  stableCoin: string;
+  zeroXApiKey: string;
+  ethWeb3?: AlchemyWeb3;
+  polygonWeb3?: AlchemyWeb3;
 }
 
 const getCryptoConfig = (): CryptoConfig => {
@@ -71,15 +86,15 @@ const getCryptoConfig = (): CryptoConfig => {
   const polygonAssetId = CHAIN_TO_ASSET_ID[polygonChain];
 
   const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
+  const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || '';
 
-  const openSeaNetwork = process.env.ETH_CHAIN || EthChain.GOERLI
-  const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || ""
+  const stableCoin = process.env.STABLE_COIN || 'WETH';
 
   return {
-    sardinePrivateKey: process.env.SARDINE_PRIVATE || "",
-    sardinePublicKey: process.env.SARDINE_PUBLIC || "",
-    ethRPC: process.env.ROOT_RPC || "",
-    maticRPC: process.env.MATIC_RPC || "",
+    sardinePrivateKey: process.env.SARDINE_PRIVATE || '',
+    sardinePublicKey: process.env.SARDINE_PUBLIC || '',
+    ethRPC: process.env.ROOT_RPC || '',
+    maticRPC: process.env.MATIC_RPC || '',
     ethChain: ethChain,
     ethChainId: ethChainId,
     ethAssetId: ethAssetId,
@@ -87,9 +102,37 @@ const getCryptoConfig = (): CryptoConfig => {
     polygonChainId: polygonChainId,
     polygonAssetId: polygonAssetId,
     solanaChain: solanaChain,
-    openSeaNetwork: openSeaNetwork,
     openSeaAPIKey: openSeaAPIKey,
-  }
-}
+    eth0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[ethChain],
+    polygon0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT[polygonChain],
+    stableCoin: stableCoin,
+    zeroXApiKey: process.env.ZERO_X_API_KEY || '',
+    ethWeb3: createAlchemyWeb3(process.env.ROOT_RPC || ''),
+    polygonWeb3: createAlchemyWeb3(process.env.MATIC_RPC || '')
+  };
+};
+
+export const getTestCryptoConfig = (): CryptoConfig => {
+  return {
+    sardinePrivateKey: '',
+    sardinePublicKey: '',
+    ethRPC: '',
+    maticRPC: '',
+    ethChain: 'goerli',
+    ethChainId: 5,
+    ethAssetId: 'ETH_TEST3"',
+    polygonChain: 'mumbai',
+    polygonChainId: 80001,
+    polygonAssetId: 'MATIC_POLYGON_MUMBAI',
+    solanaChain: 'devnet',
+    openSeaAPIKey: '',
+    eth0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT['goerli'],
+    polygon0xSwapEndpoint: CHAIN_TO_0X_ENDPOINT['mumbai'],
+    stableCoin: 'WETH',
+    zeroXApiKey: '',
+    ethWeb3: undefined,
+    polygonWeb3: undefined
+  };
+};
 
 export default getCryptoConfig;
