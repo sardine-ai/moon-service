@@ -2,8 +2,9 @@ import { executeBundleUninjected } from "../../src/orchestrators";
 import { buildTransferFundsBundle } from "../../src/commands/transfer-funds";
 import { getBundle, storeBundle, updateTransaction } from "../../src/repositories/test-repository";
 import { Bundle, Operation, createBundle, TransactionState } from "../../src/types/models";
-import logger from "../../src/loaders/logger";
 import { TestTransactionSubmissionClient } from "../../src/clients/transactions";
+import { getTestCryptoConfig } from "../../src/config/crypto-config";
+import { getTestGasDetails } from "../../src/clients/transactions/gas";
 
 describe('Testing Bundle Logic', () => {
   test('it should create a Bundle', () => {
@@ -31,15 +32,14 @@ describe('Testing Bundle Logic', () => {
     expect(storedbundle).toEqual(bundle);
   })
 
-  const testTransactionSubmissionClient = new TestTransactionSubmissionClient();
+  const testCryptoConfig = getTestCryptoConfig();
+  const transactionSubmissionClient = new TestTransactionSubmissionClient(testCryptoConfig, getTestGasDetails);
   const executeBundle = executeBundleUninjected(
-    testTransactionSubmissionClient,
+    transactionSubmissionClient,
     updateTransaction,
-    logger,
   )
 
   test('it should store the bundle', async () => {
-    console.log("bundle", bundle);
     executeBundle(bundle);
     const storedbundle = await getBundle(bundle.id);
     expect(storedbundle?.transactions[0].state).toEqual(TransactionState.SUBMITTED);

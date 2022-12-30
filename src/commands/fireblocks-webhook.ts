@@ -29,7 +29,6 @@ export const handleFireblocksWebhookUninjected =
     executeBundle: ExecuteBundle
   ) =>
   async (fireblocksWebhookResponse: FireblocksWebhookResponse) => {
-    console.log(fireblocksWebhookResponse);
     const bundle = await getBundleByTransactionExecutionId(
       fireblocksWebhookResponse.data.id
     );

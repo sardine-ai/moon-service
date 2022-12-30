@@ -35,3 +35,22 @@ export const TransactionSubmittionError: ErrorBuilder = cause => {
     500
   );
 };
+
+export const BundleNotFoundError = (bundleId: string) => {
+  return new ApplicationError(
+    undefined,
+    'BundleNotFoundError',
+    `Bundle Id ${bundleId} Not Found`,
+    410
+  );
+};
+
+
+export const UnknownFireblocksAssetError = (chain: string, assetSymbol: string) => {
+  return new ApplicationError(
+    undefined,
+    'UnknownFireblocksAssetError',
+    `No Fireblocks Asset Id for Chain: ${chain} and Asset Symbol: ${assetSymbol}`,
+    410
+  );
+};
