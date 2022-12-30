@@ -6,7 +6,7 @@ import { Expose } from 'class-transformer';
 import { IsValidEvmAddress } from './decorators';
 
 const VALID_CHAINS = ['mainnet', 'goerli'];
-const VALID_TOKENS = ['ETH', 'USDC', 'WETH'];
+const VALID_TOKENS = ['ETH', 'USDC', 'WETH', 'UNI'];
 
 export class SwapTokensParams extends BaseRequest {
   @IsDefined()

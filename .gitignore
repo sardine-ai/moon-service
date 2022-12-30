@@ -7,3 +7,4 @@ server.cert
 server.key
 .vscode
 logs
+yarn-error.log

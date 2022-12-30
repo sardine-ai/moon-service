@@ -50,7 +50,7 @@ enum SolanaChain {
 
 const CHAIN_TO_0X_ENDPOINT: { [key: string]: string } = {
   [Chain.MAINNET]: 'https://api.0x.org/',
-  [Chain.GOERLI]: 'https://api.0x.org/',
+  [Chain.GOERLI]: 'https://goerli.api.0x.org/',
   [Chain.POLYGON]: 'https://polygon.api.0x.org/',
   [Chain.MUMBAI]: 'https://mumbai.api.0x.org/'
 };
@@ -88,7 +88,7 @@ const getCryptoConfig = (): CryptoConfig => {
   const solanaChain = process.env.SOLANA_CHAIN || SolanaChain.DEVNET;
   const openSeaAPIKey = process.env.OPEN_SEA_API_KEY || '';
 
-  const stableCoin = process.env.STABLE_COIN || 'WETH';
+  const stableCoin = process.env.STABLE_COIN || 'UNI';
 
   return {
     sardinePrivateKey: process.env.SARDINE_PRIVATE || '',

@@ -13,7 +13,7 @@ import { FireblocksConfig } from '../../config/fireblocks-config';
 import { CryptoConfig } from '../../config/crypto-config';
 import { EvmTransaction } from '../../types/evm';
 import { getFireblocksAssetId } from '../../utils/fireblocks-utils';
-import { formatEther, formatUnits } from 'ethers/lib/utils';
+import { formatEther } from 'ethers/lib/utils';
 import { Transaction } from '../../types/models';
 import { TransactionSubmittionError } from '../../types/errors';
 import { GetGasDetails } from './gas';
@@ -60,12 +60,12 @@ export class FireblocksClient extends TransactionSubmissionClient {
         type: PeerType.VAULT_ACCOUNT,
         id: vaultAccount.id
       },
-      priorityFee: formatUnits(
-        transaction?.maxPriorityFeePerGas || '0',
-        'gwei'
-      ),
-      maxFee: formatUnits(transaction?.maxFeePerGas || '0', 'gwei'),
-      gasLimit: transaction.gas,
+      // priorityFee: formatUnits(
+      //   transaction?.maxPriorityFeePerGas || '0',
+      //   'gwei'
+      // ),
+      // maxFee: formatUnits(transaction?.maxFeePerGas || '0', 'gwei'),
+      // gasLimit: transaction.gas,
       destination: {
         type: PeerType.ONE_TIME_ADDRESS,
         id: '',

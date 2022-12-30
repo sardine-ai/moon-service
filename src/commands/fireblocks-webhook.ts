@@ -29,9 +29,14 @@ export const handleFireblocksWebhookUninjected =
     executeBundle: ExecuteBundle
   ) =>
   async (fireblocksWebhookResponse: FireblocksWebhookResponse) => {
+    console.log(
+      'getting bundle for execution id ',
+      fireblocksWebhookResponse.data.id
+    );
     const bundle = await getBundleByTransactionExecutionId(
       fireblocksWebhookResponse.data.id
     );
+    console.log('bundle', bundle);
     if (bundle) {
       const transactionIndex = bundle.transactions.findIndex(
         transaction =>
@@ -61,7 +66,6 @@ export const handleFireblocksWebhookUninjected =
               dogstatsd.increment('transaction.completed');
               transaction = updateTransactionWithCosts(
                 transaction,
-                fireblocksWebhookResponse.data.amountInfo.netAmount,
                 fireblocksWebhookResponse.data.feeInfo.networkFee
               );
               executeBundle(bundle);
