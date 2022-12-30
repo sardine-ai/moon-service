@@ -12,12 +12,18 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "prepare": "npm run compile",
+    "prepare": "npm run compile && husky install",
     "pretest": "npm run compile",
     "posttest": "echo done",
     "test": "jest",
     "proto:gen": "protoc --plugin='./node_modules/.bin/protoc-gen-ts_proto' --ts_proto_opt=esModuleInterop=true  --ts_proto_out='./src/generated' --proto_path=..//sardine-all/src/proto/structured-logs moon_outbound_request_response.proto",
     "prettier-format": "prettier --config .prettierrc.json 'src/**/*.ts' --write"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   },
   "nodemonConfig": {
     "watch": [
@@ -83,7 +89,9 @@
     "fireblocks-defi-sdk": "^1.2.14",
     "fireblocks-sdk": "^2.4.0",
     "hot-shots": "^9.3.0",
+    "husky": "^8.0.2",
     "jsbi": "^3.0.0",
+    "lint-staged": "^13.1.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.7",
     "opensea-js": "^4.0.12",
