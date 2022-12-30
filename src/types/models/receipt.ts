@@ -1,5 +1,5 @@
 import { Bundle, Operation, TransactionState, Transaction } from '.';
-import { getAssetDetails } from '../../utils/crypto-utils';
+import { getAssetDetails, getNativeToken } from '../../utils/crypto-utils';
 
 export interface BundleReceiptResponse {
   bundleId?: string;
@@ -18,6 +18,7 @@ export interface TransactionReceipt {
     amount: string;
     decimals: number;
   }[];
+  cost?: string;
   gasCost?: string;
   chain: string;
   operation: Operation;
@@ -90,11 +91,29 @@ export const getBundleReceiptTotalCost = (
       }
       return accumulator;
     }, {});
+
+  const totalGasCost = transactionReceipts.reduce(
+    (accumulator, transactionReceipt) => {
+      accumulator += Number(transactionReceipt.gasCost);
+      return accumulator;
+    },
+    0
+  );
+
+  const nativeToken = getNativeToken(transactionReceipts[0].chain);
+  if (nativeToken in totalCostDict) {
+    totalCostDict[nativeToken] = (
+      Number(totalCostDict[nativeToken]) + totalGasCost
+    ).toString();
+  } else {
+    totalCostDict[nativeToken] = totalGasCost.toString();
+  }
+
   const totalCosts = Object.keys(totalCostDict).map(key => {
     return {
       assetSymbol: key,
       amount: totalCostDict[key],
-      decimals: getAssetDetails('mainnet', key).decimals
+      decimals: getAssetDetails(transactionReceipts[0].chain, key).decimals
     };
   });
   return totalCosts;

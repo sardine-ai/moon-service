@@ -147,7 +147,7 @@ export const storeBundleTransactions: StoreTransactions = async (
 export const updateTransaction: UpdateTransaction = async (
   transaction: Transaction
 ) => {
-  prismaClient.transaction.update({
+  await prismaClient.transaction.update({
     where: {
       id: transaction.id
     },

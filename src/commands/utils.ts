@@ -13,10 +13,14 @@ export const configureBundleTransactions = (bundle: Bundle): Bundle => {
 
 export const updateTransactionWithCosts = (
   transaction: Transaction,
-  cost: string,
   gasCost: string
 ) => {
-  let newTransaction = update(transaction, 'cost', _c => cost);
-  newTransaction = update(newTransaction, 'gasCost', _g => gasCost);
+  const newTransaction = update(transaction, 'gasCost', _g =>
+    gweiToWei(gasCost)
+  );
   return newTransaction;
+};
+
+export const gweiToWei = (gwei: string) => {
+  return (Number(gwei) * 10 ** 9).toString();
 };

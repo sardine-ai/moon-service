@@ -14,13 +14,20 @@ export type BuildSwapTransaction = (
 
 export type GetZeroXSwapData = (
   baseUrl: string,
+  chain: string,
   zeroXSwapParams: ZeroXSwapParams
 ) => Promise<any>;
 
 export const getZeroXSwapData: GetZeroXSwapData = async (
   baseUrl: string,
+  chain: string,
   { sellToken, buyToken, buyAmount, intentOnFilling }: ZeroXSwapParams
 ) => {
+  // On devnet 0X uses contract addresses instead of token symbols
+  if (chain === 'goerli') {
+    buyToken = getAssetDetails(chain, buyToken).assetContractAddress;
+    sellToken = getAssetDetails(chain, sellToken).assetContractAddress;
+  }
   const url = `${baseUrl}swap/v1/quote?sellToken=${sellToken}&buyToken=${buyToken}&buyAmount=${buyAmount}&intentOnFilling=${intentOnFilling}`;
   const data = await axios
     .get(url, {
@@ -80,20 +87,9 @@ export type BuildZeroXSwapTransaction = (
 export const buildZeroXSwapTransactionUninjected =
   (cryptoConfig: CryptoConfig, getZeroXSwapData: GetZeroXSwapData) =>
   async (zeroXSwapParams: ZeroXSwapParams) => {
-    // On devnet 0X uses contract addresses instead of token symbols
-    // if (cryptoConfig.ethChain === "goerli") {
-    //   zeroXSwapParams.buyToken = getAssetDetails(
-    //     cryptoConfig.ethChain,
-    //     zeroXSwapParams.buyToken
-    //   ).assetContractAddress;
-    //   zeroXSwapParams.sellToken = getAssetDetails(
-    //     cryptoConfig.ethChain,
-    //     zeroXSwapParams.sellToken
-    //   ).assetContractAddress;
-    // }
-
     const swapData = await getZeroXSwapData(
       cryptoConfig.eth0xSwapEndpoint,
+      cryptoConfig.ethChain,
       zeroXSwapParams
     );
     if (swapData) {
@@ -207,6 +203,7 @@ export interface ZeroXSwapResponse {
 
 export const getTestZeroXSwapData: GetZeroXSwapData = async (
   _baseUrl: string,
+  _chain: string,
   { sellToken, buyToken, buyAmount, intentOnFilling }: ZeroXSwapParams
 ) => {
   return {

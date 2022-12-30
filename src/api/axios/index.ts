@@ -19,7 +19,7 @@ const publishToPubSub = (
 axios.interceptors.request.use(
   function (config) {
     // Do something before request is sent
-    logger.error(`Sending request to ${config.url}`, config);
+    logger.info(`Sending request to ${config.url}`, config);
     return config;
   },
   function (error) {
@@ -34,7 +34,7 @@ axios.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
-    logger.error(`Response from ${response.config.url}`, response);
+    logger.info(`Response from ${response.config.url}`, response);
     publishToPubSub({
       url: response.config.url ?? '',
       method: response.config.method ?? '',

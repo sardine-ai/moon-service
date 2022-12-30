@@ -8,6 +8,7 @@ import { CryptoConfig } from '../config/crypto-config';
 import { Operation, Transaction, TransactionState } from '../types/models';
 import { NftNotFoundError } from '../types/errors';
 import { PopulatedTransaction } from 'ethers';
+import { getAssetDetails, getNativeToken } from '../utils/crypto-utils';
 
 export interface IOpenSeaClient {
   ethOpenSea: OpenSeaSDK;
@@ -67,6 +68,16 @@ export class OpenSeaClient implements IOpenSeaClient {
     return {
       id: uuidV4(),
       order: -1,
+      assetCosts: [
+        {
+          assetSymbol: getNativeToken(buyNftParams.chain),
+          amount: callData.value?.toString() ?? '0',
+          decimals: getAssetDetails(
+            buyNftParams.chain,
+            getNativeToken(buyNftParams.chain)
+          ).decimals
+        }
+      ],
       state: TransactionState.CREATED,
       to: callData.to!,
       value: callData.value?.toString(),
