@@ -2,7 +2,7 @@ export interface EvmTransaction {
   from?: string;
   to?: string;
   gas?: string;
-  gasPrice?: string; 
+  gasPrice?: string;
   maxPriorityFeePerGas?: string;
   maxFeePerGas?: string;
   data?: string;
@@ -10,7 +10,6 @@ export interface EvmTransaction {
   txNote?: string;
   chainId?: number;
   chain: string;
-  assetSymbol: string;
   nonce: number;
 }
 
@@ -29,25 +28,25 @@ export interface GasDetails {
 
 export interface PolgyonGasDetails {
   safeLow: {
-    maxPriorityFee: number,
-    maxFee: number
-  },
+    maxPriorityFee: number;
+    maxFee: number;
+  };
   standard: {
-    maxPriorityFee: number,
-    maxFee: number
-  },
+    maxPriorityFee: number;
+    maxFee: number;
+  };
   fast: {
-    maxPriorityFee: number,
-    maxFee: number
-  },
-  estimatedBaseFee: number,
-  blockTime: number,
-  blockNumber: number
+    maxPriorityFee: number;
+    maxFee: number;
+  };
+  estimatedBaseFee: number;
+  blockTime: number;
+  blockNumber: number;
 }
 
 export interface EthGasDetails {
-  fast: number,
-  fastest: number,
-  safeLow: number,
-  average: number
+  fast: number;
+  fastest: number;
+  safeLow: number;
+  average: number;
 }

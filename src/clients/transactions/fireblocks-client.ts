@@ -49,7 +49,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
     return this.fireblocks_dontCallDirectly;
   }
 
-  getTransactionArguments(
+  buildTransactionArguments(
     transaction: EvmTransaction,
     vaultAccount: FireblocksVaultAccount
   ): TransactionArguments {
@@ -83,7 +83,6 @@ export class FireblocksClient extends TransactionSubmissionClient {
       };
       txArguments.operation = TransactionOperation.CONTRACT_CALL;
     }
-    console.log('txArguments', txArguments);
     return txArguments;
   }
 
@@ -139,7 +138,7 @@ export class FireblocksClient extends TransactionSubmissionClient {
       const evmTransaction = await this.convertTransactionToEvmTransaction(
         transaction
       );
-      const txArguments = this.getTransactionArguments(
+      const txArguments = this.buildTransactionArguments(
         evmTransaction,
         vaultAccount
       );

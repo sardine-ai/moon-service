@@ -1,6 +1,5 @@
 import { Bundle, Transaction } from '../types/models';
 import { ITransactionSubmissionClient } from '../clients/transactions';
-import { Logger } from 'winston';
 import {
   TransactionReceipt,
   BundleReceiptResponse,
@@ -13,12 +12,12 @@ import {
   getNativeToken,
   isNativeToken
 } from '../utils/crypto-utils';
+import logger from '../loaders/logger';
 
 export const quoteBundleUninjected =
   (
     transactionSubmissionClient: ITransactionSubmissionClient,
     quoteTransaction: QuoteTransaction,
-    logger: Logger
   ) =>
   async (bundle: Bundle): Promise<BundleReceiptResponse> => {
     const transactionQuotes = await Promise.all(

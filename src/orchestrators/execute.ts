@@ -3,9 +3,9 @@
 import { Bundle, Transaction, TransactionState } from '../types/models';
 import { UpdateTransaction } from '../repositories/base-repository';
 import { ITransactionSubmissionClient } from '../clients/transactions';
-import { Logger } from 'winston';
 import { BundleReceiptResponse } from '../types/models/receipt';
 import { buildBundleReceiptResponse } from '../types/models/receipt';
+import logger from '../loaders/logger';
 
 export type ExecuteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>;
 export type QuoteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>;
@@ -14,7 +14,6 @@ export const executeBundleUninjected =
   (
     transactionSubmissionClient: ITransactionSubmissionClient,
     updateTransaction: UpdateTransaction,
-    logger: Logger
   ) =>
   async (bundle: Bundle): Promise<BundleReceiptResponse> => {
     let transaction = getReadyTransaction(bundle.transactions);
