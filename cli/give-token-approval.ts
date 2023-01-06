@@ -34,6 +34,7 @@ const giveTokenApproval = async () => {
   const response = await fireblocksClient.sendTransaction({
     id: '-1',
     bundleId: '-1',
+    assetCosts: [],
     order: 0,
     state: TransactionState.CREATED,
     operation: Operation.UNKNOWN,
