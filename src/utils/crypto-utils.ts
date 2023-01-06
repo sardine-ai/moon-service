@@ -83,8 +83,8 @@ export const amountToSmallestDenomination = (
   return amount * 10 ** decimals;
 };
 
-export const isNativeToken = (assetSymbol: string) => {
-  return assetSymbol == 'ETH' || assetSymbol == 'MATIC';
+export const isNativeToken = (assetSymbol: string, chain: string) => {
+  return assetSymbol === getNativeToken(chain);
 };
 
 export const getNativeToken = (chain: string): string => {

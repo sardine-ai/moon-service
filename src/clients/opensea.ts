@@ -95,6 +95,13 @@ export class TestOpenSeaClient implements IOpenSeaClient {
     return {
       id: '0',
       order: -1,
+      assetCosts: [
+        {
+          assetSymbol: 'ETH',
+          amount: '1',
+          decimals: 18
+        }
+      ],
       state: TransactionState.CREATED,
       to: buyNftParams.contractAddress,
       value: '1',

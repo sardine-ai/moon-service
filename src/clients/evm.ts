@@ -48,6 +48,7 @@ export const buildEvmTransferTransaction = ({
 }: TransferEvmFundsParams): Transaction => {
   const transaction: Transaction = {
     id: uuidV4(),
+    assetCosts: [],
     order: -1,
     state: TransactionState.CREATED,
     to: toAddress,
@@ -55,7 +56,7 @@ export const buildEvmTransferTransaction = ({
     operation: Operation.TRANSFER_FUNDS
   };
   const assetContractDetails = getAssetDetails(chain, assetSymbol);
-  if (isNativeToken(assetSymbol)) {
+  if (isNativeToken(assetSymbol, chain)) {
     const value = amountToSmallestDenomination(
       amountInAsset,
       assetContractDetails.decimals

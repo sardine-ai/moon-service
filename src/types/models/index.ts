@@ -48,7 +48,7 @@ export interface Transaction {
   executionId?: string;
   state: TransactionState;
   operation: Operation;
-  assetCosts?: {
+  assetCosts: {
     assetSymbol: string;
     amount: string;
     decimals: number;

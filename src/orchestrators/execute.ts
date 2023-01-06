@@ -8,12 +8,11 @@ import { buildBundleReceiptResponse } from '../types/models/receipt';
 import logger from '../loaders/logger';
 
 export type ExecuteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>;
-export type QuoteBundle = (bundle: Bundle) => Promise<BundleReceiptResponse>;
 
 export const executeBundleUninjected =
   (
     transactionSubmissionClient: ITransactionSubmissionClient,
-    updateTransaction: UpdateTransaction,
+    updateTransaction: UpdateTransaction
   ) =>
   async (bundle: Bundle): Promise<BundleReceiptResponse> => {
     let transaction = getReadyTransaction(bundle.transactions);
