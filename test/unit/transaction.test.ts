@@ -93,11 +93,11 @@ describe('Testing Transaction Logic', () => {
       extraParameters: {
         contractCallData: '0xcallData'
       },
-      gasLimit: '42783673707',
-      maxFee: '67.793436624',
+      // gasLimit: '42783673707',
+      // maxFee: '67.793436624',
       note: '',
       operation: 'CONTRACT_CALL',
-      priorityFee: '1.5',
+      // priorityFee: '1.5',
       source: {
         id: 'id',
         type: 'VAULT_ACCOUNT'

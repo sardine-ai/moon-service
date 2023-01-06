@@ -162,7 +162,7 @@ describe('Testing Swap Client Logic', () => {
               decimals: 6
             },
             {
-              amount: '1.4823138912789497e+21',
+              amount: '-10000',
               assetSymbol: 'ETH',
               decimals: 18
             }
